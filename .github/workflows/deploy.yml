@@ -1,0 +1,25 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - deploy # Adjust this if your branch is different
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.EC2_HOST }} # Your EC2 instance's IP or domain
+          username: ubuntu # or ec2-user, depending on your AMI
+          key: ${{ secrets.EC2_KEY }} # Your private SSH key stored in GitHub Secrets
+          script: |
+            cd /var/www/nextjs-artist-portfolio  # Adjust the path to your repository on the EC2 server
+            sudo git pull origin deploy  # Pull latest changes
+            # Continue with build and restart pm2
