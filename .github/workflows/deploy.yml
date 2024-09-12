@@ -20,8 +20,8 @@ jobs:
           username: ubuntu # or ec2-user, depending on your AMI
           key: ${{ secrets.EC2_KEY }} # Your private SSH key stored in GitHub Secrets
           script: |
-            cd /var/www/nextjs-artist-portfolio  # Adjust the path to your repository on the EC2 server
-            sudo git pull origin deploy  # Pull latest changes
+            cd /var/www/nextjs-artist-portfolio
+            sudo git pull origin deploy 
+            sudo npm install
             sudo npm run build
             pm2 restart genacourtney.com
-            # Continue with build and restart pm2
