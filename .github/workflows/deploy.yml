@@ -23,5 +23,5 @@ jobs:
             cd /var/www/nextjs-artist-portfolio  # Adjust the path to your repository on the EC2 server
             sudo git pull origin deploy  # Pull latest changes
             sudo npm run build
-            sudo pm2 restart genacourtney.com
+            pm2 restart genacourtney.com
             # Continue with build and restart pm2
