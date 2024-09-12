@@ -2,7 +2,6 @@
 
 import {
   Button,
-  Image,
   Link,
   Navbar,
   NavbarBrand,
@@ -24,11 +23,11 @@ const NavBar = () => {
 
   return (
     <Navbar
-      className="bg-black bg-opacity-60"
+      className="bg-background"
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
       isBlurred={false}
-      maxWidth="lg"
+      maxWidth="2xl"
       height="5rem"
       // shouldHideOnScroll={true}
     >
@@ -56,7 +55,7 @@ const NavBar = () => {
             radius="full"
             variant="light"
           >
-            <BsInstagram size={30} />
+            <BsInstagram size={20} />
           </Button>
         </NavbarItem>
       </NavbarContent>
