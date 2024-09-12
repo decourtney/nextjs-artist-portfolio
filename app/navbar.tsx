@@ -1,6 +1,8 @@
 "use client";
 
 import {
+  Button,
+  Image,
   Link,
   Navbar,
   NavbarBrand,
@@ -11,6 +13,7 @@ import {
   NavbarMenuToggle,
 } from "@nextui-org/react";
 import { useState } from "react";
+import { BsInstagram } from "react-icons/bs";
 
 const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,29 +24,40 @@ const NavBar = () => {
 
   return (
     <Navbar
-      className=""
+      className="bg-black bg-opacity-60"
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
       isBlurred={false}
-      maxWidth="xl"
+      maxWidth="lg"
+      height="5rem"
       // shouldHideOnScroll={true}
     >
-      <NavbarContent justify="start">
+      <NavbarContent justify="center">
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           className="md:hidden "
         />
+      </NavbarContent>
 
+      <NavbarContent justify="center">
         <NavbarBrand>
-          <p>GenaCourtney</p>
+          <p className="font-serif font-bold text-2xl">Gena Courtney</p>
         </NavbarBrand>
       </NavbarContent>
 
       <NavbarContent justify="end">
         <NavbarItem>
-          <Link href="#">
-            <p>soon</p>
-          </Link>
+          <Button
+            as={Link}
+            href="https://www.instagram.com/genacourtney/"
+            target="_blank"
+            size="lg"
+            isIconOnly
+            radius="full"
+            variant="light"
+          >
+            <BsInstagram size={30} />
+          </Button>
         </NavbarItem>
       </NavbarContent>
 
