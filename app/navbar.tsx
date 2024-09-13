@@ -23,7 +23,7 @@ const NavBar = () => {
 
   return (
     <Navbar
-      className="bg-background"
+      className="bg-[hsl(var(--nextui-background))]"
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
       isBlurred={false}
@@ -40,7 +40,9 @@ const NavBar = () => {
 
       <NavbarContent justify="center">
         <NavbarBrand>
-          <p className="font-serif font-bold text-2xl">Gena Courtney</p>
+          <p className="font-serif font-bold text-2xl text-[hsl(var(--nextui-foreground))]">
+            Gena Courtney
+          </p>
         </NavbarBrand>
       </NavbarContent>
 
