@@ -27,7 +27,7 @@ const NavBar = () => {
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
       isBlurred={false}
-      maxWidth="2xl"
+      maxWidth="xl"
       height="5rem"
       // shouldHideOnScroll={true}
     >
@@ -47,6 +47,13 @@ const NavBar = () => {
       </NavbarContent>
 
       <NavbarContent justify="end">
+        <Link href="/">
+          <p>home</p>
+        </Link>
+        <Link href="/gallery">
+          <p>gallery</p>
+        </Link>
+
         <NavbarItem>
           <Button
             as={Link}
@@ -64,8 +71,11 @@ const NavBar = () => {
 
       <NavbarMenu>
         <NavbarMenuItem>
-          <Link href="#" onPress={handleClose}>
-            <p>LINK</p>
+          <Link href="/" onPress={handleClose}>
+            <p>home</p>
+          </Link>
+          <Link href="/gallery" onPress={handleClose}>
+            <p>gallery</p>
           </Link>
         </NavbarMenuItem>
       </NavbarMenu>
