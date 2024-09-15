@@ -53,6 +53,12 @@ const NavBar = () => {
         <Link href="/gallery">
           <p>gallery</p>
         </Link>
+        <Link href="/about">
+          <p>about</p>
+        </Link>
+        <Link href="/contact">
+          <p>contact</p>
+        </Link>
 
         <NavbarItem>
           <Button
@@ -76,6 +82,12 @@ const NavBar = () => {
           </Link>
           <Link href="/gallery" onPress={handleClose}>
             <p>gallery</p>
+          </Link>
+          <Link href="/about" onPress={handleClose}>
+            <p>about</p>
+          </Link>
+          <Link href="/contact" onPress={handleClose}>
+            <p>contact</p>
           </Link>
         </NavbarMenuItem>
       </NavbarMenu>
