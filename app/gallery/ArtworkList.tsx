@@ -1,43 +1,45 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ArtworkDocument } from "@/models/Artwork";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Image } from "@nextui-org/react";
 import getArtwork from "@/lib/getArtwork";
 
-const ArtworkList = ({
-  artworkList,
-  hasMore,
-}: {
-  artworkList: ArtworkDocument[];
-  hasMore: boolean;
-}) => {
-  const [artwork, setArtwork] = useState<ArtworkDocument[]>(artworkList);
-  const [offset, setOffset] = useState(2);
+const ArtworkList = () => {
+  const [artworkList, setArtworkList] = useState<ArtworkDocument[]>([]);
+  const [offset, setOffset] = useState(1);
   const [limit, setLimit] = useState(10); // will need to change with screen size
-  const [hasMoreArtwork, setHasMoreArtwork] = useState(hasMore);
+  const [hasMoreArtwork, setHasMoreArtwork] = useState(true);
 
+  // BUG - maybe? i dont know, could be react? fetchArtwork runs twice on intial useEffect trigger but the state values are the same
+  // runs fine after that though so screw it.
   const fetchArtwork = async () => {
-    const {artwork, hasMore} = await getArtwork(offset, limit);
-
-    setArtwork((art)=>[...art, ...artwork]);
+    const { artwork, hasMore } = await getArtwork(offset, limit);
     setOffset(offset + 1);
     setHasMoreArtwork(hasMore);
-  }
+    setArtworkList([...artworkList, ...artwork]);
+  };
 
-  console.log("artworks", artwork);
+  useEffect(() => {
+    fetchArtwork();
+  }, []);
+
+  if (artworkList.length === 0) return <h3>Loading...</h3>;
+
   return (
-    <InfiniteScroll
-      dataLength={artwork.length}
-      next={fetchArtwork}
-      hasMore={hasMoreArtwork}
-      loader={<h4>Loading...</h4>}
-    >
-      {artwork.map((art: ArtworkDocument, index: number) => (
-        <Image key={index} src={art.src}></Image>
-      ))}
-    </InfiniteScroll>
+    <>
+      <InfiniteScroll
+        dataLength={artworkList.length}
+        next={fetchArtwork}
+        hasMore={hasMoreArtwork}
+        loader={<h4>Loading...</h4>}
+      >
+        {artworkList.map((art: ArtworkDocument, index: number) => (
+          <Image key={index} src={art.src}></Image>
+        ))}
+      </InfiniteScroll>
+    </>
   );
 };
 

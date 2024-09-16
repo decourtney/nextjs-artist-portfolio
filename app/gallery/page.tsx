@@ -6,12 +6,12 @@ import { NextResponse } from "next/server";
 import ArtworkList from "./ArtworkList";
 
 const GalleryPage = async () => {
-  const { artwork, hasMore } = await getArtwork(1);
+  // const { artwork, hasMore } = await getArtwork(1);
 
   return (
-    <main>
+    <main className="min-h-dvh">
       <div>
-        <ArtworkList artworkList={artwork} hasMore={hasMore}/>
+        <ArtworkList/>
       </div>
     </main>
   );
