@@ -10,7 +10,7 @@ const GalleryPage = async () => {
 
   return (
     <main className="min-h-dvh">
-      <div>
+      <div className="w-fit">
         <ArtworkList/>
       </div>
     </main>

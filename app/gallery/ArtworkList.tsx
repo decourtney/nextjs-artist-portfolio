@@ -5,15 +5,14 @@ import { ArtworkDocument } from "@/models/Artwork";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Image } from "@nextui-org/react";
 import getArtwork from "@/lib/getArtwork";
+import Masonry from "react-masonry-css";
 
 const ArtworkList = () => {
   const [artworkList, setArtworkList] = useState<ArtworkDocument[]>([]);
   const [offset, setOffset] = useState(1);
-  const [limit, setLimit] = useState(10); // will need to change with screen size
+  const [limit, setLimit] = useState(10);
   const [hasMoreArtwork, setHasMoreArtwork] = useState(true);
 
-  // BUG - maybe? i dont know, could be react? fetchArtwork runs twice on intial useEffect trigger but the state values are the same
-  // runs fine after that though so screw it.
   const fetchArtwork = async () => {
     const { artwork, hasMore } = await getArtwork(offset, limit);
     setOffset(offset + 1);
@@ -27,6 +26,13 @@ const ArtworkList = () => {
 
   if (artworkList.length === 0) return <h3>Loading...</h3>;
 
+  const breakpointColumnsObj = {
+    default: 4,
+    1100: 3,
+    700: 2,
+    500: 1,
+  };
+
   return (
     <>
       <InfiniteScroll
@@ -35,9 +41,17 @@ const ArtworkList = () => {
         hasMore={hasMoreArtwork}
         loader={<h4>Loading...</h4>}
       >
-        {artworkList.map((art: ArtworkDocument, index: number) => (
-          <Image key={index} src={art.src}></Image>
-        ))}
+        <Masonry
+          breakpointCols={breakpointColumnsObj}
+          className="flex w-auto"
+          columnClassName=""
+        >
+          {artworkList.map((art: ArtworkDocument, index: number) => (
+            <div key={index}>
+              <Image src={art.src} />
+            </div>
+          ))}
+        </Masonry>
       </InfiniteScroll>
     </>
   );
