@@ -3,9 +3,18 @@ import mongoose from "mongoose";
 export interface ArtworkDocument extends mongoose.Document {
   name: string;
   description: string;
+  category: string
   medium: string;
   src: string;
   alt: string;
+}
+
+enum CatEnum {
+  "painting",
+  "sculpture",
+  "photography",
+  "digital",
+  "mixed",
 }
 
 const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
@@ -19,6 +28,10 @@ const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
     type: String,
     required: [true, "Please provide a description."],
     maxlength: [255, "Description cannot be more than 255 characters long"],
+  },
+  category: {
+    type: String,
+    enum: CatEnum,
   },
   medium: {
     type: String,

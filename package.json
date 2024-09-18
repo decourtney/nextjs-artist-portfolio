@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@nextui-org/react": "^2.4.6",
     "framer-motion": "^11.5.4",
     "gsap": "npm:@gsap/shockingly@^3.12.5",

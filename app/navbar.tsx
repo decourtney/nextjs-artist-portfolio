@@ -40,7 +40,7 @@ const NavBar = () => {
 
       <NavbarContent justify="center">
         <NavbarBrand>
-          <p className="font-serif font-bold text-2xl text-[hsl(var(--nextui-foreground))]">
+          <p className="font-serif font-bold text-2xl">
             Gena Courtney
           </p>
         </NavbarBrand>
