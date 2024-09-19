@@ -1,6 +1,6 @@
 import CategoryList from "./CategoryList";
 
-const tempData = ["painting", "sculpture", "photography", "digital", "mixed"];
+const tempData = ["painting", "sculpture", "photography", "digital", "mixed", "all"];
 
 const GalleryPage = () => {
   return (

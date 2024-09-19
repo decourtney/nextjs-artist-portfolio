@@ -5,14 +5,20 @@ export const GET = async (
   req: NextRequest,
   ctx: { params: { category: string } }
 ) => {
-  const {} = new URL(req.url);
-  console.log("--SEARCHPARAMS--", ctx.params.category);
+  const category = ctx.params.category;
+  const offset = parseInt(req.nextUrl.searchParams.get("offset") || "0", 10);
+  const limit = parseInt(req.nextUrl.searchParams.get("limit") || "5", 10);
 
   try {
-    const artwork = await Artwork.find({ where: { category: "painting" } });
+    const query = category === "all" ? {} : { category };
 
-    return NextResponse.json({ artwork });
+    const artwork = await Artwork.find(query).skip(offset).limit(limit);
+
+    // Determine if there are more documents
+    const hasMore = artwork.length === limit;
+
+    return NextResponse.json({ artwork, hasMore });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 };

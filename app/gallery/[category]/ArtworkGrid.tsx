@@ -1,32 +1,47 @@
+// ArtworkGrid.tsx (Client Component)
 "use client";
 
 import React, { useEffect, useState } from "react";
 import { ArtworkDocument } from "@/models/Artwork";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Image } from "@nextui-org/react";
-import getArtwork from "@/lib/getArtwork";
 import Masonry from "react-masonry-css";
+import getArtwork from "@/lib/getArtwork";
 
-const ArtworkGrid = ({ artwork }: { artwork: ArtworkDocument[] }) => {
-  const [artworkList, setArtworkList] = useState<ArtworkDocument[]>([]);
-  const [offset, setOffset] = useState(1);
-  const [limit, setLimit] = useState(10);
-  const [hasMoreArtwork, setHasMoreArtwork] = useState(true);
+const ArtworkGrid = ({
+  initialArtwork,
+  category,
+  limit,
+  initialHasMore,
+}: {
+  initialArtwork: ArtworkDocument[];
+  category: string;
+  limit: number;
+  initialHasMore: boolean;
+}) => {
+  const [artworkList, setArtworkList] =
+    useState<ArtworkDocument[]>(initialArtwork);
+  const [offset, setOffset] = useState(initialArtwork.length);
+  const [hasMoreArtwork, setHasMore] = useState(initialHasMore);
 
   const fetchArtwork = async () => {
-    const { artwork, hasMore } = await getArtwork(offset, limit);
-    setOffset(offset + 1);
-    setHasMoreArtwork(hasMore);
-    setArtworkList([...artworkList, ...artwork]);
+    try {
+      const { artwork, hasMore } = await getArtwork(
+        category,
+        limit.toString(),
+        offset.toString()
+      );
+
+      setHasMore(hasMore);
+      setArtworkList((prev) => [...prev, ...artwork]);
+      setOffset((prev) => prev + artwork.length);
+    } catch (error) {
+      console.error("Failed to fetch artwork:", error);
+    }
   };
 
-  useEffect(() => {
-    fetchArtwork();
-  }, []);
+  if (artworkList.length === 0) return <p>No artwork available.</p>;
 
-  if (artworkList.length === 0) return <h3>Loading...</h3>;
-
-  // TODO - match breakpoints with tailwindcss
   const breakpointColumnsObj = {
     default: 4,
     1100: 3,

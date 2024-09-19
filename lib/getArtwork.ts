@@ -1,12 +1,15 @@
-'use server'
+// TODO - need to look a little deeper into import server components into client components
+"use server";
 
 import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import { NextRequest, NextResponse } from "next/server";
 
-const getArtwork = async (offset: number, limit?: number) => {
+const getArtwork = async (category: string, limit: string, offset?: string) => {
   // console.log("getArtwork", offset, limit);
   try {
-    const res = await fetch(`http://localhost:3000/api/artwork?offset=${offset}&limit=${limit}`);
+    const res = await fetch(
+      `http://localhost:3000/api/gallery/${category}?offset=${offset}&limit=${limit}`
+    );
 
     return res.json();
   } catch (error: any) {
