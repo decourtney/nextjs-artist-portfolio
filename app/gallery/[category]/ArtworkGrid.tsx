@@ -4,9 +4,10 @@
 import React, { useEffect, useState } from "react";
 import { ArtworkDocument } from "@/models/Artwork";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { Image } from "@nextui-org/react";
+import { Card, CardBody, Image } from "@nextui-org/react";
 import Masonry from "react-masonry-css";
-import getArtwork from "@/lib/getArtwork";
+import {getCategoryArtwork} from "@/lib/getArtwork";
+import { useRouter } from "next/navigation";
 
 const ArtworkGrid = ({
   initialArtwork,
@@ -23,10 +24,11 @@ const ArtworkGrid = ({
     useState<ArtworkDocument[]>(initialArtwork);
   const [offset, setOffset] = useState(initialArtwork.length);
   const [hasMoreArtwork, setHasMore] = useState(initialHasMore);
+  const router = useRouter();
 
   const fetchArtwork = async () => {
     try {
-      const { artwork, hasMore } = await getArtwork(
+      const { artwork, hasMore } = await getCategoryArtwork(
         category,
         limit.toString(),
         offset.toString()
@@ -59,12 +61,20 @@ const ArtworkGrid = ({
       <Masonry
         breakpointCols={breakpointColumnsObj}
         className="flex w-auto"
-        columnClassName="p-2"
+        columnClassName="p-1"
       >
         {artworkList.map((art: ArtworkDocument, index: number) => (
-          <div key={index} className="pb-4">
-            <Image src={art.src} width={"100%"} />
-          </div>
+          <Card
+            key={index}
+            isPressable
+            fullWidth
+            onPress={() => router.push(`/gallery/${category}/${art.name}`)}
+            className="my-2"
+          >
+            <CardBody className="p-0">
+              <Image src={art.src} alt={art.name} width={"100%"} />
+            </CardBody>
+          </Card>
         ))}
       </Masonry>
     </InfiniteScroll>

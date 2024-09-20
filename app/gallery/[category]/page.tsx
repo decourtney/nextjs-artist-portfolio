@@ -1,9 +1,6 @@
 import React from "react";
-import ArtworkList from "./ArtworkList";
 import ArtworkGrid from "./ArtworkGrid";
 import { ArtworkDocument } from "@/models/Artwork";
-import { resolve } from "path/posix";
-import getArtwork from "@/lib/getArtwork";
 
 // get params and perform fetch for art in category
 const CategoryPage = async ({ params }: { params: { category: string } }) => {

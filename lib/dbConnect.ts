@@ -1,10 +1,7 @@
-import mongoose from "mongoose";
+import mongoose, { Mongoose } from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI || "http://localhost:27017";
-
-declare global {
-  var mongoose: any; // This must be a `var` and not a `let / const`
-}
+const MONGODB_URI: string =
+  process.env.MONGODB_URI || "mongodb://localhost:27017";
 
 if (!MONGODB_URI) {
   throw new Error(
@@ -12,25 +9,45 @@ if (!MONGODB_URI) {
   );
 }
 
-var cached = global.mongoose;
-
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
+interface MongooseCache {
+  conn: Mongoose | null;
+  promise: Promise<Mongoose> | null;
 }
 
-async function dbConnect() {
+// Augment the NodeJS global type
+declare global {
+  namespace NodeJS {
+    interface Global {
+      _mongoose?: MongooseCache;
+    }
+  }
+}
+
+async function dbConnect(): Promise<Mongoose> {
+  // Type assertion for global
+  const globalAny = global as typeof global & { _mongoose?: MongooseCache };
+
+  let cached = globalAny._mongoose;
+
+  if (!cached) {
+    cached = { conn: null, promise: null };
+    globalAny._mongoose = cached;
+  }
+
   if (cached.conn) {
     return cached.conn;
   }
+
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
     };
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log("Db connected");
+      console.log("DB connected");
       return mongoose;
     });
   }
+
   try {
     cached.conn = await cached.promise;
   } catch (e) {
