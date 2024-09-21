@@ -1,46 +1,64 @@
 // ArtworkGrid.tsx (Client Component)
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { ArtworkDocument } from "@/models/Artwork";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Card, CardBody, Image } from "@nextui-org/react";
 import Masonry from "react-masonry-css";
-import {getCategoryArtwork} from "@/lib/getArtwork";
-import { useRouter } from "next/navigation";
+import { getCategoryArtwork } from "@/lib/getArtwork";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const ArtworkGrid = ({
-  initialArtwork,
+  artworks,
   category,
-  limit,
-  initialHasMore,
+  // limit,
+  hasMore,
+  currentPage,
 }: {
-  initialArtwork: ArtworkDocument[];
+  artworks: ArtworkDocument[];
   category: string;
-  limit: number;
-  initialHasMore: boolean;
+  // limit: number;
+  hasMore: boolean;
+  currentPage: number;
 }) => {
-  const [artworkList, setArtworkList] =
-    useState<ArtworkDocument[]>(initialArtwork);
-  const [offset, setOffset] = useState(initialArtwork.length);
-  const [hasMoreArtwork, setHasMore] = useState(initialHasMore);
+  const [artworkList, setArtworkList] = useState<ArtworkDocument[]>([]);
   const router = useRouter();
+  // const [hasMoreArtwork, setHasMore] = useState(hasMore);
+  // const [artworkList, setArtworkList] =
+  //   useState<ArtworkDocument[]>(initialArtworks);
+  // const [offset, setOffset] = useState(initialArtworks.length);
+  // const searchParams = useSearchParams();
 
-  const fetchArtwork = async () => {
-    try {
-      const { artwork, hasMore } = await getCategoryArtwork(
-        category,
-        limit.toString(),
-        offset.toString()
-      );
+  useEffect(() => {
+    setArtworkList([...artworkList, ...artworks]);
+  }, [artworks]);
 
-      setHasMore(hasMore);
-      setArtworkList((prev) => [...prev, ...artwork]);
-      setOffset((prev) => prev + artwork.length);
-    } catch (error) {
-      console.error("Failed to fetch artwork:", error);
-    }
+  const getNextPage = () => {
+    router.replace(`/gallery/${category}?page=${currentPage + 1}`, {
+      scroll: false,
+    });
   };
+
+  // const fetchArtwork = async () => {
+  //   try {
+  //     const { artworks, hasMore } = await getCategoryArtwork(
+  //       category,
+  //       limit.toString(),
+  //       offset.toString()
+  //     );
+
+  //     //  const res = await fetch(
+  //     //    `http://localhost:3000/api/gallery/${category}?offset=${offset}&limit=${limit}`
+  //     //  );
+
+  //     setHasMore(hasMore);
+  //     setArtworkList((prev) => [...prev, ...artworks]);
+  //     setOffset((prev) => prev + artworks.length);
+  //   } catch (error) {
+  //     console.error("Failed to fetch artwork:", error);
+  //   }
+  // };
 
   if (artworkList.length === 0) return <p>No artwork available.</p>;
 
@@ -54,8 +72,8 @@ const ArtworkGrid = ({
   return (
     <InfiniteScroll
       dataLength={artworkList.length}
-      next={fetchArtwork}
-      hasMore={hasMoreArtwork}
+      next={getNextPage}
+      hasMore={hasMore}
       loader={<h4>Loading...</h4>}
     >
       <Masonry

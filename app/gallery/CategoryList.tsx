@@ -1,21 +1,25 @@
-'use client';
+"use client";
 
 import useScreenSize from "@/lib/useScreenSize";
 import { Card, CardBody } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import React, { use, useEffect } from "react";
+import { categoryValues } from "@/lib/categories";
 
-const CategoryList = ({ categories }: { categories: string[] }) => {
+const CategoryList = () => {
   const router = useRouter();
   const screenSize = useScreenSize();
+
+  // Include 'all' as an additional category
+  const categories = ["all", ...categoryValues];
 
   /**
    * CURRENTLY NOT IN USE - leaving here as a reminder as an option for handling the number of artwork fetched per page
    * Adjusting the number of artworkPerPage based on screen size.
    */
-  useEffect(() => {
-    console.log("Screen size:", screenSize);
-  }, [screenSize]);
+  // useEffect(() => {
+  //   console.log("Screen size:", screenSize);
+  // }, [screenSize]);
 
   return (
     <div className="flex flex-wrap justify-around gap-4 w-3/4 h-full mx-auto">

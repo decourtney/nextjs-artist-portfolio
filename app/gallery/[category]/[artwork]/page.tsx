@@ -1,34 +1,44 @@
-"use server";
-
+// ArtworkPage.tsx
 import React from "react";
-import ArtworkDisplay from "./ArtworkDisplay";
-import { ArtworkDocument } from "@/models/Artwork";
+import { Image, Link } from "@nextui-org/react";
 
-interface ArtworkPageProps {
+const ArtworkPage = async ({
+  params,
+}: {
   params: { category: string; artwork: string };
-}
+}) => {
+  const { category, artwork: artworkName } = params;
+  const decodedArtworkName = decodeURIComponent(artworkName);
 
-const ArtworkPage = async ({ params }: ArtworkPageProps) => {
-  const { category, artwork } = params;
+  if (!decodedArtworkName || !category) return null;
 
-  // Decode the URL-encoded artworkName name
-  const decodedArtworkName = decodeURIComponent(artwork);
-
-  // Fetch artwork in the category
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/gallery/${category}/${decodedArtworkName}`,
-    { cache: "no-store" }
+    `${process.env.NEXT_PUBLIC_API_URL}/api/gallery/${category}/${decodedArtworkName}`
   );
   const data = await res.json();
-  const artworkData: ArtworkDocument = data.artwork;
 
-  // Add buttons to navigate to the next and previous artwork.
+  if (data.error) {
+    // Handle error (e.g., show a 404 page)
+    return <div>{data.error}</div>;
+  }
+
+  const { artwork, prevArtworkName, nextArtworkName } = data;
   return (
-    <main className="h-[calc(100dvh-80px)]">
-      <div className="w-[80%] mx-auto bg-blue-500">
-        <ArtworkDisplay artwork={artworkData} />
-      </div>
-    </main>
+    <div>
+      {/* Display the artwork */}
+      <h1>{artwork.name}</h1>
+      <Image src={artwork.src} alt={artwork.alt} />
+
+      {/* Navigation links */}
+      {prevArtworkName && (
+        <Link href={`/gallery/${category}/${prevArtworkName}`}>
+          Previous
+        </Link>
+      )}
+      {nextArtworkName && (
+        <Link href={`/gallery/${category}/${nextArtworkName}`}>Next</Link>
+      )}
+    </div>
   );
 };
 

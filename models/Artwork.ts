@@ -1,20 +1,13 @@
 import mongoose from "mongoose";
+import { CategoryType, categoryValues } from "@/lib/categories";
 
 export interface ArtworkDocument extends mongoose.Document {
   name: string;
   description: string;
   category: string
-  medium: string;
+  medium: CategoryType;
   src: string;
   alt: string;
-}
-
-enum CatEnum {
-  "painting",
-  "sculpture",
-  "photography",
-  "digital",
-  "mixed",
 }
 
 const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
@@ -31,7 +24,7 @@ const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
   },
   category: {
     type: String,
-    enum: CatEnum,
+    enum: categoryValues,
   },
   medium: {
     type: String,
