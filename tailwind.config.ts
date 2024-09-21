@@ -10,7 +10,7 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      colors: {},
+      backgroundImage:{"test-gradient": "linear-gradient(90deg, #FFC593 0%, #BC7198 100%);"},
     },
   },
   // darkMode: "class",
@@ -48,10 +48,10 @@ const config: Config = {
         light: {
           layout: {},
           colors: {
-            background: "#ffffff",
-            foreground: "#171717",
-            primary: "#0070f3",
-            secondary: "#ff0080",
+            background: "#F5F5F5",
+            foreground: "#229799",
+            primary: "#F5F5F5",
+            secondary: "#424242",
             // divider: "",
             // overlay: "",
             // focus: "",
@@ -64,10 +64,10 @@ const config: Config = {
         dark: {
           layout: {},
           colors: {
-            background: "#171717",
-            foreground: "#ffffff",
-            primary: "#0070f3",
-            secondary: "#ff0080",
+            background: "#229799",
+            foreground: "#48CFCB",
+            primary: "#F5F5F5",
+            secondary: "#424242",
             // divider: "",
             // overlay: "",
             // focus: "",
