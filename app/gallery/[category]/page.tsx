@@ -26,8 +26,8 @@ const CategoryPage = async ({
   searchParams: { page: string };
 }) => {
   const category = params.category;
-  const page = parseInt(searchParams.page) || 0;
-  const adjustedArtworkPerPage = artworkPerPage + 1; // Fetch one more than the limit to determine if there are more documents
+  const page = parseInt(searchParams.page || "1", 10);
+  const adjustedArtworkPerPage = artworkPerPage * page + 1; // Fetch artworks up to the current page plus 1 to determine if there are more documents
 
   // const res = await fetch(
   //   `http://localhost:3000/api/gallery/${category}?limit=${artworkPerPage}`
@@ -39,8 +39,7 @@ const CategoryPage = async ({
   const artworksData = await Artwork.find(
     category === "all" ? {} : { category }
   )
-    .skip(page * adjustedArtworkPerPage)
-    .limit(adjustedArtworkPerPage) // Fetch one more than the limit to determine if there are more documents
+    .limit(adjustedArtworkPerPage)
     .sort({ name: 1 }) // Adjust the sort field as needed
     .lean();
 

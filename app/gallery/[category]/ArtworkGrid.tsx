@@ -7,7 +7,8 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { Card, CardBody, Image } from "@nextui-org/react";
 import Masonry from "react-masonry-css";
 import { getCategoryArtwork } from "@/lib/getArtwork";
-import { useRouter, useSearchParams } from "next/navigation";
+// import { useRouter } from "next/router";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const ArtworkGrid = ({
   artworks,
@@ -24,6 +25,7 @@ const ArtworkGrid = ({
 }) => {
   const [artworkList, setArtworkList] = useState<ArtworkDocument[]>([]);
   const router = useRouter();
+  const pathName = usePathname();
   // const [hasMoreArtwork, setHasMore] = useState(hasMore);
   // const [artworkList, setArtworkList] =
   //   useState<ArtworkDocument[]>(initialArtworks);
@@ -31,14 +33,17 @@ const ArtworkGrid = ({
   // const searchParams = useSearchParams();
 
   useEffect(() => {
-    setArtworkList([...artworkList, ...artworks]);
+    setArtworkList(artworks);
+    window.history.replaceState(null, "", `${pathName}`); // Clean URL of searchParams without refreshing the page
   }, [artworks]);
 
   const getNextPage = () => {
-    router.replace(`/gallery/${category}?page=${currentPage + 1}`, {
+    router.replace(`${pathName}?page=${currentPage + 1}`, {
       scroll: false,
     });
   };
+
+  console.log("pathName:", pathName);
 
   // const fetchArtwork = async () => {
   //   try {
