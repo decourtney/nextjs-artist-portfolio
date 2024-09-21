@@ -14,7 +14,7 @@
 
 import React from "react";
 import ArtworkGrid from "./ArtworkGrid";
-import Artwork, { ArtworkDocument } from "@/models/Artwork";
+import Artwork from "@/models/Artwork";
 
 const artworkPerPage = 10;
 
@@ -55,8 +55,6 @@ const CategoryPage = async ({
       <div className="w-3/4 mx-auto">
         <ArtworkGrid
           artworks={artworks}
-          category={category}
-          // limit={artworkPerPage}
           hasMore={hasMore}
           currentPage={page}
         />

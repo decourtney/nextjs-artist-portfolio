@@ -2,10 +2,9 @@
 
 import emailjs from "@emailjs/browser";
 import { Button, Input, Textarea } from "@nextui-org/react";
-import { useInView } from "framer-motion";
 import { useTheme } from "next-themes";
 import React, { ChangeEvent, FormEvent, useState } from "react";
-import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { FaLinkedin } from "react-icons/fa";
 
 const ContactPage = () => {
   const { theme } = useTheme();
@@ -41,7 +40,7 @@ const ContactPage = () => {
     if (Object.keys(validationErrors).length === 0) {
       setIsSending(true); // Start sending process
       try {
-        const result = await emailjs.send(
+        await emailjs.send(
           serviceId,
           templateId,
           { user_name: name, user_email: email, user_message: message },

@@ -1,18 +1,16 @@
 "use client";
 
 import {
-  Button,
   Link,
   Navbar,
   NavbarBrand,
   NavbarContent,
-  NavbarItem,
   NavbarMenu,
   NavbarMenuItem,
   NavbarMenuToggle,
 } from "@nextui-org/react";
 import { useState } from "react";
-import { BsInstagram } from "react-icons/bs";
+// import { BsInstagram } from "react-icons/bs";
 
 const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -60,7 +58,7 @@ const NavBar = () => {
           <p>contact</p>
         </Link>
 
-        <NavbarItem>
+        {/* <NavbarItem>
           <Button
             as={Link}
             href="https://www.instagram.com/genacourtney/"
@@ -72,7 +70,7 @@ const NavBar = () => {
           >
             <BsInstagram size={20} />
           </Button>
-        </NavbarItem>
+        </NavbarItem> */}
       </NavbarContent>
 
       <NavbarMenu>

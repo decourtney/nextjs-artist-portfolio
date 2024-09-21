@@ -1,14 +1,14 @@
 "use client";
 
-import useScreenSize from "@/lib/useScreenSize";
 import { Card, CardBody } from "@nextui-org/react";
-import { useRouter } from "next/navigation";
-import React, { use, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import React from "react";
 import { categoryValues } from "@/lib/categories";
 
 const CategoryList = () => {
   const router = useRouter();
-  const screenSize = useScreenSize();
+  const pathName = usePathname();
+  // console.log("pathName:", pathName);
 
   // Include 'all' as an additional category
   const categories = ["all", ...categoryValues];
@@ -29,7 +29,7 @@ const CategoryList = () => {
           className="w-[300px] h-[400px]"
           isPressable
           onPress={() => {
-            router.push(`/gallery/${category}`);
+            router.push(`${pathName}/${category}`);
           }}
         >
           <CardBody>

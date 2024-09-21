@@ -1,25 +1,19 @@
 // ArtworkGrid.tsx (Client Component)
 "use client";
 
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ArtworkDocument } from "@/models/Artwork";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Card, CardBody, Image } from "@nextui-org/react";
 import Masonry from "react-masonry-css";
-import { getCategoryArtwork } from "@/lib/getArtwork";
-// import { useRouter } from "next/router";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter,  } from "next/navigation";
 
 const ArtworkGrid = ({
   artworks,
-  category,
-  // limit,
   hasMore,
   currentPage,
 }: {
   artworks: ArtworkDocument[];
-  category: string;
-  // limit: number;
   hasMore: boolean;
   currentPage: number;
 }) => {
@@ -35,7 +29,7 @@ const ArtworkGrid = ({
   useEffect(() => {
     setArtworkList(artworks);
     window.history.replaceState(null, "", `${pathName}`); // Clean URL of searchParams without refreshing the page
-  }, [artworks]);
+  }, [artworks, pathName]);
 
   const getNextPage = () => {
     router.replace(`${pathName}?page=${currentPage + 1}`, {
@@ -91,7 +85,7 @@ const ArtworkGrid = ({
             key={index}
             isPressable
             fullWidth
-            onPress={() => router.push(`/gallery/${category}/${art.name}`)}
+            onPress={() => router.replace(`${pathName}/${art.name}`)}
             className="my-2"
           >
             <CardBody className="p-0">

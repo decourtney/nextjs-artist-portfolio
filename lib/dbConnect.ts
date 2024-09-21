@@ -1,61 +1,28 @@
-import mongoose, { Mongoose } from "mongoose";
+// Importing mongoose library along with Connection type from it
+import mongoose, { Connection } from "mongoose";
 
-const MONGODB_URI: string =
-  process.env.MONGODB_URI || "mongodb://localhost:27017";
+// Declaring a variable to store the cached database connection
+let cachedConnection: Connection | null = null;
 
-if (!MONGODB_URI) {
-  throw new Error(
-    "Please define the MONGODB_URI environment variable inside .env.local"
-  );
-}
-
-interface MongooseCache {
-  conn: Mongoose | null;
-  promise: Promise<Mongoose> | null;
-}
-
-// Augment the NodeJS global type
-declare global {
-  namespace NodeJS {
-    interface Global {
-      _mongoose?: MongooseCache;
-    }
+// Function to establish a connection to MongoDB
+export default async function dbConnect() {
+  // If a cached connection exists, return it
+  if (cachedConnection) {
+    console.log("Using cached db connection");
+    return cachedConnection;
   }
-}
-
-async function dbConnect(): Promise<Mongoose> {
-  // Type assertion for global
-  const globalAny = global as typeof global & { _mongoose?: MongooseCache };
-
-  let cached = globalAny._mongoose;
-
-  if (!cached) {
-    cached = { conn: null, promise: null };
-    globalAny._mongoose = cached;
-  }
-
-  if (cached.conn) {
-    return cached.conn;
-  }
-
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log("DB connected");
-      return mongoose;
-    });
-  }
-
   try {
-    cached.conn = await cached.promise;
-  } catch (e) {
-    cached.promise = null;
-    throw e;
+    // If no cached connection exists, establish a new connection to MongoDB
+    const cnx = await mongoose.connect(process.env.MONGODB_URI!);
+    // Cache the connection for future use
+    cachedConnection = cnx.connection;
+    // Log message indicating a new MongoDB connection is established
+    console.log("New mongodb connection established");
+    // Return the newly established connection
+    return cachedConnection;
+  } catch (error) {
+    // If an error occurs during connection, log the error and throw it
+    console.log(error);
+    throw error;
   }
-
-  return cached.conn;
 }
-
-export default dbConnect;

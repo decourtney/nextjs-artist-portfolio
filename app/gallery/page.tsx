@@ -1,6 +1,5 @@
 import CategoryList from "./CategoryList";
 
-
 const GalleryPage = () => {
   return (
     <main className="min-h-dvh">
