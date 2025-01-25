@@ -51,7 +51,7 @@ const CategoryPage = async ({
   }
 
   return (
-    <main className="min-h-dvh">
+    <section className="min-h-dvh">
       <div className="w-3/4 mx-auto">
         <ArtworkGrid
           artworks={artworks}
@@ -59,7 +59,7 @@ const CategoryPage = async ({
           currentPage={page}
         />
       </div>
-    </main>
+    </section>
   );
 };
 

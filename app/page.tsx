@@ -2,7 +2,7 @@ import { Image } from "@nextui-org/react";
 
 export default function Home() {
   return (
-    <main className="w-full h-[calc(100dvh-80px)] p-4">
+    <section className="w-full h-[calc(100dvh-80px)] p-4">
       <div className="flex justify-center h-full">
         <Image
           src="images/underconstruction.webp"
@@ -11,6 +11,6 @@ export default function Home() {
           className="object-cover"
         />
       </div>
-    </main>
+    </section>
   );
 }

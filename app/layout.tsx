@@ -63,12 +63,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable}`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Providers>
           <Navbar />
-          {children}
+          <main> {children}</main>
           <Footer />
         </Providers>
       </body>

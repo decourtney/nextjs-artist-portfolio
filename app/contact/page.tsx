@@ -80,7 +80,7 @@ const ContactPage = () => {
     };
 
   return (
-    <main id="contact" className="">
+    <section id="contact" className="">
       <div className="w-full items-center my-12 text-9xl text-center text-[hsl(var(--nextui-primary))]">
         <h1>CONTACT</h1>
       </div>
@@ -156,7 +156,7 @@ const ContactPage = () => {
           </Button>
         </div>
       </div>
-    </main>
+    </section>
   );
 };
 
