@@ -1,10 +1,20 @@
 "use client";
 
-import React, { useState, ChangeEvent } from "react";
-import { Button, ButtonGroup, Input } from "@heroui/react";
+import React, { useState, ChangeEvent, useRef } from "react";
+import { Button } from "@heroui/react";
 
-const UploadForm: React.FC = () => {
+// Use a plain HTML input for the file picker, hidden via CSS.
+// The rest of the UI (choose files, remove file, cancel, etc.) is fully customizable.
+
+const CustomFilePicker = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+  // Reference the hidden <input type="file" /> so we can trigger it programmatically.
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleOpenFileDialog = () => {
+    fileInputRef.current?.click();
+  };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -20,13 +30,11 @@ const UploadForm: React.FC = () => {
   };
 
   const handleCancel = () => {
-    // Clear all selected files
     setSelectedFiles([]);
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    // Prevent the default browser form submit
-    event.preventDefault();
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
     if (selectedFiles.length === 0) {
       alert("Please select at least one file first.");
@@ -43,13 +51,11 @@ const UploadForm: React.FC = () => {
         method: "POST",
         body: formData,
       });
-
       if (!response.ok) {
         throw new Error(`Upload failed: ${response.statusText}`);
       }
 
       alert("Files uploaded successfully!");
-      // Clear the file list after successful upload
       setSelectedFiles([]);
     } catch (error) {
       console.error(error);
@@ -59,21 +65,18 @@ const UploadForm: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-[800px] mx-auto">
-      <div className="w-fit">
-        <Input
-          type="file"
-          multiple
-          accept="image/*"
-          onChange={handleFileChange}
-          // variant=""
-          classNames={{
-            label:"",
-            input:["w-full cursor-pointer"],
-            innerWrapper:"",
-            inputWrapper:"",
-          }}
-        />
-      </div>
+      {/* 1) Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        accept="image/*"
+        style={{ display: "none" }}
+        onChange={handleFileChange}
+      />
+
+      {/* 2) Custom button to open the file picker */}
+      <Button onPress={handleOpenFileDialog}>Choose Files</Button>
 
       {/* Display the list of selected file names with remove buttons */}
       {selectedFiles.length > 0 && (
@@ -97,17 +100,16 @@ const UploadForm: React.FC = () => {
       )}
 
       <div className="flex items-center space-x-4 mt-4">
-        <ButtonGroup>
-          {/* Cancel Button */}
-          <Button variant="solid" color="danger" onPress={handleCancel}>
-            Cancel
-          </Button>
-          {/* Submit (Upload) Button */}
-          <Button type="submit">Upload</Button>
-        </ButtonGroup>
+        {/* Cancel Button */}
+        <Button variant="solid" color="danger" onPress={handleCancel}>
+          Cancel
+        </Button>
+
+        {/* Submit (Upload) Button */}
+        <Button type="submit">Upload</Button>
       </div>
     </form>
   );
 };
 
-export default UploadForm;
+export default CustomFilePicker;

@@ -1,7 +1,6 @@
-import { Image } from "@heroui/react"; 
+import { Image } from "@heroui/react";
 
-
-export default function Home() {
+const HomePage = () => {
   return (
     <div className="flex justify-center h-full">
       <Image
@@ -12,4 +11,6 @@ export default function Home() {
       />
     </div>
   );
-}
+};
+
+export default HomePage;

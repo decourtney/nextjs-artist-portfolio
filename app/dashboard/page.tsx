@@ -1,12 +1,12 @@
 import React from 'react'
-import UploadForm from './UploadForm'
+import CustomFilePicker from './CustomFilePicker'
 
 const DashboardPage = () => {
   return (
     <div>
-      <UploadForm />
+      <CustomFilePicker />
     </div>
-  )
+  );
 }
 
 export default DashboardPage
