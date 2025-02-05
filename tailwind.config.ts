@@ -1,22 +1,24 @@
 import type { Config } from "tailwindcss";
-import { nextui } from "@nextui-org/react";
+import { heroui } from "@heroui/react";
 
 const config: Config = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
-      backgroundImage:{"test-gradient": "linear-gradient(90deg, #FFC593 0%, #BC7198 100%);"},
+      backgroundImage: {
+        "test-gradient": "linear-gradient(90deg, #FFC593 0%, #BC7198 100%);",
+      },
     },
   },
-  // darkMode: "class",
+  darkMode: "class",
   plugins: [
-    nextui({
-      prefix: "nextui", // prefix for themes variables
+    heroui({
+      prefix: "heroui", // prefix for themes variables
       addCommonColors: true, // override common colors (e.g. "blue", "green", "pink").
       layout: {
         dividerWeight: "1px", // h-divider the default height applied to the divider component

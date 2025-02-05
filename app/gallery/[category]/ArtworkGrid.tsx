@@ -4,9 +4,9 @@
 import React, { useEffect, useState } from "react";
 import { ArtworkDocument } from "@/models/Artwork";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { Card, CardBody, Image } from "@nextui-org/react";
+import { Card, CardBody, Image } from "@heroui/react";
 import Masonry from "react-masonry-css";
-import { usePathname, useRouter,  } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const ArtworkGrid = ({
   artworks,

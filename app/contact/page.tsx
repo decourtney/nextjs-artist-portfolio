@@ -1,7 +1,7 @@
 "use client";
 
 import emailjs from "@emailjs/browser";
-import { Button, Input, Textarea } from "@nextui-org/react";
+import { Button, Input, Textarea } from "@heroui/react";
 import { useTheme } from "next-themes";
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { FaLinkedin } from "react-icons/fa";

@@ -8,7 +8,7 @@ import {
   NavbarMenu,
   NavbarMenuItem,
   NavbarMenuToggle,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useState } from "react";
 // import { BsInstagram } from "react-icons/bs";
 
