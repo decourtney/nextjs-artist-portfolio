@@ -6,7 +6,7 @@ import { Button } from "@heroui/react";
 // Use a plain HTML input for the file picker, hidden via CSS.
 // The rest of the UI (choose files, remove file, cancel, etc.) is fully customizable.
 
-const CustomFilePicker = () => {
+const FilePicker = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   // Reference the hidden <input type="file" /> so we can trigger it programmatically.
@@ -64,8 +64,11 @@ const CustomFilePicker = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-[800px] mx-auto">
-      {/* 1) Hidden file input */}
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-[800px] m-2 shadow-md rounded-md bg-slate-50"
+    >
+      {/* Hidden input */}
       <input
         ref={fileInputRef}
         type="file"
@@ -75,41 +78,56 @@ const CustomFilePicker = () => {
         onChange={handleFileChange}
       />
 
-      {/* 2) Custom button to open the file picker */}
-      <Button onPress={handleOpenFileDialog}>Choose Files</Button>
-
       {/* Display the list of selected file names with remove buttons */}
-      {selectedFiles.length > 0 && (
-        <div className="mt-4">
-          <h3>Selected Files:</h3>
-          <ul className="list-disc list-inside space-y-2">
-            {selectedFiles.map((file, index) => (
-              <li key={index} className="flex items-center justify-between">
-                <span>{file.name}</span>
-                <Button
-                  variant="solid"
-                  color="danger"
-                  onPress={() => handleRemoveFile(index)}
+      <div className="min-h-[200px] max-h-[500px] overflow-y-scroll scrollbar-hide text-center rounded-lg">
+        {selectedFiles.length > 0 ? (
+          <>
+            <h3 className="px-4 py-1 bg-slate-200">
+              Selected Files
+            </h3>
+            <ul className="[&>*:nth-child(even)]:bg-slate-200">
+              {selectedFiles.map((file, index) => (
+                <li
+                  key={index}
+                  className="flex justify-between items-center pr-1 pl-2 py-1"
                 >
-                  Remove
-                </Button>
-              </li>
-            ))}
-          </ul>
+                  <span className="truncate">{file.name}</span>
+                  <Button
+                    size="sm"
+                    variant="solid"
+                    color="danger"
+                    onPress={() => handleRemoveFile(index)}
+                  >
+                    remove
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <div className="h-[200px] content-center">
+            <span>No files selected</span>
+          </div>
+        )}
+      </div>
+
+      <div className="flex justify-between p-2">
+        {/* Custom button to open the file picker */}
+        <Button onPress={handleOpenFileDialog}>Choose Files</Button>
+
+        <div className="space-x-4">
+          {/* Cancel Button */}
+          <Button variant="solid" color="danger" onPress={handleCancel}>
+            Cancel
+          </Button>
+          {/* Submit (Upload) Button */}
+          <Button type="submit" color="success" disabled={selectedFiles.length === 0} className="disabled:bg-gray-400">
+            Upload
+          </Button>
         </div>
-      )}
-
-      <div className="flex items-center space-x-4 mt-4">
-        {/* Cancel Button */}
-        <Button variant="solid" color="danger" onPress={handleCancel}>
-          Cancel
-        </Button>
-
-        {/* Submit (Upload) Button */}
-        <Button type="submit">Upload</Button>
       </div>
     </form>
   );
 };
 
-export default CustomFilePicker;
+export default FilePicker;

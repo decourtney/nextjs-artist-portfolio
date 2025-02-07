@@ -4,7 +4,7 @@ import { BsInstagram } from "react-icons/bs";
 
 const Footer = () => {
   return (
-    <footer className=" bg-secondary">
+    <footer className="flex  bg-secondary">
       <div className="  ">
         <p>© 2024 Gena Courtney</p>
         <Button

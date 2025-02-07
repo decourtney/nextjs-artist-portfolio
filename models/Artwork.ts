@@ -7,6 +7,7 @@ export interface ArtworkDocument extends mongoose.Document {
   category: string
   medium: CategoryType;
   src: string;
+  thumbSrc: string;
   alt: string;
 }
 
@@ -32,6 +33,11 @@ const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
     maxlength: [40, "Medium cannot be more than 40 characters long"],
   },
   src: {
+    type: String,
+    // required: [true, "Please provide a source."],
+    maxlength: [255, "Source cannot be more than 255 characters long"],
+  },
+  thumbSrc:{
     type: String,
     // required: [true, "Please provide a source."],
     maxlength: [255, "Source cannot be more than 255 characters long"],

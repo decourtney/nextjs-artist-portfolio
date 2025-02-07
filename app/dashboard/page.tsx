@@ -1,10 +1,10 @@
 import React from 'react'
-import CustomFilePicker from './CustomFilePicker'
+import FilePicker from './FilePicker'
 
 const DashboardPage = () => {
   return (
-    <div>
-      <CustomFilePicker />
+    <div className=''>
+      <FilePicker />
     </div>
   );
 }

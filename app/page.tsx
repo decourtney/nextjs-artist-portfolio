@@ -7,7 +7,7 @@ const HomePage = () => {
         src="images/underconstruction.webp"
         alt="Under Construction"
         removeWrapper
-        className="object-cover"
+        className="object-cover rounded-none"
       />
     </div>
   );
