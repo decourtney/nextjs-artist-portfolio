@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  S3Client,
-  CompleteMultipartUploadCommandOutput,
-  DeleteObjectCommand,
-} from "@aws-sdk/client-s3";
+import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import Busboy from "busboy";
 import dbConnect from "@/lib/dbConnect";
@@ -11,7 +7,7 @@ import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import sharp from "sharp";
 import { Readable } from "stream";
 
-// Initialize S3 client
+// Create S3 client
 const s3Client = new S3Client({
   region: process.env.NEXT_PUBLIC_AWS_REGION,
   credentials: {
@@ -20,7 +16,7 @@ const s3Client = new S3Client({
   },
 });
 
-// Helper: Convert Next.js ReadableStream to Node.js Readable
+// Utility: Convert a Next.js ReadableStream to Node.js Readable
 function streamToNodeReadable(stream: ReadableStream<Uint8Array>): Readable {
   const reader = stream.getReader();
   return new Readable({
@@ -46,8 +42,9 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// This interface describes the data we'll store for each uploaded file
+// Enhanced interface to also track a UUID for each file
 interface PendingImageData {
+  id: string; // The UUID passed from the client
   truncatedBaseName: string;
   fileBuffer: Buffer;
   mainKey: string;
@@ -69,51 +66,54 @@ export async function POST(request: NextRequest) {
     }
 
     const busboy = Busboy({ headers: { "content-type": contentType } });
-
-    // We'll accumulate data here, but not upload immediately
     const pendingImages: PendingImageData[] = [];
-    const formFields: Record<string, string> = {};
+
+    // We'll store the UUIDs in an array in the order they appear
+    const uuids: string[] = [];
+    let fileIndex = 0;
 
     return new Promise<NextResponse>((resolve, reject) => {
+      // Collect any form fields (including "uuids")
       busboy.on("field", (fieldname, value) => {
-        formFields[fieldname] = value;
+        // Each "uuids" field corresponds to one file in the same order
+        if (fieldname === "uuids") {
+          uuids.push(value);
+        }
       });
 
-      // For each file in the form
+      // Collect file data
       busboy.on("file", (fieldname, fileStream, info) => {
-        const { filename, mimeType } = info;
+        const { filename } = info;
         const folderPath = process.env.NEXT_PUBLIC_AWS_IMAGES_FOLDER || "";
 
-        // Figure out base name
         const extensionIndex = filename.lastIndexOf(".");
         const baseName =
           extensionIndex !== -1
             ? filename.substring(0, extensionIndex)
             : filename;
-
         const truncatedBaseName =
           baseName.length > 60 ? baseName.substring(0, 60) : baseName;
 
-        // We'll store them as .webp
         const mainKey = `${folderPath}${truncatedBaseName}.webp`;
         const thumbKey = `${folderPath}${truncatedBaseName}-thumb.webp`;
-
         const mainUrl = `https://${process.env.NEXT_PUBLIC_AWS_S3_BUCKET}.s3.${process.env.NEXT_PUBLIC_AWS_REGION}.amazonaws.com/${mainKey}`;
         const thumbUrl = `https://${process.env.NEXT_PUBLIC_AWS_S3_BUCKET}.s3.${process.env.NEXT_PUBLIC_AWS_REGION}.amazonaws.com/${thumbKey}`;
 
-        // Gather the file data (into memory)
-                const chunks: Uint8Array[] = [];
+        // Collect file into memory
+        const chunks: Uint8Array[] = [];
+        fileStream.on("data", (chunk) => {
+          chunks.push(chunk as Uint8Array);
+        });
 
-                fileStream.on("data", (chunk) => {
-                  chunks.push(chunk as Uint8Array);
-                });
+        fileStream.on("end", () => {
+          // Match this file with the next UUID in order
+          const assignedId = uuids[fileIndex] || "NO_ID_FOUND";
+          fileIndex++;
 
-        fileStream.on("end", async () => {
-          // Store this file's data for later processing
-          const fileBuffer = Buffer.concat(chunks);
           pendingImages.push({
+            id: assignedId,
             truncatedBaseName,
-            fileBuffer,
+            fileBuffer: Buffer.concat(chunks),
             mainKey,
             thumbKey,
             mainUrl,
@@ -132,29 +132,45 @@ export async function POST(request: NextRequest) {
         });
       });
 
-      // All fields/files have been processed
+      // When all fields/files have been processed
       busboy.on("finish", async () => {
-        // At this point, we have data for all uploaded files
-        try {
-          // 1) Convert & Upload all images
-          //    We'll keep track of successfully uploaded S3 keys for possible rollback
-          const uploadedKeys: string[] = [];
+        const successes: Array<{
+          id: string;
+          mainUrl: string;
+          thumbUrl: string;
+          message: string;
+        }> = [];
+        const failures: Array<{
+          id: string;
+          message: string;
+          error: string;
+        }> = [];
 
-          for (const item of pendingImages) {
-            const { fileBuffer, mainKey, thumbKey } = item;
+        // Process each file
+        for (const item of pendingImages) {
+          const {
+            id,
+            truncatedBaseName,
+            fileBuffer,
+            mainKey,
+            thumbKey,
+            mainUrl,
+            thumbUrl,
+          } = item;
 
+          try {
             // Convert to main WebP
             const mainWebpBuffer = await sharp(fileBuffer)
               .webp({ quality: 80 })
               .toBuffer();
 
-            // Thumbnail WebP
+            // Convert to thumb WebP (400px wide)
             const thumbWebpBuffer = await sharp(fileBuffer)
               .resize(400)
               .webp({ quality: 80 })
               .toBuffer();
 
-            // Upload main
+            // Upload main image to S3
             const mainUpload = new Upload({
               client: s3Client,
               params: {
@@ -165,9 +181,8 @@ export async function POST(request: NextRequest) {
               },
             });
             await mainUpload.done();
-            uploadedKeys.push(mainKey);
 
-            // Upload thumb
+            // Upload thumbnail to S3
             const thumbUpload = new Upload({
               client: s3Client,
               params: {
@@ -178,57 +193,64 @@ export async function POST(request: NextRequest) {
               },
             });
             await thumbUpload.done();
-            uploadedKeys.push(thumbKey);
-          }
 
-          // 2) If all uploads succeeded, insert DB docs
-          const artworksToInsert: ArtworkDocument[] = pendingImages.map(
-            (item) => {
-              return new Artwork({
-                name: item.truncatedBaseName,
-                src: item.mainUrl,
-                alt: item.truncatedBaseName,
-                thumbSrc: item.thumbUrl,
-              });
+            // Insert a document into MongoDB
+            const artworkDoc = new Artwork({
+              name: truncatedBaseName,
+              src: mainUrl,
+              alt: truncatedBaseName,
+              thumbSrc: thumbUrl,
+            });
+            await artworkDoc.save();
+
+            successes.push({
+              id, // Return the UUID so client knows which file succeeded
+              mainUrl,
+              thumbUrl,
+              message: "Upload succeeded",
+            });
+          } catch (err) {
+            console.error("Error uploading or inserting doc:", err);
+
+            // Cleanup S3 if the file was partially uploaded
+            try {
+              await s3Client.send(
+                new DeleteObjectCommand({
+                  Bucket: process.env.NEXT_PUBLIC_AWS_S3_BUCKET!,
+                  Key: mainKey,
+                })
+              );
+            } catch (cleanupErr) {
+              console.error(
+                "Failed to delete mainKey during cleanup:",
+                cleanupErr
+              );
             }
-          );
 
-          await Artwork.insertMany(artworksToInsert);
+            try {
+              await s3Client.send(
+                new DeleteObjectCommand({
+                  Bucket: process.env.NEXT_PUBLIC_AWS_S3_BUCKET!,
+                  Key: thumbKey,
+                })
+              );
+            } catch (cleanupErr) {
+              console.error(
+                "Failed to delete thumbKey during cleanup:",
+                cleanupErr
+              );
+            }
 
-          // 3) If DB insert succeeded, we’re done
-          resolve(
-            NextResponse.json(
-              { message: "Files uploaded and converted successfully" },
-              { status: 200 }
-            )
-          );
-        } catch (error: any) {
-          console.error("Error in upload or DB insert:", error);
-
-          // If the DB fails or any image upload fails in the process,
-          // we can do a rollback for any images that were uploaded.
-
-          // Because we do the uploading in a loop, we only keep track of
-          // keys that actually succeeded. We delete those from S3 now.
-          if (error.name === "ValidationError") {
-            // Possibly a Mongoose validation error
-            await rollbackS3Uploads(pendingImages);
-            reject(
-              NextResponse.json(
-                { message: "Validation Error", errors: error.errors },
-                { status: 400 }
-              )
-            );
-          } else {
-            await rollbackS3Uploads(pendingImages);
-            reject(
-              NextResponse.json(
-                { message: "Error uploading files or saving to DB" },
-                { status: 500 }
-              )
-            );
+            failures.push({
+              id, // Return the UUID so client can identify which file failed
+              message: "Upload failed",
+              error: String(err),
+            });
           }
         }
+
+        // Return info about which uploads succeeded / failed
+        resolve(NextResponse.json({ successes, failures }, { status: 200 }));
       });
 
       busboy.on("error", (error) => {
@@ -241,7 +263,7 @@ export async function POST(request: NextRequest) {
         );
       });
 
-      // If no body, reject
+      // No body => can't proceed
       if (!request.body) {
         reject(
           NextResponse.json({ error: "No request body" }, { status: 400 })
@@ -249,7 +271,7 @@ export async function POST(request: NextRequest) {
         return;
       }
 
-      // Pipe the incoming request stream into Busboy
+      // Stream the request body into Busboy
       const reader = request.body.getReader();
       const stream = new ReadableStream({
         async pull(controller) {
@@ -261,38 +283,12 @@ export async function POST(request: NextRequest) {
           }
         },
       });
+
       const nodeStream = streamToNodeReadable(stream);
       nodeStream.pipe(busboy);
     });
   } catch (error) {
     console.error("Unexpected error:", error);
     return NextResponse.json({ message: "Server error" }, { status: 500 });
-  }
-}
-
-/**
- * Utility function to delete the images we just uploaded if something fails
- */
-async function rollbackS3Uploads(pendingImages: PendingImageData[]) {
-  for (const item of pendingImages) {
-    try {
-      // main
-      await s3Client.send(
-        new DeleteObjectCommand({
-          Bucket: process.env.NEXT_PUBLIC_AWS_S3_BUCKET!,
-          Key: item.mainKey,
-        })
-      );
-      // thumb
-      await s3Client.send(
-        new DeleteObjectCommand({
-          Bucket: process.env.NEXT_PUBLIC_AWS_S3_BUCKET!,
-          Key: item.thumbKey,
-        })
-      );
-    } catch (err) {
-      console.error("Rollback delete error:", err);
-      // Not much else to do if rollback fails
-    }
   }
 }
