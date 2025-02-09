@@ -2,6 +2,7 @@
 
 import React, { useState, ChangeEvent, useRef, FormEvent } from "react";
 import { Button } from "@heroui/react";
+import { MdClose } from "react-icons/md";
 
 interface FileItem {
   id: string; // A unique UUID for each file
@@ -21,13 +22,26 @@ const FilePicker = () => {
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      const newFiles = Array.from(event.target.files).map((file) => ({
-        id: crypto.randomUUID(), // A new UUID for each file
-        file,
-        name: file.name,
-        status: "idle" as const,
-      }));
-      setSelectedFiles((prev) => [...prev, ...newFiles]);
+      setSelectedFiles((prev) => {
+        // Build a set of "filename##size" to quickly detect duplicates
+        const existingNameSizeSet = new Set(
+          prev.map((fileItem) => `${fileItem.name}##${fileItem.file.size}`)
+        );
+
+        const filteredNewFiles = Array.from(event.target.files!)
+          .filter((file) => {
+            const nameSizeKey = `${file.name}##${file.size}`;
+            return !existingNameSizeSet.has(nameSizeKey);
+          })
+          .map((file) => ({
+            id: crypto.randomUUID(),
+            file,
+            name: file.name,
+            status: "idle" as const,
+          }));
+
+        return [...prev, ...filteredNewFiles];
+      });
     }
   };
 
@@ -66,7 +80,6 @@ const FilePicker = () => {
 
       // Expecting shape: { successes: [{ id, ... }], failures: [{ id, ... }] }
       const data = await response.json();
-      console.log("Server response", data);
 
       // 1) Remove successful files by matching their UUID
       if (data.successes) {
@@ -90,7 +103,7 @@ const FilePicker = () => {
               return {
                 ...fileItem,
                 status: "error",
-                errorMessage: failure.error || failure.message,
+                errorMessage: failure.message || failure.error,
               };
             }
             return fileItem;
@@ -120,11 +133,14 @@ const FilePicker = () => {
         onChange={handleFileChange}
       />
 
-      <div className="min-h-[200px] max-h-[500px] overflow-y-scroll text-center rounded-lg">
+      <div className="min-h-[200px] max-h-[500px] overflow-y-scroll rounded-lg">
         {selectedFiles.length > 0 ? (
           <>
-            <h3 className="px-4 py-1 bg-slate-200">Selected Files</h3>
-            <ul className="[&>*:nth-child(even)]:bg-slate-200">
+            <h3 className="px-4 py-1 text-center bg-slate-200">
+              <span>{selectedFiles.length} </span>Selected File
+              {selectedFiles.length > 1 ? <span>s</span> : null}
+            </h3>
+            <ul className="[&>*:nth-child(even)]:bg-slate-100">
               {selectedFiles.map((item, index) => {
                 const itemStyle =
                   item.status === "error" ? "text-red-700 font-bold" : "";
@@ -132,25 +148,27 @@ const FilePicker = () => {
                 return (
                   <li
                     key={item.id}
-                    className={`flex justify-between items-center pr-1 pl-2 py-1 ${itemStyle}`}
+                    className={`flex justify-between items-center pr-1 pl-2 py-1`}
                   >
-                    <div className="truncate">
-                      <span>{item.name}</span>
-                      {item.status === "error" && item.errorMessage ? (
-                        <span className="ml-2 text-xs font-medium">
-                          ({item.errorMessage})
-                        </span>
-                      ) : null}
-                    </div>
+                    <span className="truncate"> {item.name}</span>
 
-                    <Button
-                      size="sm"
-                      variant="solid"
-                      color="danger"
-                      onPress={() => handleRemoveFile(index)}
-                    >
-                      remove
-                    </Button>
+                    {item.status === "error" && item.errorMessage ? (
+                      <span className="ml-1 px-1 text-red-500 bg-red-100 whitespace-nowrap">
+                        {item.errorMessage}
+                      </span>
+                    ) : null}
+
+                    <div className="border-l-1">
+                      <Button
+                        isIconOnly
+                        size="sm"
+                        radius="full"
+                        className="bg-transparent text-secondary"
+                        onPress={() => handleRemoveFile(index)}
+                      >
+                        <MdClose />
+                      </Button>
+                    </div>
                   </li>
                 );
               })}
@@ -164,16 +182,19 @@ const FilePicker = () => {
       </div>
 
       <div className="flex justify-between p-2">
-        <Button onPress={handleOpenFileDialog}>Choose Files</Button>
+        <Button size="sm" onPress={handleOpenFileDialog}>
+          Choose Files
+        </Button>
 
         <div className="space-x-4">
-          <Button variant="solid" color="danger" onPress={handleCancel}>
+          <Button color="danger" size="sm" onPress={handleCancel}>
             Cancel
           </Button>
           <Button
             type="submit"
             color="success"
-            disabled={selectedFiles.length === 0}
+            size="sm"
+            isDisabled={selectedFiles.length === 0}
             className="disabled:bg-gray-400"
           >
             Upload

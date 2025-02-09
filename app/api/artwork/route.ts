@@ -42,9 +42,8 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// Enhanced interface to also track a UUID for each file
 interface PendingImageData {
-  id: string; // The UUID passed from the client
+  id: string; // The UUID for tracking success/fail uploads
   truncatedBaseName: string;
   fileBuffer: Buffer;
   mainKey: string;
@@ -133,6 +132,8 @@ export async function POST(request: NextRequest) {
       });
 
       // When all fields/files have been processed
+      // In busboy.on("finish", async () => { ... }):
+
       busboy.on("finish", async () => {
         const successes: Array<{
           id: string;
@@ -159,18 +160,34 @@ export async function POST(request: NextRequest) {
           } = item;
 
           try {
-            // Convert to main WebP
+            // 1) Check if artwork already exists in MongoDB by name
+            //    (Or whichever field you want to compare)
+            const existingDoc = await Artwork.findOne({
+              name: truncatedBaseName,
+            });
+
+            if (existingDoc) {
+              // Duplicate => skip S3 upload
+              failures.push({
+                id,
+                message: "Duplicate name found",
+                error: `An artwork with name (“${existingDoc.name}”) already exists.`,
+              });
+              continue; // move to the next file
+            }
+
+            // 2) Convert to main WebP
             const mainWebpBuffer = await sharp(fileBuffer)
               .webp({ quality: 80 })
               .toBuffer();
 
-            // Convert to thumb WebP (400px wide)
+            // 3) Convert to thumb WebP (400px wide)
             const thumbWebpBuffer = await sharp(fileBuffer)
               .resize(400)
               .webp({ quality: 80 })
               .toBuffer();
 
-            // Upload main image to S3
+            // 4) Upload main image to S3
             const mainUpload = new Upload({
               client: s3Client,
               params: {
@@ -182,7 +199,7 @@ export async function POST(request: NextRequest) {
             });
             await mainUpload.done();
 
-            // Upload thumbnail to S3
+            // 5) Upload thumbnail to S3
             const thumbUpload = new Upload({
               client: s3Client,
               params: {
@@ -194,7 +211,7 @@ export async function POST(request: NextRequest) {
             });
             await thumbUpload.done();
 
-            // Insert a document into MongoDB
+            // 6) Insert a document into MongoDB
             const artworkDoc = new Artwork({
               name: truncatedBaseName,
               src: mainUrl,
@@ -204,7 +221,7 @@ export async function POST(request: NextRequest) {
             await artworkDoc.save();
 
             successes.push({
-              id, // Return the UUID so client knows which file succeeded
+              id,
               mainUrl,
               thumbUrl,
               message: "Upload succeeded",
@@ -212,7 +229,7 @@ export async function POST(request: NextRequest) {
           } catch (err) {
             console.error("Error uploading or inserting doc:", err);
 
-            // Cleanup S3 if the file was partially uploaded
+            // Attempt to clean up S3 if partially uploaded
             try {
               await s3Client.send(
                 new DeleteObjectCommand({
@@ -242,7 +259,7 @@ export async function POST(request: NextRequest) {
             }
 
             failures.push({
-              id, // Return the UUID so client can identify which file failed
+              id,
               message: "Upload failed",
               error: String(err),
             });
