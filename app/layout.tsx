@@ -58,15 +58,19 @@ export const viewport: Viewport = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en" suppressHydrationWarning={true}>
+    <html
+      lang="en"
+      suppressHydrationWarning={true}
+      className="bg-background-100"
+    >
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Providers>
           <Navbar />
-          <main className="">{children}</main>
+          <main className="flex flex-col text-primary">{children}</main>
           <Footer />
         </Providers>
       </body>

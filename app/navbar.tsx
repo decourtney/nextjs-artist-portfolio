@@ -21,13 +21,12 @@ const NavBar = () => {
 
   return (
     <Navbar
-      className="bg-[hsl(var(--nextui-background))]"
+      className="bg-background-100"
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
       isBlurred={false}
       maxWidth="xl"
       height="5rem"
-      // shouldHideOnScroll={true}
     >
       <NavbarContent justify="center">
         <NavbarMenuToggle

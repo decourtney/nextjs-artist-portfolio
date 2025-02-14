@@ -1,5 +1,6 @@
 import type { Config } from "tailwindcss";
 import { heroui } from "@heroui/react";
+import { customColors } from "./ColorTheme";
 
 const config: Config = {
   content: [
@@ -50,33 +51,7 @@ const config: Config = {
         light: {
           layout: {},
           colors: {
-            background: "#F5F5F5",
-            foreground: "#229799",
-            primary: "#F5F5F5",
-            secondary: "#424242",
-            // divider: "",
-            // overlay: "",
-            // focus: "",
-            // content1: "",
-            // content2: "",
-            // content3: "",
-            // content4: "",
-          },
-        },
-        dark: {
-          layout: {},
-          colors: {
-            background: "#229799",
-            foreground: "#48CFCB",
-            primary: "#F5F5F5",
-            secondary: "#424242",
-            // divider: "",
-            // overlay: "",
-            // focus: "",
-            // content1: "",
-            // content2: "",
-            // content3: "",
-            // content4: "",
+            ...customColors,
           },
         },
       },

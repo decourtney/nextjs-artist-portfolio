@@ -2,13 +2,16 @@ import { Image } from "@heroui/react";
 
 const HomePage = () => {
   return (
-    <div className="flex justify-center h-full">
-      <Image
-        src="images/underconstruction.webp"
-        alt="Under Construction"
-        removeWrapper
-        className="object-cover rounded-none"
-      />
+    <div className="min-h-screen ">
+      <div className="mx-auto w-[400px]">
+        {/* <Image
+          src="images/signature-highres.webp"
+          alt="Gena Courtney"
+          removeWrapper
+          className="w-[500px] object-cover rounded-none"
+        /> */}
+          <Image src="images/logo.png" />
+      </div>
     </div>
   );
 };

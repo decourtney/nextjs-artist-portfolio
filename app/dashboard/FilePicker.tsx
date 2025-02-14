@@ -121,7 +121,7 @@ const FilePicker = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-[800px] m-2 shadow-md rounded-md bg-slate-50"
+      className="max-w-[800px] m-2 shadow-md rounded-md bg-background-200"
     >
       {/* Hidden <input type="file" /> */}
       <input
