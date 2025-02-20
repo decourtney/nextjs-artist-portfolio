@@ -2,7 +2,7 @@
 
 import React from "react";
 import { ArtworkDocument } from "@/models/Artwork";
-import { Button, Image } from "@nextui-org/react";
+import { Button, Image } from "@heroui/react";
 import { useParams, useRouter } from "next/navigation";
 
 const ArtworkDisplay = ({

@@ -1,15 +1,18 @@
 "use client";
 
 import {
+  Image,
   Link,
   Navbar,
   NavbarBrand,
   NavbarContent,
+  NavbarItem,
   NavbarMenu,
   NavbarMenuItem,
   NavbarMenuToggle,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useState } from "react";
+import SocialMediaButtons from "./components/SocialMediaButtons";
 // import { BsInstagram } from "react-icons/bs";
 
 const NavBar = () => {
@@ -21,71 +24,64 @@ const NavBar = () => {
 
   return (
     <Navbar
-      className="bg-[hsl(var(--nextui-background))]"
+      className="bg-background-300 text-primary p-1"
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
       isBlurred={false}
-      maxWidth="xl"
-      height="5rem"
-      // shouldHideOnScroll={true}
+      // shouldHideOnScroll
+      maxWidth="full"
+      height="32px"
     >
-      <NavbarContent justify="center">
+      <NavbarContent justify="start" className="md:hidden">
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-          className="md:hidden "
         />
       </NavbarContent>
 
-      <NavbarContent justify="center">
-        <NavbarBrand>
-          <p className="font-serif font-bold text-2xl">
-            Gena Courtney
-          </p>
-        </NavbarBrand>
+      <NavbarContent justify="start" className="hidden md:contents">
+        <NavbarItem>
+          <Link href="/">
+            <p>Home</p>
+          </Link>
+        </NavbarItem>
+        <NavbarItem>
+          <Link href="/gallery">
+            <p>Work</p>
+          </Link>
+        </NavbarItem>
+        <NavbarItem>
+          <Link href="/about">
+            <p>About</p>
+          </Link>
+        </NavbarItem>
       </NavbarContent>
+
+      {/* <NavbarContent justify="center" className="md:hidden">
+        <NavbarBrand>
+          <Image src={"images/logo.png"} className="max-h-[64px]" />
+        </NavbarBrand>
+      </NavbarContent> */}
 
       <NavbarContent justify="end">
-        <Link href="/">
-          <p>home</p>
-        </Link>
-        <Link href="/gallery">
-          <p>gallery</p>
-        </Link>
-        <Link href="/about">
-          <p>about</p>
-        </Link>
-        <Link href="/contact">
-          <p>contact</p>
-        </Link>
-
-        {/* <NavbarItem>
-          <Button
-            as={Link}
-            href="https://www.instagram.com/genacourtney/"
-            target="_blank"
-            size="lg"
-            isIconOnly
-            radius="full"
-            variant="light"
-          >
-            <BsInstagram size={20} />
-          </Button>
-        </NavbarItem> */}
+        <NavbarItem className="hidden md:contents ">
+          <SocialMediaButtons />
+        </NavbarItem>
       </NavbarContent>
 
-      <NavbarMenu>
+      <NavbarMenu className="bg-background-100 items-center">
         <NavbarMenuItem>
           <Link href="/" onPress={handleClose}>
-            <p>home</p>
+            <p>Work</p>
           </Link>
+        </NavbarMenuItem>
+        <NavbarMenuItem>
           <Link href="/gallery" onPress={handleClose}>
             <p>gallery</p>
           </Link>
+        </NavbarMenuItem>
+        <NavbarMenuItem>
           <Link href="/about" onPress={handleClose}>
-            <p>about</p>
-          </Link>
-          <Link href="/contact" onPress={handleClose}>
-            <p>contact</p>
+            <p>About</p>
           </Link>
         </NavbarMenuItem>
       </NavbarMenu>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardBody } from "@nextui-org/react";
+import { Card, CardBody } from "@heroui/react";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 import { categoryValues } from "@/lib/categories";

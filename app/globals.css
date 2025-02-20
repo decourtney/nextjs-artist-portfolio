@@ -17,11 +17,3 @@ select:-webkit-autofill:focus {
   -webkit-background-clip: text;
   transition: background-color 5000s ease-in-out 0s;
 }
-
-:root {
-
-}
-
-body {
-
-}

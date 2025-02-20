@@ -1,22 +1,21 @@
-import { Button, Link } from "@nextui-org/react";
+import { Button, Link } from "@heroui/react";
 import React from "react";
-import { BsInstagram } from "react-icons/bs";
- 
+import { BsInstagram, BsTwitter, BsFacebook, BsLinkedin } from "react-icons/bs";
+import SocialMediaButtons from "./components/SocialMediaButtons";
+
 const Footer = () => {
   return (
-    <footer className="w-full h-16 content-center text-center bg-secondary">
-      <p>© 2024 Gena Courtney</p>
-      <Button
-        as={Link}
-        href="https://www.instagram.com/genacourtney/"
-        target="_blank"
-        size="lg"
-        isIconOnly
-        radius="full"
-        variant="light"
-      >
-        <BsInstagram size={20} />
-      </Button>
+    <footer className="h-[150px]">
+      <div className="container mx-auto flex flex-col items-center">
+        {/* Social icons row */}
+        <div className="flex space-x-4 mb-4 ">
+          <SocialMediaButtons />
+        </div>
+        {/* Footer text */}
+        <p className="text-primary text-sm">
+          © Gena Courtney. All rights reserved.
+        </p>
+      </div>
     </footer>
   );
 };
