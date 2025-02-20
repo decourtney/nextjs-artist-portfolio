@@ -24,11 +24,11 @@ const NavBar = () => {
 
   return (
     <Navbar
-      className="bg-background-300 text-primary"
+      className="bg-background-300 text-primary p-1"
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
       isBlurred={false}
-      shouldHideOnScroll
+      // shouldHideOnScroll
       maxWidth="full"
       height="32px"
     >
