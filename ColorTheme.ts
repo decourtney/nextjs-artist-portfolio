@@ -13,104 +13,103 @@ export type ColorScale = {
   DEFAULT: string;
 };
 
-// A soft, neutral pastel gray for default elements
+// A cool neutral pastel gray with a slight blue undertone
 export const defaultColor: ColorScale = {
-  50: "#fafafa",
-  100: "#f5f5f5",
-  200: "#ededed",
-  300: "#e6e6e6",
-  400: "#dfdfdf",
-  500: "#d8d8d8",
-  600: "#d1d1d1",
-  700: "#cacaca",
-  800: "#c3c3c3",
-  900: "#bcbcbc",
+  50: "#f5f7fa",
+  100: "#ebeff5",
+  200: "#d6dceb",
+  300: "#c1c8e1",
+  400: "#adb4d7",
+  500: "#979fcf",
+  600: "#818bc7",
+  700: "#6c77bf",
+  800: "#5763b7",
+  900: "#4350af",
   foreground: "#ffffff",
-  DEFAULT: "#d8d8d8",
+  DEFAULT: "#979fcf",
 };
 
-// Pastel blue for primary accents (think clear skies)
+// A deeper, cool pastel blue for primary accents
 export const primary: ColorScale = {
-  50: "#f0f8ff",
-  100: "#e0f2ff",
-  200: "#c0e4ff",
-  300: "#a0d6ff",
-  400: "#80c8ff",
-  500: "#60baff",
-  600: "#50aaff",
-  700: "#409aff",
-  800: "#308aff",
-  900: "#207aff",
+  50: "#e8f0ff",
+  100: "#d0e1ff",
+  200: "#b8d1ff",
+  300: "#a0c2ff",
+  400: "#88b2ff",
+  500: "#70a3ff",
+  600: "#6092e6",
+  700: "#507fcc",
+  800: "#406db3",
+  900: "#305a99",
   foreground: "#ffffff",
-  DEFAULT: "#60baff",
+  DEFAULT: "#70a3ff",
 };
 
-// Pastel peach for secondary accents (warm and soft)
+// A soft pastel pink for secondary accents
 export const secondary: ColorScale = {
-  50: "#fff8f5",
-  100: "#fff0eb",
-  200: "#ffe1d7",
-  300: "#ffd3c3",
-  400: "#ffc4af",
-  500: "#ffb59b",
-  600: "#ff9c82",
-  700: "#ff8370",
-  800: "#ff695e",
-  900: "#ff504c",
+  50: "#fff5f7",
+  100: "#ffe7ea",
+  200: "#ffcfd5",
+  300: "#ffb7c0",
+  400: "#ff9fae",
+  500: "#ff879b",
+  600: "#ff6f88",
+  700: "#ff5775",
+  800: "#ff3f62",
+  900: "#ff274f",
   foreground: "#ffffff",
-  DEFAULT: "#ffb59b",
+  DEFAULT: "#ff879b",
 };
 
-// Pastel green for success (fresh and natural)
+// A pastel teal for success states
 export const success: ColorScale = {
-  50: "#f3faf0",
-  100: "#e7f5e0",
-  200: "#cfeac0",
-  300: "#b7dfa0",
-  400: "#9fd480",
-  500: "#87c860",
-  600: "#6fac40",
-  700: "#578530",
-  800: "#3f7b20",
-  900: "#275210",
+  50: "#e0f8f2",
+  100: "#c2f0e6",
+  200: "#a3e8da",
+  300: "#85e0ce",
+  400: "#66d8c2",
+  500: "#48d0b6",
+  600: "#3ab3a1",
+  700: "#2d9783",
+  800: "#207b69",
+  900: "#145f50",
   foreground: "#ffffff",
-  DEFAULT: "#87c860",
+  DEFAULT: "#48d0b6",
 };
 
-// Pastel yellow for warning (bright but soft)
+// A soft pastel yellow for warning messages
 export const warning: ColorScale = {
-  50: "#fffaf0",
-  100: "#fff7e0",
-  200: "#ffefc0",
-  300: "#ffe7a0",
-  400: "#ffdf80",
-  500: "#ffd760",
-  600: "#ffd140",
-  700: "#ffc920",
-  800: "#ffc200",
-  900: "#ffba00",
+  50: "#fffef5",
+  100: "#fffde6",
+  200: "#fffbcf",
+  300: "#fff8b8",
+  400: "#fff6a1",
+  500: "#fff489",
+  600: "#fff16f",
+  700: "#ffee55",
+  800: "#ffeb3b",
+  900: "#ffe821",
   foreground: "#000000",
-  DEFAULT: "#ffd760",
+  DEFAULT: "#fff489",
 };
 
-// A very light off-white for background surfaces
+// A soft pastel blue for background surfaces
 export const background: ColorScale = {
-  50: "#f0fdf4",  // very light pastel green
-  100: "#dcfce7",
-  200: "#bbf7d0",
-  300: "#86efac",
-  400: "#4ade80",
-  500: "#22c55e", // DEFAULT pastel green
-  600: "#16a34a",
-  700: "#15803d",
-  800: "#166534",
-  900: "#14532d",
-  foreground: "#000000", // suitable contrast for text on green
-  DEFAULT: "#22c55e",
+  50: "#ffffff",
+  100: "#eff8ff",
+  200: "#d9f0ff",
+  300: "#c3e7ff",
+  400: "#addfff",
+  500: "#97d7ff",
+  600: "#82cfff",
+  700: "#6dc7ff",
+  800: "#57bfff",
+  900: "#42b7ff",
+  foreground: "#000000",
+  DEFAULT: "#ffffff",
 };
 
-
-// A soft, muted dark gray for text (foreground)
+// A soft, muted dark gray for text
 export const foreground: ColorScale = {
   50: "#f3f3f3",
   100: "#e6e6e6",
@@ -126,36 +125,36 @@ export const foreground: ColorScale = {
   DEFAULT: "#b3b3b3",
 };
 
-// Light pastel gray for dividers
+// A cool, pastel gray for dividers
 export const divider: ColorScale = {
-  50: "#fafafa",
-  100: "#f5f5f5",
-  200: "#eeeeee",
-  300: "#e0e0e0",
-  400: "#d3d3d3",
-  500: "#c6c6c6",
-  600: "#b9b9b9",
-  700: "#acacac",
-  800: "#9f9f9f",
-  900: "#929292",
+  50: "#f7f7fa",
+  100: "#f0f0f5",
+  200: "#e8e8f0",
+  300: "#e1e1eb",
+  400: "#d9d9e6",
+  500: "#d2d2e1",
+  600: "#cbcbdc",
+  700: "#c4c4d7",
+  800: "#bdbdd2",
+  900: "#b6b6cd",
   foreground: "#ffffff",
-  DEFAULT: "#c6c6c6",
+  DEFAULT: "#d2d2e1",
 };
 
-// A muted gray for overlays (such as modal backdrops)
+// A muted cool gray for overlays (e.g. modal backdrops)
 export const overlay: ColorScale = {
-  50: "#f5f5f5",
-  100: "#ebebeb",
-  200: "#e0e0e0",
-  300: "#d6d6d6",
-  400: "#cccccc",
-  500: "#c2c2c2",
-  600: "#b8b8b8",
-  700: "#aeaeae",
-  800: "#a4a4a4",
-  900: "#9a9a9a",
+  50: "#f2f2f5",
+  100: "#e6e6eb",
+  200: "#d9d9e1",
+  300: "#ccccd7",
+  400: "#bfbfcf",
+  500: "#b3b3c7",
+  600: "#a6a6bf",
+  700: "#9999b7",
+  800: "#8c8cab",
+  900: "#8080a3",
   foreground: "#ffffff",
-  DEFAULT: "#c2c2c2",
+  DEFAULT: "#b3b3c7",
 };
 
 // A soft pastel violet-blue for focus states
@@ -174,69 +173,68 @@ export const focus: ColorScale = {
   DEFAULT: "#a38bff",
 };
 
-// Content surfaces can have subtle variations.
-// Content1: a light neutral pastel surface
+// Content1: a light, cool neutral pastel surface
 export const content1: ColorScale = {
-  50: "#f8f8fa",
-  100: "#f1f1f4",
-  200: "#e9e9ed",
-  300: "#e2e2e7",
-  400: "#dadada",
-  500: "#d3d3d3",
-  600: "#cccccc",
-  700: "#c5c5c5",
-  800: "#bdbdbd",
-  900: "#b6b6b6",
+  50: "#f8f9fb",
+  100: "#f1f3f7",
+  200: "#e9ecf3",
+  300: "#e2e6ef",
+  400: "#dadfeb",
+  500: "#d3d9e7",
+  600: "#ccd3e3",
+  700: "#c5cde0",
+  800: "#bdb7dc",
+  900: "#b6b1d8",
   foreground: "#000000",
-  DEFAULT: "#d3d3d3",
+  DEFAULT: "#d3d9e7",
 };
 
-// Content2: a slightly warmer, soft beige surface
+// Content2: a light cool beige (nearly white) with a hint of blue
 export const content2: ColorScale = {
-  50: "#fdfcfb",
-  100: "#f9f8f6",
-  200: "#f5f3f1",
-  300: "#f1efec",
-  400: "#edeae7",
-  500: "#e9e5e2",
-  600: "#e5e0dd",
-  700: "#e1dbd8",
-  800: "#ddddd3",
-  900: "#d9d8ce",
+  50: "#fefefc",
+  100: "#fdfdf9",
+  200: "#fbfbf5",
+  300: "#f9f9f1",
+  400: "#f7f7ed",
+  500: "#f5f5e9",
+  600: "#f3f3e5",
+  700: "#f1f1e1",
+  800: "#efefe0",
+  900: "#ededdc",
   foreground: "#000000",
-  DEFAULT: "#e9e5e2",
+  DEFAULT: "#f5f5e9",
 };
 
-// Content3: a pastel peach-tinted surface for subtle warmth
+// Content3: a pale sky blue surface for subtle variation
 export const content3: ColorScale = {
-  50: "#fff9f8",
-  100: "#fff3f0",
-  200: "#ffe7e1",
-  300: "#ffdbd2",
-  400: "#ffcfc3",
-  500: "#ffc3b4",
-  600: "#ffb7a5",
-  700: "#ffab96",
-  800: "#ff9f87",
-  900: "#ff9378",
+  50: "#f7faff",
+  100: "#eef5ff",
+  200: "#ddebff",
+  300: "#cce1ff",
+  400: "#bbd7ff",
+  500: "#aadcff",
+  600: "#99d2ff",
+  700: "#88c8ff",
+  800: "#77beff",
+  900: "#66b4ff",
   foreground: "#000000",
-  DEFAULT: "#ffc3b4",
+  DEFAULT: "#aadcff",
 };
 
-// Content4: a pastel lavender-tinted surface for a cool alternative
+// Content4: a pastel gray-blue surface for an alternative feel
 export const content4: ColorScale = {
-  50: "#f9f8ff",
-  100: "#f3f1ff",
-  200: "#e7e3ff",
-  300: "#dbd5ff",
-  400: "#cfc7ff",
-  500: "#c3b9ff",
-  600: "#b7abff",
-  700: "#ab9dff",
-  800: "#9f8fff",
-  900: "#9381ff",
+  50: "#f9fafb",
+  100: "#f3f5f7",
+  200: "#e7ebef",
+  300: "#dbe1e7",
+  400: "#cfd7df",
+  500: "#c3cdd7",
+  600: "#b7c3cf",
+  700: "#abb9c7",
+  800: "#9fafbf",
+  900: "#93a5b7",
   foreground: "#ffffff",
-  DEFAULT: "#c3b9ff",
+  DEFAULT: "#c3cdd7",
 };
 
 export const customColors = {

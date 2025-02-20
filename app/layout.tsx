@@ -65,13 +65,15 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning={true}
-      className="bg-background-100"
+      className="bg-background-50"
     >
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Providers>
           <Navbar />
-          <main className="flex flex-col text-primary">{children}</main>
-          <Footer />
+          <main className="flex flex-col min-h-[calc(100dvh-250px)] text-primary">
+            {children}
+          </main>
+          {/* <Footer /> */}
         </Providers>
       </body>
     </html>

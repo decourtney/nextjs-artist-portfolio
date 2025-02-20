@@ -18,7 +18,7 @@ const GalleryPage = async () => {
   console.log("list of artwork", artworksData);
   return (
     <section className="min-h-dvh">
-      <div className="text-center bg-blue-100">FILTER BAR</div>
+      <div className="text-center h-[50px] bg-secondary-100">FILTER BAR</div>
       <ul className="w-fit columns-3 gap-1 space-y-1">
         {artworksData.map((artwork: ArtworkDocument) => (
           <li key={artwork.name}>
