@@ -12,6 +12,11 @@ interface FileItem {
   errorMessage?: string;
 }
 
+interface ArtworkApiResponse {
+  successes?: Array<{ id: string }>;
+  failures?: Array<{ id: string; message?: string; error?: string }>;
+}
+
 const FilePicker = () => {
   const [selectedFiles, setSelectedFiles] = useState<FileItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -61,7 +66,6 @@ const FilePicker = () => {
       return;
     }
 
-    // Build form data: each file + its UUID
     const formData = new FormData();
     selectedFiles.forEach((item) => {
       formData.append("files", item.file);
@@ -78,27 +82,25 @@ const FilePicker = () => {
         throw new Error(`Upload failed: ${response.statusText}`);
       }
 
-      // Expecting shape: { successes: [{ id, ... }], failures: [{ id, ... }] }
-      const data = await response.json();
+      // Cast the parsed JSON to the ArtworkApiResponse type
+      const data = (await response.json()) as ArtworkApiResponse;
 
-      // 1) Remove successful files by matching their UUID
+      // Remove successes
       if (data.successes) {
         setSelectedFiles((prev) =>
           prev.filter(
             (fileItem) =>
-              // Keep fileItem if it's NOT in successes
-              !data.successes.some((s: any) => s.id === fileItem.id)
+              // Keep item if it's NOT in successes
+              !data.successes!.some((s) => s.id === fileItem.id)
           )
         );
       }
 
-      // 2) Mark failures in red by matching their UUID
+      // Mark failures
       if (data.failures) {
         setSelectedFiles((prev) =>
           prev.map((fileItem) => {
-            const failure = data.failures.find(
-              (f: any) => f.id === fileItem.id
-            );
+            const failure = data.failures!.find((f) => f.id === fileItem.id);
             if (failure) {
               return {
                 ...fileItem,
@@ -142,8 +144,8 @@ const FilePicker = () => {
             </h3>
             <ul className="[&>*:nth-child(even)]:bg-slate-100">
               {selectedFiles.map((item, index) => {
-                const itemStyle =
-                  item.status === "error" ? "text-red-700 font-bold" : "";
+                // const itemStyle =
+                //   item.status === "error" ? "text-red-700 font-bold" : "";
 
                 return (
                   <li
