@@ -1,6 +1,6 @@
-import { Button, Link } from "@heroui/react";
+// import { Button, Link } from "@heroui/react";
 import React from "react";
-import { BsInstagram, BsTwitter, BsFacebook, BsLinkedin } from "react-icons/bs";
+// import { BsInstagram, BsTwitter, BsFacebook, BsLinkedin } from "react-icons/bs";
 import SocialMediaButtons from "./components/SocialMediaButtons";
 
 const Footer = () => {

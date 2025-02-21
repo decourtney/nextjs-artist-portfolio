@@ -3,7 +3,7 @@ import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import Busboy from "busboy";
 import dbConnect from "@/lib/dbConnect";
-import Artwork, { ArtworkDocument } from "@/models/Artwork";
+import Artwork from "@/models/Artwork";
 import sharp from "sharp";
 import { Readable } from "stream";
 
@@ -31,7 +31,7 @@ function streamToNodeReadable(stream: ReadableStream<Uint8Array>): Readable {
   });
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     await dbConnect();
     const artworks = await Artwork.find({});
@@ -42,8 +42,9 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// Enhanced interface to also track a UUID for each file
 interface PendingImageData {
-  id: string; // The UUID for tracking success/fail uploads
+  id: string; // The UUID passed from the client
   truncatedBaseName: string;
   fileBuffer: Buffer;
   mainKey: string;
@@ -132,8 +133,6 @@ export async function POST(request: NextRequest) {
       });
 
       // When all fields/files have been processed
-      // In busboy.on("finish", async () => { ... }):
-
       busboy.on("finish", async () => {
         const successes: Array<{
           id: string;
@@ -160,34 +159,18 @@ export async function POST(request: NextRequest) {
           } = item;
 
           try {
-            // 1) Check if artwork already exists in MongoDB by name
-            //    (Or whichever field you want to compare)
-            const existingDoc = await Artwork.findOne({
-              name: truncatedBaseName,
-            });
-
-            if (existingDoc) {
-              // Duplicate => skip S3 upload
-              failures.push({
-                id,
-                message: "Duplicate name found",
-                error: `An artwork with name (“${existingDoc.name}”) already exists.`,
-              });
-              continue; // move to the next file
-            }
-
-            // 2) Convert to main WebP
+            // Convert to main WebP
             const mainWebpBuffer = await sharp(fileBuffer)
               .webp({ quality: 80 })
               .toBuffer();
 
-            // 3) Convert to thumb WebP (400px wide)
+            // Convert to thumb WebP (400px wide)
             const thumbWebpBuffer = await sharp(fileBuffer)
               .resize(400)
               .webp({ quality: 80 })
               .toBuffer();
 
-            // 4) Upload main image to S3
+            // Upload main image to S3
             const mainUpload = new Upload({
               client: s3Client,
               params: {
@@ -199,7 +182,7 @@ export async function POST(request: NextRequest) {
             });
             await mainUpload.done();
 
-            // 5) Upload thumbnail to S3
+            // Upload thumbnail to S3
             const thumbUpload = new Upload({
               client: s3Client,
               params: {
@@ -211,7 +194,7 @@ export async function POST(request: NextRequest) {
             });
             await thumbUpload.done();
 
-            // 6) Insert a document into MongoDB
+            // Insert a document into MongoDB
             const artworkDoc = new Artwork({
               name: truncatedBaseName,
               src: mainUrl,
@@ -221,7 +204,7 @@ export async function POST(request: NextRequest) {
             await artworkDoc.save();
 
             successes.push({
-              id,
+              id, // Return the UUID so client knows which file succeeded
               mainUrl,
               thumbUrl,
               message: "Upload succeeded",
@@ -229,7 +212,7 @@ export async function POST(request: NextRequest) {
           } catch (err) {
             console.error("Error uploading or inserting doc:", err);
 
-            // Attempt to clean up S3 if partially uploaded
+            // Cleanup S3 if the file was partially uploaded
             try {
               await s3Client.send(
                 new DeleteObjectCommand({
@@ -259,7 +242,7 @@ export async function POST(request: NextRequest) {
             }
 
             failures.push({
-              id,
+              id, // Return the UUID so client can identify which file failed
               message: "Upload failed",
               error: String(err),
             });

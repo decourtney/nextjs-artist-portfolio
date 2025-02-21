@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useState } from "react";
 import { Image } from "@heroui/react";
@@ -29,7 +29,11 @@ const HomePage = () => {
       <div className="flex justify-center md:h-[60%] bg-[url(/images/mountains.jpg)] bg-cover bg-center">
         <div className="absolute w-full h-full bg-opacity-20 bg-white" />
         <div className="flex w-full h-full items-center p-[10%]">
-          <Image src="images/logo.png" className="w-[80%]" />
+          <Image
+            src="images/logo.png"
+            alt="Stylized oversized straw hat hanging on the letter G in Gena Courtney with two crossed paintbrushes below the name."
+            className="w-[80%]"
+          />
         </div>
       </div>
 

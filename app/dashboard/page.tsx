@@ -1,10 +1,10 @@
 import React from 'react'
-import FilePicker from './FilePicker'
+// import FilePicker from './FilePicker'
 
 const DashboardPage = () => {
   return (
     <div className=''>
-      <FilePicker />
+      {/* <FilePicker /> */}
     </div>
   );
 }

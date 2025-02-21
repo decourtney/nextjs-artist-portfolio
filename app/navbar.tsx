@@ -1,10 +1,8 @@
 "use client";
 
 import {
-  Image,
   Link,
   Navbar,
-  NavbarBrand,
   NavbarContent,
   NavbarItem,
   NavbarMenu,
