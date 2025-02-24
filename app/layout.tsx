@@ -1,20 +1,8 @@
 import { Providers } from "./providers";
 import type { Metadata, Viewport } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "./navbar";
 // import Footer from "./footer";
-
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
 
 export const metadata: Metadata = {
   title: "Gena Courtney",
@@ -65,14 +53,14 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning={true}
-      className="bg-background-100 text-foreground-900"
+      className="bg-background-100"
     >
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body
+        className={``}
+      >
         <Providers>
           <Navbar />
-          <main className="flex flex-col min-h-[calc(100dvh-250px)]">
-            {children}
-          </main>
+          <main className="flex flex-col text-foreground-900">{children}</main>
           {/* <Footer /> */}
         </Providers>
       </body>
