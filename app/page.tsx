@@ -1,20 +1,14 @@
 // "use client";
 
-import { useState } from "react";
-import { Button, Image, Link } from "@heroui/react";
 import dbConnect from "@/lib/dbConnect";
 import Artwork, { ArtworkDocument } from "@/models/Artwork";
-import {
-  dynalight,
-  whisper,
-  charm,
-  engagement,
-  romanesco,
-  praise,
-} from "./fonts/fonts";
-import { FaArrowRight, FaLongArrowAltRight } from "react-icons/fa";
+import { Image, Link } from "@heroui/react";
 import { FaArrowRightLong } from "react-icons/fa6";
 import Contact from "./components/ContactForm";
+import
+  {
+    charm
+  } from "./fonts/fonts";
 import Footer from "./footer";
 
 const HomePage = async () => {
@@ -31,6 +25,7 @@ const HomePage = async () => {
         <div id="hero" className="flex w-full h-full">
           <Image
             src="/images/water.jpg"
+            alt=""
             removeWrapper
             radius="none"
             className="w-full h-auto object-cover object-top"

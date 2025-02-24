@@ -11,7 +11,7 @@ import {
 } from "@heroui/react";
 import { useState } from "react";
 import SocialMediaButtons from "./components/SocialMediaButtons";
-import { charm } from "./fonts/fonts";
+// import { charm } from "./fonts/fonts";
 // import { BsInstagram } from "react-icons/bs";
 
 const NavBar = () => {
