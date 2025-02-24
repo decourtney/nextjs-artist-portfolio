@@ -17,3 +17,36 @@ select:-webkit-autofill:focus {
   -webkit-background-clip: text;
   transition: background-color 5000s ease-in-out 0s;
 }
+
+/* Desktop default: each image is clipped on both left and right */
+.clipped-image {
+  clip-path: polygon(20% 0, 100% 0, 80% 100%, 0 100%);
+}
+
+/* Desktop first image: no left clip */
+.clipped-image.first {
+  clip-path: polygon(0% 0, 100% 0, 80% 100%, 0 100%);
+  border-top-left-radius: 1rem /* 8px */;
+  border-bottom-left-radius: 1rem /* 8px */;
+}
+
+/* Desktop last image: no right clip */
+.clipped-image.last {
+  clip-path: polygon(20% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* Mobile overrides */
+@media (max-width: 1024px) {
+  /* Mobile default: clip diagonally on top and bottom */
+  .clipped-image {
+    clip-path: polygon(0 20%, 100% 0, 100% 80%, 0 100%);
+  }
+  /* Mobile first image: no top clip */
+  .clipped-image.first {
+    clip-path: polygon(0 0%, 100% 0, 100% 80%, 0 100%);
+  }
+  /* Mobile last image: no bottom clip */
+  .clipped-image.last {
+    clip-path: polygon(0% 20%, 100% 0, 100% 100%, 0 100%);
+  }
+}

@@ -9,49 +9,49 @@ const SocialMediaButtons = () => {
         as={Link}
         href="https://www.instagram.com/genacourtney/"
         target="_blank"
-        size="sm"
+        size="lg"
         isIconOnly
         radius="full"
         variant="light"
-        className="text-primary"
+        className=" text-foreground-900"
       >
-        <BsInstagram size={20} />
+        <BsInstagram size={40} />
       </Button>
       <Button
         as={Link}
-        href="https://twitter.com/yourusername"
+        href="/"
         target="_blank"
-        size="sm"
+        size="lg"
         isIconOnly
         radius="full"
         variant="light"
-        className="text-primary"
+        className=" text-foreground-900"
       >
-        <BsTwitter size={20} />
+        <BsTwitter size={40} />
       </Button>
       <Button
         as={Link}
-        href="https://facebook.com/yourusername"
+        href="/"
         target="_blank"
-        size="sm"
+        size="lg"
         isIconOnly
         radius="full"
         variant="light"
-        className="text-primary"
+        className=" text-foreground-900"
       >
-        <BsFacebook size={20} />
+        <BsFacebook size={40} />
       </Button>
       <Button
         as={Link}
-        href="https://linkedin.com/in/yourusername"
+        href="/"
         target="_blank"
-        size="sm"
+        size="lg"
         isIconOnly
         radius="full"
         variant="light"
-        className="text-primary"
+        className=" text-foreground-900"
       >
-        <BsLinkedin size={20} />
+        <BsLinkedin size={40} />
       </Button>
     </div>
   );

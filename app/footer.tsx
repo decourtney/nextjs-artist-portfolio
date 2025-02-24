@@ -12,7 +12,7 @@ const Footer = () => {
           <SocialMediaButtons />
         </div>
         {/* Footer text */}
-        <p className="text-primary text-sm">
+        <p className="text-foreground-900 text-2xl">
           © Gena Courtney. All rights reserved.
         </p>
       </div>

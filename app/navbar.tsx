@@ -11,6 +11,7 @@ import {
 } from "@heroui/react";
 import { useState } from "react";
 import SocialMediaButtons from "./components/SocialMediaButtons";
+// import { charm } from "./fonts/fonts";
 // import { BsInstagram } from "react-icons/bs";
 
 const NavBar = () => {
@@ -22,34 +23,37 @@ const NavBar = () => {
 
   return (
     <Navbar
-      className="bg-background-300 text-primary p-1"
+      className={`bg-transparent p-1 `}
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
       isBlurred={false}
-      // shouldHideOnScroll
+      shouldHideOnScroll
       maxWidth="full"
-      height="32px"
+      height="96px"
     >
-      <NavbarContent justify="start" className="md:hidden">
+      <NavbarContent
+        justify="start"
+        className="md:invisible text-foreground-900"
+      >
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
         />
       </NavbarContent>
 
-      <NavbarContent justify="start" className="hidden md:contents">
+      <NavbarContent justify="center" className="hidden md:contents space-x-10">
         <NavbarItem>
           <Link href="/">
-            <p>Home</p>
+            <p className="text-6xl text-foreground-900">Home</p>
           </Link>
         </NavbarItem>
         <NavbarItem>
           <Link href="/gallery">
-            <p>Work</p>
+            <p className="text-6xl text-foreground-900">Work</p>
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link href="/about">
-            <p>About</p>
+          <Link href="#contact">
+            <p className="text-6xl text-foreground-900">Contact</p>
           </Link>
         </NavbarItem>
       </NavbarContent>
@@ -61,7 +65,7 @@ const NavBar = () => {
       </NavbarContent> */}
 
       <NavbarContent justify="end">
-        <NavbarItem className="hidden md:contents ">
+        <NavbarItem className="hidden md:contents">
           <SocialMediaButtons />
         </NavbarItem>
       </NavbarContent>
@@ -78,8 +82,8 @@ const NavBar = () => {
           </Link>
         </NavbarMenuItem>
         <NavbarMenuItem>
-          <Link href="/about" onPress={handleClose}>
-            <p>About</p>
+          <Link href="#about" onPress={handleClose}>
+            <p>Contact</p>
           </Link>
         </NavbarMenuItem>
       </NavbarMenu>
