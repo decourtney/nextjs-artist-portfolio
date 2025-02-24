@@ -108,7 +108,7 @@ const HomePage = async () => {
         </div>
       </div>
 
-      <div className="flex justify-end items-center w-full h-[768px] p-24 font-bold text-foreground-200 text-6xl lg:text-8xl bg-background-200">
+      <div className="flex justify-end items-center w-full h-[50dvh] p-24 font-bold text-foreground-200 text-6xl lg:text-8xl bg-background-200">
         <h2>visit the </h2>
         <Link
           href="/gallery"
