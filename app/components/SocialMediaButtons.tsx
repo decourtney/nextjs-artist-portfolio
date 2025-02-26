@@ -13,11 +13,11 @@ const SocialMediaButtons = () => {
         isIconOnly
         radius="full"
         variant="light"
-        className=" text-foreground-900"
+        className=" text-foreground-400"
       >
         <BsInstagram size={40} />
       </Button>
-      <Button
+      {/* <Button
         as={Link}
         href="/"
         target="_blank"
@@ -52,7 +52,7 @@ const SocialMediaButtons = () => {
         className=" text-foreground-900"
       >
         <BsLinkedin size={40} />
-      </Button>
+      </Button> */}
     </div>
   );
 }

@@ -5,10 +5,7 @@ import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import { Image, Link } from "@heroui/react";
 import { FaArrowRightLong } from "react-icons/fa6";
 import Contact from "./components/ContactForm";
-import
-  {
-    charm
-  } from "./fonts/fonts";
+import { charm } from "./fonts/fonts";
 import Footer from "./footer";
 
 const HomePage = async () => {
@@ -16,7 +13,7 @@ const HomePage = async () => {
   await dbConnect();
   const artworks: ArtworkDocument[] = await Artwork.find()
     .sort({ createdAt: -1 })
-    .limit(6);
+    .limit(3);
 
   return (
     <div className="min-h-screen">
@@ -39,10 +36,10 @@ const HomePage = async () => {
       {/* Scrollable Content */}
       <div
         id="about"
-        className="relative mt-[100dvh] p-24 w-full h-[75dvh] bg-background-200 bg-gradient-to-b from-emerald-300 to-transparent"
+        className="relative w-full h-screen mt-[100dvh] p-24 content-center bg-background-300 bg-gradient-to-b from-emerald-300 to-transparent"
       >
-        <div className="absolute bottom-full left-0 w-full h-1/3 md:h-1/3 pointer-events-none bg-gradient-to-t from-emerald-300 to-transparent" />
-        <div className="flex flex-col justify-center items-center w-full h-full space-y-24 ">
+        {/* <div className="absolute bottom-full left-0 w-full h-1/3 md:h-1/3 pointer-events-none bg-gradient-to-t from-emerald-300 to-transparent" /> */}
+        <div className="flex flex-col justify-center items-center w-full space-y-24">
           <h3 className="font-black text-9xl">Bio</h3>
           <div className="flex justify-center text-center w-1/2 h-1/2">
             {/* <Image
@@ -59,9 +56,22 @@ const HomePage = async () => {
             </p>
           </div>
         </div>
+
+        <div className="flex justify-end items-end w-full p-24 font-bold text-foreground-200 text-6xl lg:text-8xl">
+          <h2>visit the </h2>
+          <Link
+            href="/gallery"
+            className={`${charm.className} group flex-col pl-12 text-6xl lg:text-[200px] text-primary-500`}
+          >
+            Gallery
+            {/* <div className="text-9xl group-hover:translate-x-10 transition-transform duration-500 ease-in-out">
+            <FaArrowRightLong />
+          </div> */}
+          </Link>
+        </div>
       </div>
 
-      <div className="flex flex-col justify-around w-full min-h-[75dvh] py-4 bg-background-200">
+      {/* <div className="flex flex-col justify-around w-full min-h-[75dvh] py-4 bg-background-200">
         <div>
           <h2 className="px-24 py-4 font-bold text-6xl">
             my <span className={`text-9xl ${charm.className}`}>Latest</span>{" "}
@@ -101,10 +111,31 @@ const HomePage = async () => {
             })}
           </ul>
         </div>
-      </div>
+      </div> */}
 
-      <div className="flex justify-end items-center w-full h-[50dvh] p-24 font-bold text-foreground-200 text-6xl lg:text-8xl bg-background-200">
-        <h2>visit the </h2>
+      {/* <div className="h-screen content-center">
+        <h2 className="px-24 py-4 font-bold text-6xl">
+          my <span className={`text-9xl ${charm.className}`}>Latest</span> works
+        </h2>
+
+        <ul className="flex flex-row h-1/2">
+          {artworks.map((artwork) => (
+            <li className="w-full">
+              <Image
+                src={artwork.thumbSrc}
+                alt={artwork.name}
+                removeWrapper
+                radius="none"
+                className="h-full w-full object-cover"
+                style={{ clipPath: "inherit" }}
+              />
+            </li>
+          ))}
+        </ul>
+      </div> */}
+
+      {/* <div className="flex justify-end items-center w-full h-[50dvh] p-24 font-bold text-foreground-200 text-6xl lg:text-8xl bg-background-200">
+        <h2>visit my </h2>
         <Link
           href="/gallery"
           className={`${charm.className} group flex-col pl-12 text-6xl lg:text-[300px] text-primary-500`}
@@ -114,9 +145,9 @@ const HomePage = async () => {
             <FaArrowRightLong />
           </div>
         </Link>
-      </div>
+      </div> */}
 
-      <div className="min-h-[50dvh] p-24 bg-background-200">
+      {/* <div className="min-h-[50dvh] p-24 bg-background-200">
         <h2 className="text-8xl text-foreground-200 font-bold">
           go on a{" "}
           <span className={`${charm.className} text-[300px] text-primary-500`}>
@@ -126,9 +157,9 @@ const HomePage = async () => {
         <div className="h-[50dvh] content-center font-black text-center text-9xl text-foreground-200 bg-foreground-600 rounded-2xl">
           <p className="">Coming Soon</p>
         </div>
-      </div>
+      </div> */}
 
-      <div
+      {/* <div
         id="contact"
         className="flex flex-col justify-between h-screen p-4 bg-foreground-200"
       >
@@ -150,7 +181,7 @@ const HomePage = async () => {
           </div>
         </div>
         <Footer />
-      </div>
+      </div> */}
     </div>
   );
 };

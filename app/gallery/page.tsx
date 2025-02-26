@@ -16,10 +16,10 @@ import { Image } from "@heroui/react";
 const GalleryPage = async () => {
   await dbConnect(); // important!
 
-  const response = await Artwork.find();
+  const response: ArtworkDocument[] = await Artwork.find({}).limit(10);
+  // const response = await Artwork.find();
   const artworksData = JSON.parse(JSON.stringify(response));
 
-  // console.log("list of artwork", artworksData);
   return (
     <section className="min-h-dvh">
       <div className="text-center content-center h-[50px] bg-secondary-100">
