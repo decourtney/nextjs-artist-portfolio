@@ -74,11 +74,11 @@ export async function PATCH(
   try {
     await dbConnect();
     const { id } = params;
-    // Parse the JSON request body containing the updated artwork document
+    // Parse the incoming JSON payload containing the updated artwork fields.
+    // Expected keys: name, description, size, medium, categories, etc.
     const updatedFields = await request.json();
-    // Example expected fields: { name, description, size, ... }
 
-    // Find the artwork document by ID
+    // Retrieve the artwork document by ID
     const artwork = await Artwork.findById(id);
     if (!artwork) {
       return NextResponse.json(
@@ -93,14 +93,14 @@ export async function PATCH(
     const folderPath = process.env.NEXT_PUBLIC_AWS_IMAGES_FOLDER || "";
     const urlPrefix = `https://${bucket}.s3.${region}.amazonaws.com/`;
 
-    // Determine the old S3 keys from the existing URLs
+    // Determine current S3 keys based on stored URLs
     const oldMainKey = artwork.src.replace(urlPrefix, "");
     const oldThumbKey = artwork.thumbSrc.replace(urlPrefix, "");
 
     let newSrc = artwork.src;
     let newThumbSrc = artwork.thumbSrc;
 
-    // Check if the name is being updated and is different
+    // If the name is being updated (and is different), handle S3 renaming
     if (updatedFields.name && updatedFields.name !== artwork.name) {
       // Truncate the new name to 60 characters if necessary
       const truncatedName =
@@ -151,6 +151,8 @@ export async function PATCH(
     artwork.name = updatedFields.name || artwork.name;
     artwork.description = updatedFields.description || artwork.description;
     artwork.size = updatedFields.size || artwork.size;
+    artwork.medium = updatedFields.medium || artwork.medium;
+    artwork.categories = updatedFields.categories || artwork.categories;
     artwork.src = newSrc;
     artwork.thumbSrc = newThumbSrc;
 
@@ -162,3 +164,4 @@ export async function PATCH(
     return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
+

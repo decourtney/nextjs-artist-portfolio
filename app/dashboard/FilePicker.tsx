@@ -3,6 +3,7 @@
 import React, { useState, ChangeEvent, useRef, FormEvent } from "react";
 import { Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
+import { useRouter } from "next/navigation";
 
 interface FileItem {
   id: string; // A unique UUID for each file
@@ -18,6 +19,7 @@ interface ArtworkApiResponse {
 }
 
 const FilePicker = () => {
+  const router = useRouter();
   const [selectedFiles, setSelectedFiles] = useState<FileItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -113,6 +115,7 @@ const FilePicker = () => {
         );
       }
 
+      router.refresh();
       alert("Upload completed. See highlights for success/fail status.");
     } catch (error) {
       console.error(error);

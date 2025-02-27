@@ -2,9 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface TagDocument extends Document {
   name: string;
-  type: string; // e.g. "category", "medium", "size", etc.
-  createdAt: Date;
-  updatedAt: Date;
+  type: string;
 }
 
 const TagSchema = new Schema<TagDocument>(

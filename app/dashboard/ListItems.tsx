@@ -17,15 +17,29 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { ArtworkDocument } from "@/models/Artwork";
+import { TagDocument } from "@/models/Tag";
+import CategoryDropDown from "./CategoryDropDown";
 
 // Define a type for the editable fields.
 interface EditableArtwork {
   name: string;
   description: string;
-  thumbSrc: string; // if you need to update the thumbnail, include it
+  thumbSrc: string;
 }
 
-export default function ListItems({ files }: { files: ArtworkDocument[] }) {
+interface AllTags {
+  categories: TagDocument[];
+  mediums: TagDocument[];
+  sizes: TagDocument[];
+}
+
+export default function ListItems({
+  files,
+  tags,
+}: {
+  files: ArtworkDocument[];
+  tags: AllTags;
+}) {
   const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [editingFile, setEditingFile] = useState<ArtworkDocument | null>(null);
@@ -201,7 +215,7 @@ export default function ListItems({ files }: { files: ArtworkDocument[] }) {
       {/* Edit Modal using NextUI/@heroui Modal */}
       <Modal
         isOpen={isOpen}
-        placement={'auto'}
+        placement={"auto"}
         onOpenChange={onOpenChange}
         size="5xl"
       >
@@ -251,7 +265,7 @@ export default function ListItems({ files }: { files: ArtworkDocument[] }) {
                           })
                         }
                       />
-                     
+                      {/* <CategoryDropDown dropdownItemList={categories}/> */}
                     </div>
                   </div>
                   <ModalFooter className="w-full">

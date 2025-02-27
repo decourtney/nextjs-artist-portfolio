@@ -1,4 +1,5 @@
 import Artwork, { ArtworkDocument } from "@/models/Artwork";
+import Tag, { TagDocument } from "@/models/Tag";
 import dynamic from "next/dynamic";
 import React from "react";
 
@@ -8,9 +9,35 @@ const ListOfFilesClient = dynamic(() => import("./ListItems"), {
 });
 
 export default async function ListOfFiles() {
-  const response: ArtworkDocument[] = await Artwork.find({});
-  // Convert to JSON-serializable objects
-  const files = JSON.parse(JSON.stringify(response));
+  // Fetch artworks with populated fields
+  const artworkResponse = await Artwork.find({})
+    .populate("categories")
+    .populate("medium")
+    .populate("size")
+    .lean();
 
-  return <ListOfFilesClient files={files} />;
+  // Fetch all tags (all types: category, medium, size, etc.)
+  const tagsResponse = await Tag.find({}).lean();
+
+  // Convert to JSON-serializable objects
+  const files:ArtworkDocument[] = JSON.parse(JSON.stringify(artworkResponse));
+  const tags:TagDocument[] = JSON.parse(JSON.stringify(tagsResponse));
+
+  // Split tags by type
+  const categories: TagDocument[] = tags.filter(
+    (tag: TagDocument) => tag.type === "category"
+  );
+  const mediums: TagDocument[] = tags.filter(
+    (tag: TagDocument) => tag.type === "medium"
+  );
+  const sizes: TagDocument[] = tags.filter(
+    (tag: TagDocument) => tag.type === "size"
+  );
+
+  // Optionally, pass all tags as well if needed
+  const allTags = { categories, mediums, sizes };
+
+  console.log(files, allTags);
+
+  return <ListOfFilesClient files={files} tags={allTags} />;
 }

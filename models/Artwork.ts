@@ -8,7 +8,9 @@ export interface ArtworkDocument extends mongoose.Document {
   src: string;
   thumbSrc: string;
   alt: string;
-  tags: mongoose.Types.ObjectId[]; // Array of Tag document references
+  medium: mongoose.Types.ObjectId;
+  size: mongoose.Types.ObjectId;
+  categories: mongoose.Types.ObjectId[];
 }
 
 const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
@@ -33,8 +35,15 @@ const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
     type: String,
     maxlength: [255, "Alt text cannot be more than 255 characters long"],
   },
-  // New field: an array of references to Tag documents
-  tags: [
+  medium: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Tag",
+  },
+  size: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Tag",
+  },
+  categories: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Tag",
