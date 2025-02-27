@@ -2,21 +2,35 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Checkbox } from "@heroui/react";
+import {
+  Button,
+  Checkbox,
+  Form,
+  Image,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Textarea,
+  useDisclosure,
+} from "@heroui/react";
+import { ArtworkDocument } from "@/models/Artwork";
 
-interface Artwork {
-  _id: string;
+// Define a type for the editable fields.
+interface EditableArtwork {
   name: string;
-  size?: string;
+  description: string;
+  thumbSrc: string; // if you need to update the thumbnail, include it
 }
 
-interface ListOfFilesClientProps {
-  files: Artwork[];
-}
-
-export default function ListItems({ files }: ListOfFilesClientProps) {
+export default function ListItems({ files }: { files: ArtworkDocument[] }) {
   const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [editingFile, setEditingFile] = useState<ArtworkDocument | null>(null);
+  const [editForm, setEditForm] = useState<EditableArtwork | null>(null);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   // Split files into two columns
   const midIndex = Math.ceil(files.length / 2);
@@ -36,17 +50,15 @@ export default function ListItems({ files }: ListOfFilesClientProps) {
 
   // Handle "Select All" in a column
   const handleSelectAllColumn = (
-    filesInColumn: Artwork[],
+    filesInColumn: ArtworkDocument[],
     isSelected: boolean
   ) => {
     setSelectedIds((prev) => {
       const columnIds = filesInColumn.map((file) => file._id);
       if (isSelected) {
-        // Add all column ids that are not already selected
         const newIds = columnIds.filter((id) => !prev.includes(id));
         return [...prev, ...newIds];
       } else {
-        // Remove all column ids from the selection
         return prev.filter((id) => !columnIds.includes(id));
       }
     });
@@ -55,55 +67,93 @@ export default function ListItems({ files }: ListOfFilesClientProps) {
   // Delete selected items (calls your API DELETE route)
   const handleDelete = async () => {
     console.log("Deleting files:", selectedIds);
-    // For each selected file, call the delete endpoint.
-    for (const id of selectedIds) {
-      try {
-        const res = await fetch(`/api/artwork/${id}`, { method: "DELETE" });
-        if (!res.ok) {
-          console.error(`Failed to delete ${id}`, await res.json());
-        }
-      } catch (error) {
-        console.error("Error deleting file", error);
+    try {
+      const res = await fetch(`/api/artwork/batch-delete`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: selectedIds }),
+      });
+      if (!res.ok) {
+        console.error("Batch delete failed", await res.json());
+      } else {
+        router.refresh();
       }
+    } catch (error) {
+      console.error("Error deleting files", error);
     }
-    // Refresh the list after deletion
+  };
+
+  // Open the edit modal and populate form fields with the selected file's details
+  const handleEdit = (file: ArtworkDocument) => {
+    setEditingFile(file);
+    setEditForm({
+      name: file.name,
+      description: file.description || "",
+      thumbSrc: file.thumbSrc,
+    });
+    onOpen(); // Open the modal
+  };
+
+  // Handle modal form submission (update artwork)
+  const handleModalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingFile || !editForm) return;
+    console.log("Updating artwork", editingFile._id, editForm);
+    try {
+      const res = await fetch(`/api/artwork/${editingFile._id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editForm),
+      });
+      if (!res.ok) {
+        console.error("Update failed", await res.json());
+      }
+    } catch (error) {
+      console.error("Error updating artwork", error);
+    }
+    setEditingFile(null);
     router.refresh();
   };
 
-  // Edit selected item (only works if exactly one item is selected)
-  const handleEdit = () => {
-    if (selectedIds.length !== 1) {
-      alert("Please select exactly one item to edit.");
-      return;
-    }
-    const id = selectedIds[0];
-    console.log("Editing file:", id);
-    // Navigate to your edit route or open an edit modal
-  };
-
-  // Render a single file item with a checkbox and file info
-  const renderFileItem = (file: Artwork) => {
+  // Render a single file item with a checkbox, thumbnail, and an edit button
+  const renderFileItem = (file: ArtworkDocument) => {
     const isChecked = selectedIds.includes(file._id);
     return (
-      <li key={file._id} className="flex items-center border-b ">
+      <li key={file._id} className="flex border-b p-2 items-center">
         <Checkbox
-          checked={isChecked}
+          isSelected={isChecked}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             handleSelectItem(file._id, e.target.checked)
           }
         />
-        <div className="overflow-hidden">
-          <p className="text-lg overflow-hidden text-nowrap text-ellipsis">
+        <div className="min-w-12 w-12 min-h-12 h-12">
+          <Image
+            src={file.thumbSrc}
+            removeWrapper
+            radius="none"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="flex flex-col items-start px-2 overflow-hidden">
+          <p className="text-lg text-nowrap text-ellipsis overflow-hidden">
             {file.name}
           </p>
-          <div className="text-xs">{file.size}</div>
+          <Button
+            variant="light"
+            size="sm"
+            isIconOnly
+            onPress={() => handleEdit(file)}
+            className="min-w-fit h-fit text-foreground-100"
+          >
+            Edit
+          </Button>
         </div>
       </li>
     );
   };
 
   // Helper to determine if all items in a column are selected
-  const allSelected = (filesInColumn: Artwork[]) =>
+  const allSelected = (filesInColumn: ArtworkDocument[]) =>
     filesInColumn.every((file) => selectedIds.includes(file._id));
 
   return (
@@ -111,10 +161,10 @@ export default function ListItems({ files }: ListOfFilesClientProps) {
       {/* Two columns for the file list */}
       <div className="grid grid-cols-2 gap-x-4">
         {/* Left Column */}
-        <ul className="">
+        <ul>
           <div className="flex items-center border-b-2 py-1">
             <Checkbox
-              checked={allSelected(leftFiles)}
+              isSelected={allSelected(leftFiles)}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 handleSelectAllColumn(leftFiles, e.target.checked)
               }
@@ -127,7 +177,7 @@ export default function ListItems({ files }: ListOfFilesClientProps) {
         <ul>
           <div className="flex items-center border-b-2 border-background-300 mb-2 p-2">
             <Checkbox
-              checked={allSelected(rightFiles)}
+              isSelected={allSelected(rightFiles)}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 handleSelectAllColumn(rightFiles, e.target.checked)
               }
@@ -137,23 +187,97 @@ export default function ListItems({ files }: ListOfFilesClientProps) {
           {rightFiles.map(renderFileItem)}
         </ul>
       </div>
-      {/* Global Edit and Delete buttons */}
-      <div className="flex justify-end space-x-4">
-        <button
-          className="btn btn-primary"
-          onClick={handleEdit}
-          disabled={selectedIds.length !== 1}
-        >
-          Edit
-        </button>
+      {/* Global Delete button */}
+      <div className="flex justify-end space-x-4 mt-4">
         <button
           className="btn btn-danger"
           onClick={handleDelete}
           disabled={selectedIds.length === 0}
         >
-          Delete
+          Delete Selected
         </button>
       </div>
+
+      {/* Edit Modal using NextUI/@heroui Modal */}
+      <Modal
+        isOpen={isOpen}
+        placement={'auto'}
+        onOpenChange={onOpenChange}
+        size="5xl"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <div className="bg-background-50 p-4 rounded shadow-lg">
+              <ModalHeader className="flex flex-col text-tiny text-foreground-100 truncate">
+                Editing <div className="text-lg">{editForm?.name}</div>
+              </ModalHeader>
+              <ModalBody>
+                <Form
+                  onSubmit={handleModalSubmit}
+                  onReset={() => {
+                    onClose();
+                    setEditingFile(null);
+                  }}
+                  className="text-foreground-100"
+                >
+                  <div className="flex w-full">
+                    <div className="mr-4">
+                      <Image
+                        removeWrapper
+                        radius="none"
+                        src={editForm?.thumbSrc}
+                        className="w-full h-auto"
+                      />
+                    </div>
+                    <div className="w-full max-w-[800px] space-y-4">
+                      <Input
+                        type="text"
+                        label="Name"
+                        value={editForm?.name || ""}
+                        onChange={(e) =>
+                          setEditForm({
+                            ...editForm!,
+                            name: e.target.value,
+                          })
+                        }
+                      />
+                      <Textarea
+                        label="Description"
+                        value={editForm?.description || ""}
+                        onChange={(e) =>
+                          setEditForm({
+                            ...editForm!,
+                            description: e.target.value,
+                          })
+                        }
+                      />
+                     
+                    </div>
+                  </div>
+                  <ModalFooter className="w-full">
+                    <div className="flex space-x-2">
+                      <Button
+                        type="reset"
+                        variant="light"
+                        className="text-foreground-100 underline"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        variant="light"
+                        className="text-foreground-100 underline"
+                      >
+                        Update
+                      </Button>
+                    </div>
+                  </ModalFooter>
+                </Form>
+              </ModalBody>
+            </div>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

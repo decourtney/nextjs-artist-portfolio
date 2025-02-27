@@ -155,11 +155,11 @@ const FilePicker = () => {
                     <p className="truncate"> {item.name}</p>
 
                     <div className="flex items-center space-x-2">
-                      {/* {item.status === "error" && item.errorMessage ? ( */}
+                      {item.status === "error" && item.errorMessage ? (
                       <span className="p-1 rounded-sm text-red-500 bg-red-100 whitespace-nowrap">
                         {item.errorMessage}
                       </span>
-                      {/* ) : null} */}
+                      ) : null}
                       <div className="border-l-2">
                         <Button
                           isIconOnly
