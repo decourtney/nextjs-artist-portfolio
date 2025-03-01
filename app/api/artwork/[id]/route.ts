@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { S3Client, DeleteObjectCommand, CopyObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  DeleteObjectCommand,
+  CopyObjectCommand,
+} from "@aws-sdk/client-s3";
 import dbConnect from "@/lib/dbConnect";
 import Artwork from "@/models/Artwork";
+import { Tag } from "@/models";
 
 // Create S3 client
 const s3Client = new S3Client({
@@ -20,7 +25,6 @@ export async function DELETE(
     await dbConnect();
     const { id } = params;
 
-    console.log(id);
     // Find the artwork document by ID
     const artwork = await Artwork.findById(id);
     if (!artwork) {
@@ -75,7 +79,7 @@ export async function PATCH(
     await dbConnect();
     const { id } = params;
     // Parse the incoming JSON payload containing the updated artwork fields.
-    // Expected keys: name, description, size, medium, categories, etc.
+    // Expected keys: name, description, size, medium, categories (array of category names), etc.
     const updatedFields = await request.json();
 
     // Retrieve the artwork document by ID
@@ -102,7 +106,6 @@ export async function PATCH(
 
     // If the name is being updated (and is different), handle S3 renaming
     if (updatedFields.name && updatedFields.name !== artwork.name) {
-      // Truncate the new name to 60 characters if necessary
       const truncatedName =
         updatedFields.name.length > 60
           ? updatedFields.name.substring(0, 60)
@@ -110,7 +113,6 @@ export async function PATCH(
       const newMainKey = `${folderPath}${truncatedName}.webp`;
       const newThumbKey = `${folderPath}${truncatedName}-thumb.webp`;
 
-      // If the main image key has changed, copy and then delete the old S3 object
       if (newMainKey !== oldMainKey) {
         await s3Client.send(
           new CopyObjectCommand({
@@ -127,8 +129,6 @@ export async function PATCH(
         );
         newSrc = `https://${bucket}.s3.${region}.amazonaws.com/${newMainKey}`;
       }
-
-      // Similarly, handle the thumbnail image
       if (newThumbKey !== oldThumbKey) {
         await s3Client.send(
           new CopyObjectCommand({
@@ -147,12 +147,36 @@ export async function PATCH(
       }
     }
 
-    // Update the artwork document with new values
+    console.log("UPDATED CATEGORIES: ", updatedFields.categories);
+    // --- Update Tag Collection for Categories ---
+    // Assume updatedFields.categories is an array of category names.
+    const updatedCatNames: string[] = updatedFields.categories || [];
+    // For each category in the update, ensure it exists in the Tag collection.
+    for (const catName of updatedCatNames) {
+      const exists = await Tag.findOne({ name: catName, type: "category" });
+      if (!exists) {
+        await Tag.create({ name: catName, type: "category" });
+      }
+    }
+
+    // Update the artwork's categories:
+    // Find all Tag documents (of type "category") whose names are in the updated list.
+    const updatedTags = await Tag.find({
+      name: { $in: updatedCatNames },
+      type: "category",
+    });
+
+    console.log("Updated Tags", updatedTags);
+    console.log("Current Artwork Categories: ", artwork.categories);
+    // Update the artwork's categories field to only include the Tag IDs from the updated list.
+    artwork.categories = updatedTags.map((tag) => tag._id);
+    console.log("Updated Artwork Cateogies", artwork.categories)
+
+    // --- Update the Artwork Document ---
     artwork.name = updatedFields.name || artwork.name;
     artwork.description = updatedFields.description || artwork.description;
     artwork.size = updatedFields.size || artwork.size;
     artwork.medium = updatedFields.medium || artwork.medium;
-    artwork.categories = updatedFields.categories || artwork.categories;
     artwork.src = newSrc;
     artwork.thumbSrc = newThumbSrc;
 
@@ -164,4 +188,3 @@ export async function PATCH(
     return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
-

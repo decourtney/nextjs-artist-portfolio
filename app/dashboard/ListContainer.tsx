@@ -37,7 +37,7 @@ export default async function ListOfFiles() {
   // Optionally, pass all tags as well if needed
   const allTags = { categories, mediums, sizes };
 
-  console.log(files, allTags);
+  // console.log(files, allTags);
 
   return <ListOfFilesClient files={files} tags={allTags} />;
 }

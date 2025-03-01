@@ -25,6 +25,7 @@ interface EditableArtwork {
   name: string;
   description: string;
   thumbSrc: string;
+  categories: string[];
 }
 
 interface AllTags {
@@ -44,7 +45,7 @@ export default function ListItems({
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [editingFile, setEditingFile] = useState<ArtworkDocument | null>(null);
   const [editForm, setEditForm] = useState<EditableArtwork | null>(null);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
   // Split files into two columns
   const midIndex = Math.ceil(files.length / 2);
@@ -97,13 +98,17 @@ export default function ListItems({
     }
   };
 
-  // Open the edit modal and populate form fields with the selected file's details
+  // Open the edit modal and populate form fields with the selected file's details.
+  // Also extract the assigned category IDs from the populated categories field.
   const handleEdit = (file: ArtworkDocument) => {
     setEditingFile(file);
     setEditForm({
       name: file.name,
       description: file.description || "",
       thumbSrc: file.thumbSrc,
+      categories: file.categories?.map((cat: any) =>
+        typeof cat === "object" ? cat.name : cat.toString()
+      ),
     });
     onOpen(); // Open the modal
   };
@@ -112,7 +117,7 @@ export default function ListItems({
   const handleModalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingFile || !editForm) return;
-    console.log("Updating artwork", editingFile._id, editForm);
+    console.log("Client Updating artwork: ", editingFile._id, editForm);
     try {
       const res = await fetch(`/api/artwork/${editingFile._id}`, {
         method: "PATCH",
@@ -126,10 +131,11 @@ export default function ListItems({
       console.error("Error updating artwork", error);
     }
     setEditingFile(null);
+    onClose();
     router.refresh();
   };
 
-  // Render a single file item with a checkbox, thumbnail, and an edit button
+  // Render a single file item with a checkbox, thumbnail, and an edit button.
   const renderFileItem = (file: ArtworkDocument) => {
     const isChecked = selectedIds.includes(file._id);
     return (
@@ -215,7 +221,7 @@ export default function ListItems({
       {/* Edit Modal using NextUI/@heroui Modal */}
       <Modal
         isOpen={isOpen}
-        placement={"auto"}
+        placement="auto"
         onOpenChange={onOpenChange}
         size="5xl"
       >
@@ -265,7 +271,17 @@ export default function ListItems({
                           })
                         }
                       />
-                      {/* <CategoryDropDown dropdownItemList={categories}/> */}
+                      {/* Category Dropdown: Pass available categories and currently assigned ones */}
+                      <CategoryDropDown
+                        availableCategories={tags.categories}
+                        selectedCategories={editForm?.categories || []}
+                        onSelectionChange={(newSelected: string[]) =>
+                          setEditForm({
+                            ...editForm!,
+                            categories: newSelected,
+                          })
+                        }
+                      />
                     </div>
                   </div>
                   <ModalFooter className="w-full">
@@ -273,16 +289,16 @@ export default function ListItems({
                       <Button
                         type="reset"
                         variant="light"
-                        className="text-foreground-100 underline"
+                        className="text-foreground-100"
                       >
                         Cancel
                       </Button>
                       <Button
                         type="submit"
                         variant="light"
-                        className="text-foreground-100 underline"
+                        className="text-foreground-100"
                       >
-                        Update
+                        Save
                       </Button>
                     </div>
                   </ModalFooter>
