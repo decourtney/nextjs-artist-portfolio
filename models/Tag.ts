@@ -2,13 +2,13 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface TagDocument extends Document {
   _id: string;
-  name: string;
+  label: string;
   type: string;
 }
 
 const TagSchema = new Schema<TagDocument>(
   {
-    name: {
+    label: {
       type: String,
       required: true,
       unique: true,

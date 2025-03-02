@@ -1,3 +1,4 @@
+import { TagDocument } from "@/models/Tag";
 import {
   Button,
   ButtonGroup,
@@ -16,53 +17,39 @@ import {
   IoIosClose,
 } from "react-icons/io";
 
-type Tag = {
-  _id: string;
-  name: string;
-};
-
-type CategoryDropDownProps = {
-  availableCategories: Tag[];
-  selectedCategories: string[];
+type ItemDropDownProps = {
+  availableItems: TagDocument[];
+  selectedItems: string[];
   onSelectionChange: (newSelected: string[]) => void;
 };
 
-const CategoryDropDown: React.FC<CategoryDropDownProps> = ({
-  availableCategories,
-  selectedCategories,
+const ItemDropDown = ({
+  availableItems,
+  selectedItems,
   onSelectionChange,
-}) => {
+}: ItemDropDownProps) => {
   const [selectedKeys, setSelectedKeys] = useState<SharedSelection>(
-    new Set(selectedCategories)
+    new Set(selectedItems)
   );
   const [displayInput, setDisplayInput] = useState<Boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
   const [dropDownOpen, setDropDownOpen] = useState<Boolean>(false);
 
-  useEffect(() => {
-    setSelectedKeys(new Set(selectedCategories));
-  }, [selectedCategories]);
+  const unionItems = useMemo(() => {
+    const itemMap = new Map<string, string>();
 
-  const unionCategories = useMemo(() => {
-    console.log("Client avail cats: ", availableCategories);
-    console.log("Client sel cats: ", selectedCategories);
-    const categoryMap = new Map<string, string>();
-
-    // Add available categories by name (lowercased as key, original name as value)
-    availableCategories.forEach((cat) => {
-      categoryMap.set(cat.name.toLowerCase(), cat.name.toLowerCase());
+    availableItems.forEach((availItem: TagDocument) => {
+      itemMap.set(availItem.label.toLowerCase(), availItem.label.toLowerCase());
     });
 
-    // For each selected category name, add it if not already present
-    selectedCategories.forEach((selectedName) => {
-      const lowerName = selectedName.toLowerCase();
-      if (!categoryMap.has(lowerName)) {
-        categoryMap.set(lowerName, selectedName);
+    selectedItems.forEach((selItem: string) => {
+      if (!itemMap.has(selItem.toLowerCase())) {
+        itemMap.set(selItem.toLowerCase(), selItem.toLowerCase());
       }
     });
 
-    return Array.from(categoryMap.values());
-  }, [availableCategories, selectedCategories]);
+    return Array.from(itemMap.values());
+  }, [availableItems, selectedItems]);
 
   const handleOnPress = () => {
     // Convert the current selection to an array of strings.
@@ -83,14 +70,13 @@ const CategoryDropDown: React.FC<CategoryDropDownProps> = ({
 
   return (
     <ButtonGroup>
-      {/* <div className="flex w-48"> */}
       <Button
         disabled
         disableAnimation
         isIconOnly
         className="pointer-events-none"
       >
-        {selectedCategories.length}
+        {selectedItems.length}
       </Button>
       {displayInput ? (
         <>
@@ -99,7 +85,7 @@ const CategoryDropDown: React.FC<CategoryDropDownProps> = ({
             radius="none"
             maxLength={60}
             fullWidth
-            placeholder="New Category"
+            placeholder="Type Here"
             className=" w-[123.83px]"
             onValueChange={(value) => setInputValue(value)}
           ></Input>
@@ -145,8 +131,8 @@ const CategoryDropDown: React.FC<CategoryDropDownProps> = ({
                 onSelectionChange(newSelected);
               }}
             >
-              {unionCategories.map((cat) => (
-                <DropdownItem key={cat}>{cat}</DropdownItem>
+              {unionItems.map((item) => (
+                <DropdownItem key={item}>{item}</DropdownItem>
               ))}
             </DropdownMenu>
           </Dropdown>
@@ -170,9 +156,8 @@ const CategoryDropDown: React.FC<CategoryDropDownProps> = ({
           )}
         </>
       )}
-      {/* </div> */}
     </ButtonGroup>
   );
 };
 
-export default CategoryDropDown;
+export default ItemDropDown;

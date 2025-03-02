@@ -16,15 +16,17 @@ import {
   Textarea,
   useDisclosure,
 } from "@heroui/react";
-import { ArtworkDocument } from "@/models/Artwork";
+import { PopulatedArtworkDocument } from "@/models/Artwork";
 import { TagDocument } from "@/models/Tag";
-import CategoryDropDown from "./CategoryDropDown";
+import ItemDropDown from "./ItemDropDown";
 
 // Define a type for the editable fields.
 interface EditableArtwork {
   name: string;
   description: string;
   thumbSrc: string;
+  medium: string;
+  size: string;
   categories: string[];
 }
 
@@ -38,12 +40,13 @@ export default function ListItems({
   files,
   tags,
 }: {
-  files: ArtworkDocument[];
+  files: PopulatedArtworkDocument[];
   tags: AllTags;
 }) {
   const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [editingFile, setEditingFile] = useState<ArtworkDocument | null>(null);
+  const [editingFile, setEditingFile] =
+    useState<PopulatedArtworkDocument | null>(null);
   const [editForm, setEditForm] = useState<EditableArtwork | null>(null);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
@@ -65,7 +68,7 @@ export default function ListItems({
 
   // Handle "Select All" in a column
   const handleSelectAllColumn = (
-    filesInColumn: ArtworkDocument[],
+    filesInColumn: PopulatedArtworkDocument[],
     isSelected: boolean
   ) => {
     setSelectedIds((prev) => {
@@ -100,17 +103,19 @@ export default function ListItems({
 
   // Open the edit modal and populate form fields with the selected file's details.
   // Also extract the assigned category IDs from the populated categories field.
-  const handleEdit = (file: ArtworkDocument) => {
+  const handleEdit = (file: PopulatedArtworkDocument) => {
     setEditingFile(file);
     setEditForm({
       name: file.name,
       description: file.description || "",
       thumbSrc: file.thumbSrc,
-      categories: file.categories?.map((cat: any) =>
-        typeof cat === "object" ? cat.name : cat.toString()
+      medium: file.medium?.toString(),
+      size: file.size?.toString(),
+      categories: file.categories.map(
+        (category: TagDocument) => category.label
       ),
     });
-    onOpen(); // Open the modal
+    onOpen();
   };
 
   // Handle modal form submission (update artwork)
@@ -136,7 +141,7 @@ export default function ListItems({
   };
 
   // Render a single file item with a checkbox, thumbnail, and an edit button.
-  const renderFileItem = (file: ArtworkDocument) => {
+  const renderFileItem = (file: PopulatedArtworkDocument) => {
     const isChecked = selectedIds.includes(file._id);
     return (
       <li key={file._id} className="flex border-b p-2 items-center">
@@ -173,7 +178,7 @@ export default function ListItems({
   };
 
   // Helper to determine if all items in a column are selected
-  const allSelected = (filesInColumn: ArtworkDocument[]) =>
+  const allSelected = (filesInColumn: PopulatedArtworkDocument[]) =>
     filesInColumn.every((file) => selectedIds.includes(file._id));
 
   return (
@@ -272,9 +277,9 @@ export default function ListItems({
                         }
                       />
                       {/* Category Dropdown: Pass available categories and currently assigned ones */}
-                      <CategoryDropDown
-                        availableCategories={tags.categories}
-                        selectedCategories={editForm?.categories || []}
+                      <ItemDropDown
+                        availableItems={tags.categories}
+                        selectedItems={editForm?.categories || []}
                         onSelectionChange={(newSelected: string[]) =>
                           setEditForm({
                             ...editForm!,

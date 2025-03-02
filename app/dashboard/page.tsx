@@ -1,6 +1,6 @@
-import React from 'react'
-import FilePicker from './FilePicker'
-import ListContainer from "./ListContainer";
+import React from "react";
+import FilePicker from "./FilePicker";
+import ListContainer from "../../ListContainer";
 
 const DashboardPage = () => {
   return (
@@ -11,6 +11,6 @@ const DashboardPage = () => {
       </div>
     </div>
   );
-}
+};
 
-export default DashboardPage
+export default DashboardPage;

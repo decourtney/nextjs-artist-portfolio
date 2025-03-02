@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { CategoryType, categoryValues } from "@/lib/categories";
+import { TagDocument } from "./Tag";
 
 export interface ArtworkDocument extends mongoose.Document {
   _id: string;
@@ -53,3 +53,13 @@ const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
 
 export default mongoose.models.Artwork ||
   mongoose.model<ArtworkDocument>("Artwork", ArtworkSchema);
+
+  // Extended type for populated categories:
+export type PopulatedArtworkDocument = Omit<
+  ArtworkDocument,
+  "categories" | "medium" | "size"
+> & {
+  categories: TagDocument[];
+  medium: TagDocument;
+  size: TagDocument;
+};;

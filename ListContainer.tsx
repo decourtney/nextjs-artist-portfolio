@@ -1,10 +1,10 @@
-import Artwork, { ArtworkDocument } from "@/models/Artwork";
+import Artwork, { PopulatedArtworkDocument } from "@/models/Artwork";
 import Tag, { TagDocument } from "@/models/Tag";
 import dynamic from "next/dynamic";
 import React from "react";
 
 // Dynamically import the client component so the server doesn't access its internals
-const ListOfFilesClient = dynamic(() => import("./ListItems"), {
+const ListOfFilesClient = dynamic(() => import("./app/dashboard/ListItems"), {
   ssr: false,
 });
 
@@ -20,8 +20,10 @@ export default async function ListOfFiles() {
   const tagsResponse = await Tag.find({}).lean();
 
   // Convert to JSON-serializable objects
-  const files:ArtworkDocument[] = JSON.parse(JSON.stringify(artworkResponse));
-  const tags:TagDocument[] = JSON.parse(JSON.stringify(tagsResponse));
+  const files: PopulatedArtworkDocument[] = JSON.parse(
+    JSON.stringify(artworkResponse)
+  );
+  const tags: TagDocument[] = JSON.parse(JSON.stringify(tagsResponse));
 
   // Split tags by type
   const categories: TagDocument[] = tags.filter(
@@ -36,8 +38,6 @@ export default async function ListOfFiles() {
 
   // Optionally, pass all tags as well if needed
   const allTags = { categories, mediums, sizes };
-
-  // console.log(files, allTags);
 
   return <ListOfFilesClient files={files} tags={allTags} />;
 }

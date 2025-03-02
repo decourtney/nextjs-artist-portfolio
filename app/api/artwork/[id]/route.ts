@@ -5,7 +5,7 @@ import {
   CopyObjectCommand,
 } from "@aws-sdk/client-s3";
 import dbConnect from "@/lib/dbConnect";
-import Artwork from "@/models/Artwork";
+import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import { Tag } from "@/models";
 
 // Create S3 client
@@ -26,7 +26,7 @@ export async function DELETE(
     const { id } = params;
 
     // Find the artwork document by ID
-    const artwork = await Artwork.findById(id);
+    const artwork = await Artwork.findById(id) as ArtworkDocument;
     if (!artwork) {
       return NextResponse.json(
         { message: "Artwork not found" },
@@ -147,30 +147,32 @@ export async function PATCH(
       }
     }
 
-    console.log("UPDATED CATEGORIES: ", updatedFields.categories);
     // --- Update Tag Collection for Categories ---
-    // Assume updatedFields.categories is an array of category names.
-    const updatedCatNames: string[] = updatedFields.categories || [];
+    // Assume updatedFields.categories is an array of category labels.
+    const updatedCategoryLabels: string[] = updatedFields.categories || [];
     // For each category in the update, ensure it exists in the Tag collection.
-    for (const catName of updatedCatNames) {
-      const exists = await Tag.findOne({ name: catName, type: "category" });
+
+    for (const categoryLabel of updatedCategoryLabels) {
+      const exists = await Tag.findOne({
+        label: categoryLabel,
+        type: "category",
+      });
+
       if (!exists) {
-        await Tag.create({ name: catName, type: "category" });
+console.log("new cat label: ", categoryLabel);
+        await Tag.create({ label: categoryLabel, type: "category" });
       }
     }
 
     // Update the artwork's categories:
-    // Find all Tag documents (of type "category") whose names are in the updated list.
+    // Find all Tag documents (of type "category") whose labels are in the updated list.
     const updatedTags = await Tag.find({
-      name: { $in: updatedCatNames },
+      label: { $in: updatedCategoryLabels },
       type: "category",
     });
-
-    console.log("Updated Tags", updatedTags);
-    console.log("Current Artwork Categories: ", artwork.categories);
+console.log("updated tag list",updatedTags)
     // Update the artwork's categories field to only include the Tag IDs from the updated list.
     artwork.categories = updatedTags.map((tag) => tag._id);
-    console.log("Updated Artwork Cateogies", artwork.categories)
 
     // --- Update the Artwork Document ---
     artwork.name = updatedFields.name || artwork.name;
