@@ -36,7 +36,7 @@ const HomePage = async () => {
       {/* Scrollable Content */}
       <div
         id="about"
-        className="relative w-full h-screen mt-[100dvh] p-24 content-center bg-background-300 bg-gradient-to-b from-emerald-300 to-transparent"
+        className="relative w-full min-h-screen mt-[100dvh] p-24 content-center bg-background-300 bg-gradient-to-b from-emerald-300 to-transparent"
       >
         {/* <div className="absolute bottom-full left-0 w-full h-1/3 md:h-1/3 pointer-events-none bg-gradient-to-t from-emerald-300 to-transparent" /> */}
         <div className="flex flex-col justify-center items-center w-full space-y-24">

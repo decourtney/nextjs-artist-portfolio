@@ -36,7 +36,8 @@ const CategoryDropDown: React.FC<CategoryDropDownProps> = ({
     new Set(selectedCategories)
   );
   const [displayInput, setDisplayInput] = useState<Boolean>(false);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState<string>("");
+  const [dropDownOpen, setDropDownOpen] = useState<Boolean>(false);
 
   useEffect(() => {
     setSelectedKeys(new Set(selectedCategories));
@@ -121,7 +122,11 @@ const CategoryDropDown: React.FC<CategoryDropDownProps> = ({
         </>
       ) : (
         <>
-          <Dropdown>
+          <Dropdown
+            onOpenChange={(isOpen) => {
+              setDropDownOpen(isOpen);
+            }}
+          >
             <DropdownTrigger>
               <Button variant="bordered" className="text-foreground-100">
                 Categories
@@ -145,13 +150,24 @@ const CategoryDropDown: React.FC<CategoryDropDownProps> = ({
               ))}
             </DropdownMenu>
           </Dropdown>
-          <Button
-            isIconOnly
-            className="text-2xl text-green-500"
-            onPress={() => setDisplayInput(!displayInput)}
-          >
-            <IoIosAdd />
-          </Button>
+          {dropDownOpen ? (
+            <Button
+              isIconOnly
+              isDisabled
+              disableAnimation
+              className="text-lg pointer-events-none"
+            >
+              <IoIosAdd />
+            </Button>
+          ) : (
+            <Button
+              isIconOnly
+              className="text-2xl text-green-500"
+              onPress={() => setDisplayInput(!displayInput)}
+            >
+              <IoIosAdd />
+            </Button>
+          )}
         </>
       )}
       {/* </div> */}
