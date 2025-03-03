@@ -18,7 +18,9 @@ import {
 } from "@heroui/react";
 import { PopulatedArtworkDocument } from "@/models/Artwork";
 import { TagDocument } from "@/models/Tag";
-import ItemDropDown from "./ItemDropDown";
+import CategoryDropDown from "./CategoryDropDown";
+import MediumDropDown from "./MediumDropDown";
+import SizeDropDown from "./SizeDropDown";
 
 // Define a type for the editable fields.
 interface EditableArtwork {
@@ -109,8 +111,8 @@ export default function ListItems({
       name: file.name,
       description: file.description || "",
       thumbSrc: file.thumbSrc,
-      medium: file.medium?.toString(),
-      size: file.size?.toString(),
+      medium: file.medium?.label,
+      size: file.size?.label,
       categories: file.categories.map(
         (category: TagDocument) => category.label
       ),
@@ -255,38 +257,64 @@ export default function ListItems({
                       />
                     </div>
                     <div className="w-full max-w-[800px] space-y-4">
-                      <Input
-                        type="text"
-                        label="Name"
-                        value={editForm?.name || ""}
-                        onChange={(e) =>
-                          setEditForm({
-                            ...editForm!,
-                            name: e.target.value,
-                          })
-                        }
-                      />
-                      <Textarea
-                        label="Description"
-                        value={editForm?.description || ""}
-                        onChange={(e) =>
-                          setEditForm({
-                            ...editForm!,
-                            description: e.target.value,
-                          })
-                        }
-                      />
-                      {/* Category Dropdown: Pass available categories and currently assigned ones */}
-                      <ItemDropDown
-                        availableItems={tags.categories}
-                        selectedItems={editForm?.categories || []}
-                        onSelectionChange={(newSelected: string[]) =>
-                          setEditForm({
-                            ...editForm!,
-                            categories: newSelected,
-                          })
-                        }
-                      />
+                      <div className="flex flex-col space-y-4">
+                        <Input
+                          type="text"
+                          label="Name"
+                          value={editForm?.name || ""}
+                          onChange={(e) =>
+                            setEditForm({
+                              ...editForm!,
+                              name: e.target.value,
+                            })
+                          }
+                        />
+                        <Textarea
+                          label="Description"
+                          value={editForm?.description || ""}
+                          onChange={(e) =>
+                            setEditForm({
+                              ...editForm!,
+                              description: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+
+                      <div className="flex justify-between">
+                        <CategoryDropDown
+                          availableItems={tags.categories}
+                          selectedItems={editForm?.categories || null}
+                          onSelectionChange={(newSelected: string[]) =>
+                            setEditForm({
+                              ...editForm!,
+                              categories: newSelected,
+                            })
+                          }
+                        />
+
+                        <MediumDropDown
+                          availableItems={tags.mediums}
+                          selectedItem={editForm?.medium || null}
+                          onSelectionChange={(newSelected: string) =>
+                            setEditForm({
+                              ...editForm!,
+                              medium: newSelected,
+                            })
+                          }
+                        />
+
+                        <SizeDropDown
+                          availableItems={tags.sizes}
+                          selectedItem={editForm?.size || null}
+                          onSelectionChange={(newSelected: string) =>
+                            setEditForm({
+                              ...editForm!,
+                              size: newSelected,
+                            })
+                          }
+                        />
+                      </div>
                     </div>
                   </div>
                   <ModalFooter className="w-full">

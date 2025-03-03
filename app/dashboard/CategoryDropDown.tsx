@@ -9,7 +9,7 @@ import {
   Input,
   SharedSelection,
 } from "@heroui/react";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   IoIosAdd,
   IoIosArrowDown,
@@ -17,23 +17,28 @@ import {
   IoIosClose,
 } from "react-icons/io";
 
-type ItemDropDownProps = {
+type CategoryDropDownProps = {
   availableItems: TagDocument[];
-  selectedItems: string[];
+  selectedItems: string[] | null;
   onSelectionChange: (newSelected: string[]) => void;
 };
 
-const ItemDropDown = ({
+const CategoryDropDown = ({
   availableItems,
   selectedItems,
   onSelectionChange,
-}: ItemDropDownProps) => {
+}: CategoryDropDownProps) => {
   const [selectedKeys, setSelectedKeys] = useState<SharedSelection>(
     new Set(selectedItems)
   );
   const [displayInput, setDisplayInput] = useState<Boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
   const [dropDownOpen, setDropDownOpen] = useState<Boolean>(false);
+  const inputContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setSelectedKeys(new Set(selectedItems));
+  }, [selectedItems]);
 
   const unionItems = useMemo(() => {
     const itemMap = new Map<string, string>();
@@ -42,7 +47,7 @@ const ItemDropDown = ({
       itemMap.set(availItem.label.toLowerCase(), availItem.label.toLowerCase());
     });
 
-    selectedItems.forEach((selItem: string) => {
+    selectedItems?.forEach((selItem: string) => {
       if (!itemMap.has(selItem.toLowerCase())) {
         itemMap.set(selItem.toLowerCase(), selItem.toLowerCase());
       }
@@ -50,6 +55,24 @@ const ItemDropDown = ({
 
     return Array.from(itemMap.values());
   }, [availableItems, selectedItems]);
+
+  // Detect clicks outside the input container to close input.
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        displayInput &&
+        inputContainerRef.current &&
+        !inputContainerRef.current.contains(e.target as Node)
+      ) {
+        closeInput();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [displayInput]);
 
   const handleOnPress = () => {
     // Convert the current selection to an array of strings.
@@ -76,27 +99,21 @@ const ItemDropDown = ({
         isIconOnly
         className="pointer-events-none"
       >
-        {selectedItems.length}
+        {selectedItems?.length}
       </Button>
       {displayInput ? (
-        <>
+        <div ref={inputContainerRef} className="flex">
           <Input
             type="text"
             radius="none"
             maxLength={60}
             fullWidth
             placeholder="Type Here"
-            className=" w-[123.83px]"
+            className="w-[125px]"
             onValueChange={(value) => setInputValue(value)}
           ></Input>
-          <Button
-            isIconOnly
-            className="text-2xl text-red-500"
-            onPress={closeInput}
-          >
-            <IoIosClose />
-          </Button>
-          {inputValue && (
+
+          {inputValue ? (
             <Button
               isIconOnly
               className="text-3xl text-green-500"
@@ -104,8 +121,16 @@ const ItemDropDown = ({
             >
               <IoIosCheckmark />
             </Button>
+          ) : (
+            <Button
+              isIconOnly
+              className="text-2xl text-red-500"
+              onPress={closeInput}
+            >
+              <IoIosClose />
+            </Button>
           )}
-        </>
+        </div>
       ) : (
         <>
           <Dropdown
@@ -114,7 +139,10 @@ const ItemDropDown = ({
             }}
           >
             <DropdownTrigger>
-              <Button variant="bordered" className="text-foreground-100">
+              <Button
+                variant="bordered"
+                className="w-[125px] text-foreground-100"
+              >
                 Categories
                 <span>
                   <IoIosArrowDown />
@@ -160,4 +188,4 @@ const ItemDropDown = ({
   );
 };
 
-export default ItemDropDown;
+export default CategoryDropDown;

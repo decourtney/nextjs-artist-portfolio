@@ -26,7 +26,7 @@ export async function DELETE(
     const { id } = params;
 
     // Find the artwork document by ID
-    const artwork = await Artwork.findById(id) as ArtworkDocument;
+    const artwork = (await Artwork.findById(id)) as ArtworkDocument;
     if (!artwork) {
       return NextResponse.json(
         { message: "Artwork not found" },
@@ -147,11 +147,49 @@ export async function PATCH(
       }
     }
 
-    // --- Update Tag Collection for Categories ---
+    // --- Update Tag Collection ---
     // Assume updatedFields.categories is an array of category labels.
     const updatedCategoryLabels: string[] = updatedFields.categories || [];
-    // For each category in the update, ensure it exists in the Tag collection.
+    const updatedMediumLabel: string = updatedFields.medium;
+    const updatedSizeLabel: string = updatedFields.size;
 
+    if (updatedMediumLabel) {
+      const mediumExists = await Tag.findOne({
+        label: updatedMediumLabel,
+        type: "medium",
+      });
+
+      if (!mediumExists) {
+        const newMediumTag = await Tag.create({
+          label: updatedMediumLabel,
+          type: "medium",
+        });
+
+        updatedFields.medium = newMediumTag._id;
+      } else {
+        updatedFields.medium = mediumExists._id;
+      }
+    }
+
+    if (updatedSizeLabel) {
+      const sizeExists = await Tag.findOne({
+        label: updatedSizeLabel,
+        type: "size",
+      });
+
+      if (!sizeExists) {
+        const newSizeTag = await Tag.create({
+          label: updatedSizeLabel,
+          type: "size",
+        });
+
+        updatedFields.size = newSizeTag._id;
+      } else {
+        updatedFields.size = sizeExists._id;
+      }
+    }
+
+    // For each category in the update, ensure it exists in the Tag collection.
     for (const categoryLabel of updatedCategoryLabels) {
       const exists = await Tag.findOne({
         label: categoryLabel,
@@ -159,7 +197,6 @@ export async function PATCH(
       });
 
       if (!exists) {
-console.log("new cat label: ", categoryLabel);
         await Tag.create({ label: categoryLabel, type: "category" });
       }
     }
@@ -170,7 +207,7 @@ console.log("new cat label: ", categoryLabel);
       label: { $in: updatedCategoryLabels },
       type: "category",
     });
-console.log("updated tag list",updatedTags)
+
     // Update the artwork's categories field to only include the Tag IDs from the updated list.
     artwork.categories = updatedTags.map((tag) => tag._id);
 
