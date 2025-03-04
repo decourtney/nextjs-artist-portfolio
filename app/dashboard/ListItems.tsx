@@ -146,34 +146,53 @@ export default function ListItems({
   const renderFileItem = (file: PopulatedArtworkDocument) => {
     const isChecked = selectedIds.includes(file._id);
     return (
-      <li key={file._id} className="flex border-b p-2 items-center">
+      <li key={file._id} className="flex flex-row p-2 border-b">
         <Checkbox
           isSelected={isChecked}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             handleSelectItem(file._id, e.target.checked)
           }
         />
-        <div className="min-w-12 w-12 min-h-12 h-12">
+        <div className="flex w-full overflow-hidden">
           <Image
             src={file.thumbSrc}
             removeWrapper
             radius="none"
-            className="w-full h-full object-cover"
+            className="w-12 h-12 object-cover"
           />
-        </div>
-        <div className="flex flex-col items-start px-2 overflow-hidden">
-          <p className="text-lg text-nowrap text-ellipsis overflow-hidden">
-            {file.name}
-          </p>
-          <Button
-            variant="light"
-            size="sm"
-            isIconOnly
-            onPress={() => handleEdit(file)}
-            className="min-w-fit h-fit text-foreground-100"
-          >
-            Edit
-          </Button>
+          <div className="flex flex-col w-full h-full ml-2 truncate">
+            <p className="truncate">{file.name}</p>
+            <div className="flex justify-between">
+              <div className="flex flex-row text-tiny">
+                {file.categories.length > 0 && (
+                  <div className="px-2">
+                    {file.categories.length}
+                    <span className="ml-1">
+                      {file.categories.length > 1 ? "Categories" : "Category"}
+                    </span>
+                  </div>
+                )}
+
+                {file.medium && (
+                  <div className="border-l-1 px-2">{file.medium.label}</div>
+                )}
+                {file.size && (
+                  <div className="border-l-1 px-2">
+                    {file.size && file.size.label}
+                  </div>
+                )}
+              </div>
+
+              <Button
+                variant="light"
+                size="sm"
+                onPress={() => handleEdit(file)}
+                className="min-w-fit h-fit text-foreground-100"
+              >
+                Edit
+              </Button>
+            </div>
+          </div>
         </div>
       </li>
     );
@@ -189,27 +208,27 @@ export default function ListItems({
       <div className="grid grid-cols-2 gap-x-4">
         {/* Left Column */}
         <ul>
-          <div className="flex items-center border-b-2 py-1">
+          <div className="flex items-center border-b-2 p-2">
             <Checkbox
               isSelected={allSelected(leftFiles)}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 handleSelectAllColumn(leftFiles, e.target.checked)
               }
             />
-            <span className="font-semibold text-xs">Select All</span>
+            <span className="font-medium text-xs">Select All</span>
           </div>
           {leftFiles.map(renderFileItem)}
         </ul>
         {/* Right Column */}
         <ul>
-          <div className="flex items-center border-b-2 border-background-300 mb-2 p-2">
+          <div className="flex items-center border-b-2 p-2">
             <Checkbox
               isSelected={allSelected(rightFiles)}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 handleSelectAllColumn(rightFiles, e.target.checked)
               }
             />
-            <span className="ml-2 font-bold">Select All</span>
+            <span className="font-medium text-xs">Select All</span>
           </div>
           {rightFiles.map(renderFileItem)}
         </ul>
