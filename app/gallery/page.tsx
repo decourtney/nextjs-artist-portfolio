@@ -16,30 +16,29 @@ import { Image } from "@heroui/react";
 const GalleryPage = async () => {
   await dbConnect(); // important!
 
-  const response: ArtworkDocument[] = await Artwork.find({}).limit(10);
+  const response: ArtworkDocument[] = await Artwork.find({});
   // const response = await Artwork.find();
   const artworksData = JSON.parse(JSON.stringify(response));
 
   return (
-    <section className="min-h-dvh">
-      <div className="text-center content-center h-[50px] bg-secondary-100">
-        TOP FILTER
+    <div className="flex h-[100dvh-64px] min-h-[100dvh-64px]">
+      <div className="flex w-[20%] h-full p-4 bg-background-600">
+        OR SIDE FILTER
       </div>
 
-      <div className="flex flex-row">
-        <div className="w-[20%] h-full p-4 text-center my-auto">
-          OR SIDE FILTER
-        </div>
-
-        <ul className="w-fit columns-3 gap-1 space-y-1">
-          {artworksData.map((artwork: ArtworkDocument) => (
-            <li key={artwork.name}>
-              <Image src={artwork.thumbSrc} alt="" />
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
+      <ul className="w-full columns-5 gap-1 space-y-1">
+        {artworksData.map((artwork: ArtworkDocument) => (
+          <li className=" " key={artwork.name}>
+            <Image
+              removeWrapper
+              radius="none"
+              src={artwork.thumbSrc}
+              className="w-full"
+            />
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };
 

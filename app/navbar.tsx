@@ -36,7 +36,7 @@ const NavBar = () => {
       isBlurred={false}
       shouldHideOnScroll
       maxWidth="full"
-      height="96px"
+      // height="96px"
     >
       <NavbarContent
         justify="start"

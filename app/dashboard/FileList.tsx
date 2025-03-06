@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Button,
   Checkbox,
@@ -21,6 +21,7 @@ import { TagDocument } from "@/models/Tag";
 import CategoryDropDown from "./CategoryDropDown";
 import MediumDropDown from "./MediumDropDown";
 import SizeDropDown from "./SizeDropDown";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
 // Define a type for the editable fields.
 interface EditableArtwork {
@@ -38,12 +39,16 @@ interface AllTags {
   sizes: TagDocument[];
 }
 
-export default function ListItems({
+export default function FileList({
   files,
   tags,
+  currentPage,
+  totalPages,
 }: {
   files: PopulatedArtworkDocument[];
   tags: AllTags;
+  currentPage: number;
+  totalPages: number;
 }) {
   const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -52,11 +57,17 @@ export default function ListItems({
   const [editForm, setEditForm] = useState<EditableArtwork | null>(null);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
-  // Split files into two columns
-  const midIndex = Math.ceil(files.length / 2);
-  const leftFiles = files.slice(0, midIndex);
-  const rightFiles = files.slice(midIndex);
+  const handlePrevious = () => {
+    if (currentPage > 1) {
+      router.push(`?page=${currentPage - 1}`);
+    }
+  };
 
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      router.push(`?page=${currentPage + 1}`);
+    }
+  };
   // Handle individual item selection
   const handleSelectItem = (id: string, isSelected: boolean) => {
     setSelectedIds((prev) => {
@@ -142,12 +153,17 @@ export default function ListItems({
     router.refresh();
   };
 
+  // Helper to determine if all items in a column are selected
+  const allSelected = (filesInColumn: PopulatedArtworkDocument[]) =>
+    filesInColumn.every((file) => selectedIds.includes(file._id));
+
   // Render a single file item with a checkbox, thumbnail, and an edit button.
   const renderFileItem = (file: PopulatedArtworkDocument) => {
     const isChecked = selectedIds.includes(file._id);
     return (
       <li key={file._id} className="flex flex-row p-2 border-b">
         <Checkbox
+          size="sm"
           isSelected={isChecked}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             handleSelectItem(file._id, e.target.checked)
@@ -160,8 +176,9 @@ export default function ListItems({
             radius="none"
             className="w-12 h-12 object-cover"
           />
-          <div className="flex flex-col w-full h-full ml-2 truncate">
+          <div className="flex flex-col w-full h-full ml-2 gap-2 truncate">
             <p className="truncate">{file.name}</p>
+
             <div className="flex justify-between">
               <div className="flex flex-row text-tiny">
                 {file.categories.length > 0 && (
@@ -198,53 +215,60 @@ export default function ListItems({
     );
   };
 
-  // Helper to determine if all items in a column are selected
-  const allSelected = (filesInColumn: PopulatedArtworkDocument[]) =>
-    filesInColumn.every((file) => selectedIds.includes(file._id));
-
   return (
-    <div className="flex flex-col m-4 text-foreground-100 bg-background-100">
-      {/* Two columns for the file list */}
-      <div className="grid grid-cols-2 gap-x-4">
-        {/* Left Column */}
-        <ul>
-          <div className="flex items-center border-b-2 p-2">
-            <Checkbox
-              isSelected={allSelected(leftFiles)}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleSelectAllColumn(leftFiles, e.target.checked)
-              }
-            />
-            <span className="font-medium text-xs">Select All</span>
-          </div>
-          {leftFiles.map(renderFileItem)}
-        </ul>
-        {/* Right Column */}
-        <ul>
-          <div className="flex items-center border-b-2 p-2">
-            <Checkbox
-              isSelected={allSelected(rightFiles)}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleSelectAllColumn(rightFiles, e.target.checked)
-              }
-            />
-            <span className="font-medium text-xs">Select All</span>
-          </div>
-          {rightFiles.map(renderFileItem)}
-        </ul>
-      </div>
-      {/* Global Delete button */}
-      <div className="flex justify-end space-x-4 mt-4">
-        <button
-          className="btn btn-danger"
-          onClick={handleDelete}
-          disabled={selectedIds.length === 0}
+    <div className="max-w-[800px] m-1 rounded-lg border-1 text-foreground-100 bg-background-50 shadow-md">
+      <ul>
+        <div className="flex justify-between items-center border-b-2 p-2">
+          <Checkbox
+            size="sm"
+            isSelected={allSelected(files)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              handleSelectAllColumn(files, e.target.checked)
+            }
+          >
+            <span className="font-medium text-xs text-foreground-100">
+              Select All
+            </span>
+          </Checkbox>
+
+          <Button
+            size="sm"
+            color="danger"
+            onPress={handleDelete}
+            isDisabled={selectedIds.length === 0}
+          >
+            Delete Selected
+          </Button>
+        </div>
+        {files.map(renderFileItem)}
+      </ul>
+
+      <div className="flex justify-center gap-2 p-2 items-center">
+        <Button
+          isIconOnly
+          size="sm"
+          variant="light"
+          onPress={handlePrevious}
+          isDisabled={currentPage === 1}
+          className="text-foreground-100 text-lg"
         >
-          Delete Selected
-        </button>
+          <IoIosArrowBack />
+        </Button>
+        <span>
+          {currentPage} of {totalPages}
+        </span>
+        <Button
+          isIconOnly
+          size="sm"
+          variant="light"
+          onPress={handleNext}
+          isDisabled={currentPage === totalPages}
+          className="text-foreground-100 text-lg"
+        >
+          <IoIosArrowForward />
+        </Button>
       </div>
 
-      {/* Edit Modal using NextUI/@heroui Modal */}
       <Modal
         isOpen={isOpen}
         placement="auto"
