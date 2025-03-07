@@ -21,7 +21,7 @@ import { TagDocument } from "@/models/Tag";
 import CategoryDropDown from "./CategoryDropDown";
 import MediumDropDown from "./MediumDropDown";
 import SizeDropDown from "./SizeDropDown";
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { IoIosArrowBack, IoIosArrowForward, IoIosClose } from "react-icons/io";
 
 // Define a type for the editable fields.
 interface EditableArtwork {
@@ -177,7 +177,14 @@ export default function FileList({
             className="w-12 h-12 object-cover"
           />
           <div className="flex flex-col w-full h-full ml-2 gap-2 truncate">
-            <p className="truncate">{file.name}</p>
+            <div className="flex justify-between">
+              <p className="truncate">{file.name}</p>
+              <div className="flex items-center text-tiny">
+                {file.metaWidth}
+                <IoIosClose />
+                {file.metaHeight}
+              </div>
+            </div>
 
             <div className="flex justify-between">
               <div className="flex flex-row text-tiny">

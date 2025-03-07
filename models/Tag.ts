@@ -1,9 +1,10 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { TagType } from "@/types/tagType";
 
 export interface TagDocument extends Document {
   _id: string;
   label: string;
-  type: string;
+  type: TagType; 
 }
 
 const TagSchema = new Schema<TagDocument>(
@@ -18,12 +19,10 @@ const TagSchema = new Schema<TagDocument>(
       type: String,
       required: true,
       trim: true,
-      enum: ["category", "medium", "size"],
+      enum: [TagType.CATEGORY, TagType.MEDIUM, TagType.SIZE],
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 export default mongoose.models.Tag ||

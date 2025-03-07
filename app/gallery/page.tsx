@@ -1,43 +1,43 @@
 import dbConnect from "@/lib/dbConnect";
 import Artwork, { ArtworkDocument } from "@/models/Artwork";
-import { Image } from "@heroui/react";
-// import CategoryList from "./CategoryList";
-// import InfiniteScroll from "react-infinite-scroll-component";
-// import Masonry from "react-masonry-css";
-// import { Card, CardBody, Image } from "@heroui/react";
+import ImageDisplay from "./ImageDisplay";
+import { Tag } from "@/models";
+import { TagDocument } from "@/models/Tag";
+import { TagType } from "@/types/tagType";
 
-// const breakpointColumnsObj = {
-//   default: 4,
-//   1100: 3,
-//   700: 2,
-//   500: 1,
-// };
+function toTitleCase(str: string): string {
+  return str
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}
 
 const GalleryPage = async () => {
-  await dbConnect(); // important!
+  await dbConnect();
 
-  const response: ArtworkDocument[] = await Artwork.find({});
-  // const response = await Artwork.find();
-  const artworksData = JSON.parse(JSON.stringify(response));
+  const artworkData = await Artwork.find();
+  const tagData = await Tag.find();
+
+  const artworks = JSON.parse(JSON.stringify(artworkData)) as ArtworkDocument[];
+  const tags = JSON.parse(JSON.stringify(tagData)) as TagDocument;
+
+  Object.values(TagType).forEach((value) => {
+    console.log(toTitleCase(value));
+  });
 
   return (
-    <div className="flex h-[100dvh-64px] min-h-[100dvh-64px]">
-      <div className="flex w-[20%] h-full p-4 bg-background-600">
-        OR SIDE FILTER
+    <div className="flex w-full h-[100dvh-64px] min-h-[100dvh-64px]">
+      <div className="flex w-[20%] h-full p-4">
+        <div className="w-full">
+          {Object.values(TagType).map((typeValue) => (
+            <ul key={typeValue} className="w-full font-medium text-center text-4xl text-foreground-300">
+              {toTitleCase(typeValue)}
+            </ul>
+          ))}
+        </div>
       </div>
 
-      <ul className="w-full columns-5 gap-1 space-y-1">
-        {artworksData.map((artwork: ArtworkDocument) => (
-          <li className=" " key={artwork.name}>
-            <Image
-              removeWrapper
-              radius="none"
-              src={artwork.thumbSrc}
-              className="w-full"
-            />
-          </li>
-        ))}
-      </ul>
+      <ImageDisplay artworks={artworks} />
     </div>
   );
 };
