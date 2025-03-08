@@ -30,7 +30,7 @@ const NavBar = () => {
 
   return (
     <Navbar
-      className={`bg-transparent p-1 `}
+      className="bg-transparent"
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
       isBlurred={false}

@@ -12,7 +12,7 @@ const ImageDisplay = ({ artworks }: ImageDisplayProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
-    <ul className="w-full columns-1 lg:columns-3 xl:columns-4 gap-1 space-y-1">
+    <ul className="w-full columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-1 space-y-1">
       {artworks.map((artwork: ArtworkDocument) => (
         <li key={artwork._id}>
           <Skeleton isLoaded={isLoaded}>
