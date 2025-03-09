@@ -15,13 +15,23 @@ import dbConnect from "@/lib/dbConnect";
 function parseActiveFilters(segments: string[]): Record<string, string[]> {
   const active: Record<string, string[]> = {};
   for (const seg of segments) {
-    const [type, label] = seg.split("-");
+    const [type, label] = splitFirst(seg,"-");
+
     if (!active[type]) {
       active[type] = [];
     }
     active[type].push(label);
   }
   return active;
+}
+
+function splitFirst(str:string, sep:string) {
+  const idx = str.indexOf(sep);
+  if (idx === -1) return [str]; // no separator
+  return [
+    str.slice(0, idx),
+    str.slice(idx + sep.length), // the remainder (including any other dashes)
+  ];
 }
 
 /**
@@ -39,8 +49,17 @@ function buildNewSegments(
   const active = parseActiveFilters(currentSegments);
 
   if (singleSelectTypes[clickedType]) {
-    // single select => only keep this label
-    active[clickedType] = [clickedLabel];
+    // single select => toggle if it's the same label
+    const existingLabels = active[clickedType] ?? [];
+
+    // If user clicks the same label, remove it (toggle off); otherwise, select it
+    if (existingLabels.length === 1 && existingLabels[0] === clickedLabel) {
+      // Same label => remove
+      active[clickedType] = [];
+    } else {
+      // Different label => select only the new one
+      active[clickedType] = [clickedLabel];
+    }
   } else {
     // multi select => toggle
     const existingLabels = active[clickedType] ?? [];
@@ -58,19 +77,22 @@ function buildNewSegments(
   let newSegments: string[] = [];
   for (const [type, labels] of Object.entries(active)) {
     for (const lbl of labels) {
-      newSegments.push(`${type}-${lbl}`);
+      if (lbl) {
+        newSegments.push(`${type}-${lbl}`);
+      }
     }
   }
 
   // Remove duplicates & optionally sort
-  newSegments = Array.from(new Set(newSegments)); // no duplicates
+  newSegments = Array.from(new Set(newSegments));
   newSegments.sort();
   return newSegments;
 }
 
+
 function toTitleCase(str: string): string {
   return str
-    .split(" ")
+    .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(" ");
 }
@@ -145,7 +167,7 @@ const GalleryLayout = async ({
                         <p
                           className={`w-full text-center text-xl transition-colors ${textClass}`}
                         >
-                          {tag.label}
+                          {toTitleCase(tag.label)}
                         </p>
                       </Link>
                     </li>

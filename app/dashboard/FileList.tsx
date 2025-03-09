@@ -24,7 +24,7 @@ import SizeDropDown from "./SizeDropDown";
 import { IoIosArrowBack, IoIosArrowForward, IoIosClose } from "react-icons/io";
 
 // Define a type for the editable fields.
-interface EditableArtwork {
+export interface EditableArtwork {
   name: string;
   description: string;
   thumbSrc: string;

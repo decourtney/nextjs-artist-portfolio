@@ -7,6 +7,7 @@ import {
 import dbConnect from "@/lib/dbConnect";
 import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import { Tag } from "@/models";
+import { EditableArtwork } from "@/app/dashboard/FileList";
 
 // Create S3 client
 const s3Client = new S3Client({
@@ -80,7 +81,7 @@ export async function PATCH(
     const { id } = params;
     // Parse the incoming JSON payload containing the updated artwork fields.
     // Expected keys: name, description, size, medium, categories (array of category names), etc.
-    const updatedFields = await request.json();
+    const updatedFields:EditableArtwork = await request.json();
 
     // Retrieve the artwork document by ID
     const artwork = await Artwork.findById(id);
@@ -105,13 +106,15 @@ export async function PATCH(
     let newThumbSrc = artwork.thumbSrc;
 
     // If the name is being updated (and is different), handle S3 renaming
-    if (updatedFields.name && updatedFields.name !== artwork.name) {
-      const truncatedName =
-        updatedFields.name.length > 60
-          ? updatedFields.name.substring(0, 60)
-          : updatedFields.name;
-      const newMainKey = `${folderPath}${truncatedName}.webp`;
-      const newThumbKey = `${folderPath}${truncatedName}-thumb.webp`;
+    const sanitizedUpdatedName:string = updatedFields.name.replaceAll(" ", "-");
+    if (sanitizedUpdatedName && sanitizedUpdatedName.toLowerCase() !== artwork.name.toLowerCase()) {
+      updatedFields.name =
+        sanitizedUpdatedName.length > 60
+          ? sanitizedUpdatedName.substring(0, 60)
+          : sanitizedUpdatedName;
+
+      const newMainKey = `${folderPath}${updatedFields.name}.webp`;
+      const newThumbKey = `${folderPath}${updatedFields.name}-thumb.webp`;
 
       if (newMainKey !== oldMainKey) {
         await s3Client.send(
@@ -154,14 +157,15 @@ export async function PATCH(
     const updatedSizeLabel: string = updatedFields.size;
 
     if (updatedMediumLabel) {
+      const sanitizedMediumLabel = updatedMediumLabel.replaceAll(" ", "-");
       const mediumExists = await Tag.findOne({
-        label: updatedMediumLabel,
+        label: sanitizedMediumLabel,
         type: "medium",
       });
 
       if (!mediumExists) {
         const newMediumTag = await Tag.create({
-          label: updatedMediumLabel,
+          label: sanitizedMediumLabel,
           type: "medium",
         });
 
@@ -172,14 +176,15 @@ export async function PATCH(
     }
 
     if (updatedSizeLabel) {
+      const sanitizedSizeLabel = updatedSizeLabel.replaceAll(" ", "-");
       const sizeExists = await Tag.findOne({
-        label: updatedSizeLabel,
+        label: sanitizedSizeLabel,
         type: "size",
       });
 
       if (!sizeExists) {
         const newSizeTag = await Tag.create({
-          label: updatedSizeLabel,
+          label: sanitizedSizeLabel,
           type: "size",
         });
 
@@ -190,7 +195,12 @@ export async function PATCH(
     }
 
     // For each category in the update, ensure it exists in the Tag collection.
-    for (const categoryLabel of updatedCategoryLabels) {
+    const sanitizedCategoryLabels: string[] = updatedCategoryLabels.map(
+      (label) => {
+        return label.replaceAll(" ", "-");
+      }
+    );
+    for (const categoryLabel of sanitizedCategoryLabels) {
       const exists = await Tag.findOne({
         label: categoryLabel,
         type: "category",
@@ -204,7 +214,7 @@ export async function PATCH(
     // Update the artwork's categories:
     // Find all Tag documents (of type "category") whose labels are in the updated list.
     const updatedTags = await Tag.find({
-      label: { $in: updatedCategoryLabels },
+      label: { $in: sanitizedCategoryLabels },
       type: "category",
     });
 

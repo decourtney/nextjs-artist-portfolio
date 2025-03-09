@@ -87,12 +87,18 @@ export async function POST(request: NextRequest) {
         const folderPath = process.env.NEXT_PUBLIC_AWS_IMAGES_FOLDER || "";
 
         const extensionIndex = filename.lastIndexOf(".");
-        const baseName =
+
+        const rawBaseName =
           extensionIndex !== -1
             ? filename.substring(0, extensionIndex)
             : filename;
+
+        const safeBaseName = rawBaseName.replaceAll(" ", "-");
+
         const truncatedBaseName =
-          baseName.length > 60 ? baseName.substring(0, 60) : baseName;
+          safeBaseName.length > 60
+            ? safeBaseName.substring(0, 60)
+            : safeBaseName;
 
         const mainKey = `${folderPath}${truncatedBaseName}.webp`;
         const thumbKey = `${folderPath}${truncatedBaseName}-thumb.webp`;
