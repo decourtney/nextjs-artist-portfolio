@@ -1,13 +1,13 @@
-import Artwork, { ArtworkDocument } from "@/models/Artwork";
-import { Image, Skeleton } from "@heroui/react";
-import React, { useState } from "react";
-import ImageDisplay from "./ImageDisplay";
 import dbConnect from "@/lib/dbConnect";
 import { Tag } from "@/models";
+import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import { TagDocument } from "@/models/Tag";
+import ImageDisplay from "./ImageDisplay";
 
 // utils/filters.ts
-export function parseActiveFilters(segments: string[]): Record<string, string[]> {
+export function parseActiveFilters(
+  segments: string[]
+): Record<string, string[]> {
   const active: Record<string, string[]> = {};
   for (const seg of segments) {
     // Split on the first dash
@@ -26,11 +26,11 @@ export function parseActiveFilters(segments: string[]): Record<string, string[]>
   return active;
 }
 
-export default async function FilteredDisplayPage({
+const FilteredDisplayPage = async ({
   params,
 }: {
   params: { filters?: string[] };
-}) {
+}) => {
   await dbConnect();
 
   // Fetch all tags for mapping filter labels to tag _id's.
@@ -97,4 +97,6 @@ export default async function FilteredDisplayPage({
       <ImageDisplay artworks={artworks} />
     </div>
   );
-}
+};
+
+export default FilteredDisplayPage;

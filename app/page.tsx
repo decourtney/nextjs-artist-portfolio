@@ -1,7 +1,17 @@
+// "use client";
+
+import dbConnect from "@/lib/dbConnect";
+import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import { Image, Link } from "@heroui/react";
 import { charm } from "./fonts/fonts";
 
 const HomePage = async () => {
+  // const [showOverlay, setShowOverlay] = useState(true);
+  await dbConnect();
+  const artworks: ArtworkDocument[] = await Artwork.find()
+    .sort({ createdAt: -1 })
+    .limit(3);
+
   return (
     <div className="min-h-screen">
       {/* Fixed Hero Section */}
@@ -23,9 +33,9 @@ const HomePage = async () => {
       {/* Scrollable Content */}
       <div
         id="about"
-        className="relative w-full min-h-screen mt-[100dvh] p-24 content-center bg-background-300 bg-gradient-to-b from-emerald-300 to-transparent"
+        className="relative w-full min-h-screen mt-[100dvh] p-24 content-center bg-background-300 bg-gradient-to-b from-sky-600 to-transparent"
       >
-        {/* <div className="absolute bottom-full left-0 w-full h-1/3 md:h-1/3 pointer-events-none bg-gradient-to-t from-emerald-300 to-transparent" /> */}
+        <div className="absolute bottom-full left-0 w-full h-1/3 md:h-1/3 pointer-events-none bg-gradient-to-t from-sky-600 to-transparent" />
         <div className="flex flex-col justify-center items-center w-full space-y-24">
           <h3 className="font-black text-9xl">Bio</h3>
           <div className="flex justify-center text-center w-1/2 h-1/2">

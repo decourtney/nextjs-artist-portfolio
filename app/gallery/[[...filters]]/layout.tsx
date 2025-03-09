@@ -1,8 +1,8 @@
-import { Button, Link } from "@heroui/react";
-import React from "react";
+import dbConnect from "@/lib/dbConnect";
 import Tag, { TagDocument } from "@/models/Tag";
 import { TagType } from "@/types/tagType";
-import dbConnect from "@/lib/dbConnect";
+import { Link } from "@heroui/react";
+import React from "react";
 
 /**
  * Parse segments like ["category-landscape","size-4x4"] into an object:
@@ -15,7 +15,7 @@ import dbConnect from "@/lib/dbConnect";
 function parseActiveFilters(segments: string[]): Record<string, string[]> {
   const active: Record<string, string[]> = {};
   for (const seg of segments) {
-    const [type, label] = splitFirst(seg,"-");
+    const [type, label] = splitFirst(seg, "-");
 
     if (!active[type]) {
       active[type] = [];
@@ -25,7 +25,7 @@ function parseActiveFilters(segments: string[]): Record<string, string[]> {
   return active;
 }
 
-function splitFirst(str:string, sep:string) {
+function splitFirst(str: string, sep: string) {
   const idx = str.indexOf(sep);
   if (idx === -1) return [str]; // no separator
   return [
@@ -88,7 +88,6 @@ function buildNewSegments(
   newSegments.sort();
   return newSegments;
 }
-
 
 function toTitleCase(str: string): string {
   return str

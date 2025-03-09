@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { PopulatedArtworkDocument } from "@/models/Artwork";
+import { TagDocument } from "@/models/Tag";
 import {
   Button,
   Checkbox,
@@ -16,12 +16,12 @@ import {
   Textarea,
   useDisclosure,
 } from "@heroui/react";
-import { PopulatedArtworkDocument } from "@/models/Artwork";
-import { TagDocument } from "@/models/Tag";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import { IoIosArrowBack, IoIosArrowForward, IoIosClose } from "react-icons/io";
 import CategoryDropDown from "./CategoryDropDown";
 import MediumDropDown from "./MediumDropDown";
 import SizeDropDown from "./SizeDropDown";
-import { IoIosArrowBack, IoIosArrowForward, IoIosClose } from "react-icons/io";
 
 // Define a type for the editable fields.
 export interface EditableArtwork {
