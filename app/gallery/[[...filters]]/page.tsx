@@ -26,34 +26,6 @@ export function parseActiveFilters(segments: string[]): Record<string, string[]>
   return active;
 }
 
-function buildQueryFromFilters(
-  active: Record<string, string[]>
-): Record<string, any> {
-  const query: Record<string, any> = {};
-
-  // For example: if your Artwork schema has a "category" field which is an array,
-  // you might do something like:
-  if (active.category?.length) {
-    // "where category includes any of these"
-    query.categories = { $in: active.category };
-  }
-
-  // If you have a "medium" field that’s a string:
-  if (active.medium?.length) {
-    // If multi is allowed, do `$in: active.medium`
-    // If single is typical, just pick the first, or build your logic
-    query.medium = { $in: active.medium };
-  }
-
-  // If size is a single field:
-  if (active.size?.length) {
-    query.size = { $in: active.size };
-  }
-
-  return query;
-}
-
-
 export default async function FilteredDisplayPage({
   params,
 }: {
