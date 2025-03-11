@@ -19,7 +19,7 @@ const s3Client = new S3Client({
 });
 
 export async function GET(
-  // request: NextRequest,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
