@@ -1,9 +1,7 @@
-import React from "react";
-import FilePicker from "./FilePicker";
 import Artwork, { PopulatedArtworkDocument } from "@/models/Artwork";
 import Tag, { TagDocument } from "@/models/Tag";
-import dynamic from "next/dynamic";
 import FileList from "./FileList";
+import FilePicker from "./FilePicker";
 
 // const FileList = dynamic(() => import("./FileList"), {
 //   ssr: false,

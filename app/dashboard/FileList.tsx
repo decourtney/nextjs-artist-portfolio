@@ -172,6 +172,7 @@ export default function FileList({
         <div className="flex w-full overflow-hidden">
           <Image
             src={file.thumbSrc}
+            alt={file.name}
             removeWrapper
             radius="none"
             className="w-12 h-12 object-cover"
@@ -303,6 +304,7 @@ export default function FileList({
                         removeWrapper
                         radius="none"
                         src={editForm?.thumbSrc}
+                        alt={editForm?.name}
                         className="w-full h-auto"
                       />
                     </div>

@@ -1,6 +1,5 @@
 import { Button, Link } from '@heroui/react';
-import React from 'react'
-import { BsFacebook, BsInstagram, BsLinkedin, BsTwitter } from 'react-icons/bs';
+import { BsInstagram } from 'react-icons/bs';
 
 const SocialMediaButtons = () => {
   return (

@@ -1,17 +1,9 @@
 // "use client";
 
-import dbConnect from "@/lib/dbConnect";
-import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import { Image, Link } from "@heroui/react";
 import { charm } from "./fonts/fonts";
 
 const HomePage = async () => {
-  // const [showOverlay, setShowOverlay] = useState(true);
-  await dbConnect();
-  const artworks: ArtworkDocument[] = await Artwork.find()
-    .sort({ createdAt: -1 })
-    .limit(3);
-
   return (
     <div className="min-h-screen">
       {/* Fixed Hero Section */}

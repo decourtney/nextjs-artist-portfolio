@@ -1,21 +1,23 @@
 import { TagDocument } from "@/models/Tag";
-import {
-  Button,
-  ButtonGroup,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-  Input,
-  SharedSelection,
-} from "@heroui/react";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import {
-  IoIosAdd,
-  IoIosArrowDown,
-  IoIosCheckmark,
-  IoIosClose,
-} from "react-icons/io";
+import
+  {
+    Button,
+    ButtonGroup,
+    Dropdown,
+    DropdownItem,
+    DropdownMenu,
+    DropdownTrigger,
+    Input,
+    SharedSelection,
+  } from "@heroui/react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import
+  {
+    IoIosAdd,
+    IoIosArrowDown,
+    IoIosCheckmark,
+    IoIosClose,
+  } from "react-icons/io";
 
 type CategoryDropDownProps = {
   availableItems: TagDocument[];
@@ -31,9 +33,9 @@ const CategoryDropDown = ({
   const [selectedKeys, setSelectedKeys] = useState<SharedSelection>(
     new Set(selectedItems)
   );
-  const [displayInput, setDisplayInput] = useState<Boolean>(false);
+  const [displayInput, setDisplayInput] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
-  const [dropDownOpen, setDropDownOpen] = useState<Boolean>(false);
+  const [dropDownOpen, setDropDownOpen] = useState<boolean>(false);
   const inputContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

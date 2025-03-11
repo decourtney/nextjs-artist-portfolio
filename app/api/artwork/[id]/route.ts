@@ -18,6 +18,23 @@ const s3Client = new S3Client({
   },
 });
 
+export async function GET(
+  // request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    await dbConnect();
+    const { id } = params;
+    // const req = await request.json();
+
+    const artwork = await Artwork.find({id});
+    return NextResponse.json({ artwork });
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
+  }
+}
+
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -81,7 +98,7 @@ export async function PATCH(
     const { id } = params;
     // Parse the incoming JSON payload containing the updated artwork fields.
     // Expected keys: name, description, size, medium, categories (array of category names), etc.
-    const updatedFields:EditableArtwork = await request.json();
+    const updatedFields: EditableArtwork = await request.json();
 
     // Retrieve the artwork document by ID
     const artwork = await Artwork.findById(id);
@@ -106,8 +123,14 @@ export async function PATCH(
     let newThumbSrc = artwork.thumbSrc;
 
     // If the name is being updated (and is different), handle S3 renaming
-    const sanitizedUpdatedName:string = updatedFields.name.replaceAll(" ", "-");
-    if (sanitizedUpdatedName && sanitizedUpdatedName.toLowerCase() !== artwork.name.toLowerCase()) {
+    const sanitizedUpdatedName: string = updatedFields.name.replaceAll(
+      " ",
+      "-"
+    );
+    if (
+      sanitizedUpdatedName &&
+      sanitizedUpdatedName.toLowerCase() !== artwork.name.toLowerCase()
+    ) {
       updatedFields.name =
         sanitizedUpdatedName.length > 60
           ? sanitizedUpdatedName.substring(0, 60)
