@@ -3,9 +3,20 @@ import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import Busboy from "busboy";
 import dbConnect from "@/lib/dbConnect";
-import Artwork from "@/models/Artwork";
+import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import sharp from "sharp";
 import { Readable } from "stream";
+
+// Enhanced interface to also track a UUID for each file
+interface PendingImageData {
+  id: string; // The UUID passed from the client
+  truncatedBaseName: string;
+  fileBuffer: Buffer;
+  mainKey: string;
+  thumbKey: string;
+  mainUrl: string;
+  thumbUrl: string;
+}
 
 // Create S3 client
 const s3Client = new S3Client({
@@ -42,17 +53,6 @@ export async function GET() {
   }
 }
 
-// Enhanced interface to also track a UUID for each file
-interface PendingImageData {
-  id: string; // The UUID passed from the client
-  truncatedBaseName: string;
-  fileBuffer: Buffer;
-  mainKey: string;
-  thumbKey: string;
-  mainUrl: string;
-  thumbUrl: string;
-}
-
 export async function POST(request: NextRequest) {
   try {
     await dbConnect();
@@ -87,12 +87,18 @@ export async function POST(request: NextRequest) {
         const folderPath = process.env.NEXT_PUBLIC_AWS_IMAGES_FOLDER || "";
 
         const extensionIndex = filename.lastIndexOf(".");
-        const baseName =
+
+        const rawBaseName =
           extensionIndex !== -1
             ? filename.substring(0, extensionIndex)
             : filename;
+
+        const safeBaseName = rawBaseName.replaceAll(" ", "-");
+
         const truncatedBaseName =
-          baseName.length > 60 ? baseName.substring(0, 60) : baseName;
+          safeBaseName.length > 60
+            ? safeBaseName.substring(0, 60)
+            : safeBaseName;
 
         const mainKey = `${folderPath}${truncatedBaseName}.webp`;
         const thumbKey = `${folderPath}${truncatedBaseName}-thumb.webp`;
@@ -159,13 +165,20 @@ export async function POST(request: NextRequest) {
           } = item;
 
           try {
+            const sharpImageOriginal = sharp(fileBuffer);
+            const metadata = await sharpImageOriginal.metadata();
+            const originalWidth = metadata.width;
+            const originalHeight = metadata.height;
+
             // Convert to main WebP
-            const mainWebpBuffer = await sharp(fileBuffer)
+            const mainWebpBuffer = await sharpImageOriginal
+              .rotate()
               .webp({ quality: 80 })
               .toBuffer();
 
-            // Convert to thumb WebP (400px wide)
+            // Convert to thumbnail WebP
             const thumbWebpBuffer = await sharp(fileBuffer)
+              .rotate()
               .resize(400)
               .webp({ quality: 80 })
               .toBuffer();
@@ -195,11 +208,13 @@ export async function POST(request: NextRequest) {
             await thumbUpload.done();
 
             // Insert a document into MongoDB
-            const artworkDoc = new Artwork({
+            const artworkDoc: ArtworkDocument = new Artwork({
               name: truncatedBaseName,
               src: mainUrl,
               alt: truncatedBaseName,
               thumbSrc: thumbUrl,
+              metaWidth: originalWidth,
+              metaHeight: originalHeight,
             });
             await artworkDoc.save();
 

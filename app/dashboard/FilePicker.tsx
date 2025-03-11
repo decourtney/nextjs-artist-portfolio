@@ -3,6 +3,7 @@
 import React, { useState, ChangeEvent, useRef, FormEvent } from "react";
 import { Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
+import { useRouter } from "next/navigation";
 
 interface FileItem {
   id: string; // A unique UUID for each file
@@ -18,6 +19,7 @@ interface ArtworkApiResponse {
 }
 
 const FilePicker = () => {
+  const router = useRouter();
   const [selectedFiles, setSelectedFiles] = useState<FileItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -113,6 +115,7 @@ const FilePicker = () => {
         );
       }
 
+      router.refresh();
       alert("Upload completed. See highlights for success/fail status.");
     } catch (error) {
       console.error(error);
@@ -123,7 +126,7 @@ const FilePicker = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-[800px] m-2 shadow-md rounded-md bg-background-200"
+      className="max-w-[800px] m-1 shadow-md rounded-md bg-background-100 text-foreground-100"
     >
       {/* Hidden <input type="file" /> */}
       <input
@@ -142,7 +145,7 @@ const FilePicker = () => {
               <span>{selectedFiles.length} </span>Selected File
               {selectedFiles.length > 1 ? <span>s</span> : null}
             </h3>
-            <ul className="[&>*:nth-child(even)]:bg-slate-100">
+            <ul className="[&>*:nth-child(even)]:bg-slate-200 text-foreground-100">
               {selectedFiles.map((item, index) => {
                 // const itemStyle =
                 //   item.status === "error" ? "text-red-700 font-bold" : "";
@@ -152,24 +155,25 @@ const FilePicker = () => {
                     key={item.id}
                     className={`flex justify-between items-center pr-1 pl-2 py-1`}
                   >
-                    <span className="truncate"> {item.name}</span>
+                    <p className="truncate"> {item.name}</p>
 
-                    {item.status === "error" && item.errorMessage ? (
-                      <span className="ml-1 px-1 text-red-500 bg-red-100 whitespace-nowrap">
+                    <div className="flex items-center space-x-2">
+                      {item.status === "error" && item.errorMessage ? (
+                      <span className="p-1 rounded-sm text-red-500 bg-red-100 whitespace-nowrap">
                         {item.errorMessage}
                       </span>
-                    ) : null}
-
-                    <div className="border-l-1">
-                      <Button
-                        isIconOnly
-                        size="sm"
-                        radius="full"
-                        className="bg-transparent text-secondary"
-                        onPress={() => handleRemoveFile(index)}
-                      >
-                        <MdClose />
-                      </Button>
+                      ) : null}
+                      <div className="border-l-2">
+                        <Button
+                          isIconOnly
+                          size="sm"
+                          radius="full"
+                          className="bg-transparent text-foreground-100"
+                          onPress={() => handleRemoveFile(index)}
+                        >
+                          <MdClose />
+                        </Button>
+                      </div>
                     </div>
                   </li>
                 );
