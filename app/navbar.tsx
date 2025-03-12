@@ -12,13 +12,15 @@ import {
 import { useState } from "react";
 import SocialMediaButtons from "./components/SocialMediaButtons";
 import ActiveLink from "./components/ActiveLink";
+import { IoIosMenu } from "react-icons/io";
 // import { charm } from "./fonts/fonts";
 // import { BsInstagram } from "react-icons/bs";
 
 const navLinks = [
   { label: "HOME", href: "/" },
   { label: "GALLERY", href: "/gallery" },
-  { label: "CONTACT", href: "#contact" },
+  { label: "ABOUT", href: "/#about" },
+  { label: "CONTACT", href: "/#contact" },
 ];
 
 const NavBar = () => {
@@ -38,14 +40,7 @@ const NavBar = () => {
       maxWidth="full"
       // height="96px"
     >
-      <NavbarContent
-        justify="start"
-        className="md:invisible text-foreground-900"
-      >
-        <NavbarMenuToggle
-          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-        />
-      </NavbarContent>
+      <NavbarContent justify="start"></NavbarContent>
 
       <NavbarContent justify="center" className="hidden md:contents space-x-10">
         {/* <NavbarItem> */}
@@ -54,7 +49,7 @@ const NavBar = () => {
             <ActiveLink href={navItem.href!}>
               {({ isActive }) => (
                 <div
-                  className={`px-1 font-bold text-2xl text-foreground-400 content-center hover:shadow-[inset_0_-4px_0_hsl(var(--heroui-primary-500))] pointer-events-auto ${
+                  className={`px-1 font-bold text-lg text-foreground-500 content-center hover:shadow-[inset_0_-4px_0_hsl(var(--heroui-primary-500))] pointer-events-auto ${
                     isActive
                       ? "shadow-[inset_0_-4px_0_hsl(var(--heroui-primary-500))]"
                       : ""
@@ -89,9 +84,16 @@ const NavBar = () => {
       </NavbarContent> */}
 
       <NavbarContent justify="end">
-        <NavbarItem className="hidden md:contents">
+        <NavbarItem className=" text-foreground-500">
           <SocialMediaButtons />
         </NavbarItem>
+
+        {/* md:invisible */}
+        <NavbarMenuToggle
+          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          icon={<IoIosMenu size={40}/>}
+          className="md:invisible text-foreground-500"
+        />
       </NavbarContent>
 
       <NavbarMenu className="bg-background-00 items-center">

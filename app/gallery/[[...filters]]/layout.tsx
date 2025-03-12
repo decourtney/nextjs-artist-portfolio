@@ -132,7 +132,7 @@ const GalleryLayout = async ({
         <div className="sticky top-0 left-0 space-y-10 p-2">
           {Object.entries(groupedTags).map(([type, tagArray]) => (
             <section key={type} className="pt-2">
-              <h2 className="w-full font-medium text-center text-4xl text-foreground-300">
+              <h2 className="w-full font-medium text-left text-xl text-foreground-300">
                 {toTitleCase(type)}
               </h2>
               <ul className="space-y-2">

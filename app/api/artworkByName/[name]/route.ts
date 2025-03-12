@@ -9,7 +9,12 @@ export async function GET(
   try {
     await dbConnect();
     const { name } = params;
-    const artwork = await Artwork.findOne({name});
+
+    const artwork = await Artwork.findOne({ name })
+      .populate("categories")
+      .populate("medium")
+      .populate("size");
+
     return NextResponse.json({ artwork });
   } catch (error) {
     console.error("Unexpected error:", error);

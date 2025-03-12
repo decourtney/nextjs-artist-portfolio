@@ -5,14 +5,14 @@ import SocialMediaButtons from "./components/SocialMediaButtons";
 
 const Footer = () => {
   return (
-    <footer className="h-[150px]">
-      <div className="container mx-auto flex flex-col items-center">
+    <footer className="flex justify-center items-center w-full bg-background-200">
+      <div className="mx-auto flex flex-col items-center p-4">
         {/* Social icons row */}
-        <div className="flex space-x-4 mb-4 ">
+        {/* <div className="flex space-x-4 text-foreground-100">
           <SocialMediaButtons />
-        </div>
+        </div> */}
         {/* Footer text */}
-        <p className="text-foreground-900 text-2xl">
+        <p className="text-foreground-100 text-tiny">
           © Gena Courtney. All rights reserved.
         </p>
       </div>

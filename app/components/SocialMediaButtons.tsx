@@ -1,21 +1,21 @@
-import { Button, Link } from '@heroui/react';
+import { Button, Link, LinkIcon } from '@heroui/react';
 import { BsInstagram } from 'react-icons/bs';
 
 const SocialMediaButtons = () => {
   return (
     <div className="space-x-1">
-      <Button
+      <Link
         as={Link}
         href="https://www.instagram.com/genacourtney/"
         target="_blank"
-        size="lg"
-        isIconOnly
-        radius="full"
-        variant="light"
-        className=" text-foreground-400"
+        // size="sm"
+        // isIconOnly
+        // radius="full"
+        // variant="light"
+        className="text-inherit rounded-full hover:bg-background-200"
       >
-        <BsInstagram size={40} />
-      </Button>
+        <BsInstagram size={25} />
+      </Link>
       {/* <Button
         as={Link}
         href="/"

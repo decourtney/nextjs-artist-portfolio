@@ -30,7 +30,7 @@ const FilteredDisplayPage = async ({
   const artworks = JSON.parse(JSON.stringify(artworkData)) as ArtworkDocument[];
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full bg-gradient-to-t from-background-300 to-transparent">
       <ImageDisplay artworks={artworks} />
     </div>
   );

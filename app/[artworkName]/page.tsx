@@ -1,12 +1,15 @@
 "use client";
 
-import { ArtworkDocument } from "@/models/Artwork";
-import { Link } from "@heroui/react";
+import { ArtworkDocument, PopulatedArtworkDocument } from "@/models/Artwork";
+import { Link, Image, LinkIcon, Skeleton } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useFilteredArtworks } from "../context/FilteredArtworkContext";
 import { IoIosArrowRoundBack, IoIosArrowRoundForward } from "react-icons/io";
-import Image from "next/image";
+import { FaArrowLeftLong } from "react-icons/fa6";
+import Footer from "../footer";
+import { useSwipeable } from "react-swipeable";
+// import Image from "next/image";
 
 interface ArtworkDetailPageProps {
   params: { artworkName: string };
@@ -16,9 +19,11 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
   // Get the array of filtered artwork names (string[])
   const { filteredNames } = useFilteredArtworks();
   const router = useRouter();
-  const [artworkDoc, setArtworkDoc] = useState<ArtworkDocument | null>(null);
+  const [artworkDoc, setArtworkDoc] = useState<PopulatedArtworkDocument | null>(
+    null
+  );
   const [fetching, setfetching] = useState<boolean>(true);
-  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [loaded, setLoaded] = useState(false);
 
   // Fetch the ArtworkDocument for the current artworkName from the API.
   useEffect(() => {
@@ -33,9 +38,9 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
           setArtworkDoc(null);
         } else {
           const data = await res.json();
-          console.log(data);
+
           // Expecting { artwork: ArtworkDocument } from the API.
-          setArtworkDoc(data.artwork);
+          setArtworkDoc(data.artwork as PopulatedArtworkDocument);
         }
       } catch (error) {
         console.error("Error fetching artwork:", error);
@@ -61,88 +66,93 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
     total > 0 ? filteredNames[(displayIndex - 1 + total) % total] : null;
   const nextName = total > 0 ? filteredNames[(displayIndex + 1) % total] : null;
 
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => {
+      if (nextName) {
+        router.push(`/${nextName}`);
+      }
+    },
+    onSwipedRight: () => {
+      if (prevName) {
+        router.push(`/${prevName}`);
+      }
+    },
+    trackMouse: true,
+  });
+
   if (fetching) {
     return <div>Loading artwork details...</div>;
   }
 
   return (
-    <div className=" p-4 text-foreground-100">
-      <div className="w-full h-full">
-        {artworkDoc ? (
-          <div
-            style={{
-              position: "relative",
-              width: "100%",
-              paddingBottom:
-                artworkDoc.metaWidth && artworkDoc.metaHeight
-                  ? `${(artworkDoc.metaHeight / artworkDoc.metaWidth) * 100}%`
-                  : "100%", // fallback if missing data
-            }}
-          >
-            {isLoaded ? (
+    <div
+      {...swipeHandlers}
+      className="relative h-[calc(100dvh-64px)] max-h-[calc(100dvh-64px)] text-foreground-100"
+    >
+      <div className="flex flex-col h-full">
+          <div className="w-fit max-h-[65%] h-[65%] mx-auto mt-24">
+            {artworkDoc ? (
+              // <Skeleton isLoaded={loaded}>
               <Image
+                removeWrapper
                 src={artworkDoc.src}
+                fallbackSrc={artworkDoc.thumbSrc}
                 alt={artworkDoc.name}
-                fill
-                sizes="100%"
-                loading="lazy"
-                onLoad={() => setIsLoaded(true)}
-                className="absolute top-0 left-0 object-cover"
+                radius="none"
+                loading="eager"
+                className="w-full h-full object-contain"
+                onLoad={() => setLoaded(true)}
               />
             ) : (
-              <Image
-                src={artworkDoc.thumbSrc}
-                alt={artworkDoc.name}
-                fill
-                sizes="100%"
-                loading="lazy"
-                className="absolute top-0 left-0 object-cover"
-              />
+              // </Skeleton>
+              <div className="flex items-center justify-center w-full h-full text-foreground-100">
+                <p>Couldn't find artwork.</p>
+              </div>
             )}
+
+            <div className="hidden md:flex w-full md:h-10 justify-between">
+              {prevName && (
+              <Link
+                href={`/${prevName}`}
+                className="group flex justify-start items-center w-full pl-10 text-foreground-300 hover:bg-background-200"
+              >
+                <IoIosArrowRoundBack size={40} />
+              </Link>
+              )}
+
+              {nextName && (
+              <Link
+                href={`/${nextName}`}
+                className="group flex justify-end items-center w-full pr-10 text-foreground-300 hover:bg-background-200"
+              >
+                <IoIosArrowRoundForward size={40} />
+              </Link>
+              )}
+            </div>
           </div>
-        ) : (
-          <div className="flex items-center justify-center w-full h-full text-red-500">
-            <p>Artwork document not found.</p>
+
+        <div className="relative flex flex-col justify-between w-full h-full mt-10">
+          <div className="max-w-[600px] mx-auto text-foreground-300">
+            <h1 className="text-center text-3xl font-bold">
+              {artworkDoc?.name || ""}
+            </h1>
+
+            <div className="flex justify-center gap-4 font-medium text-sm">
+              <h2>{artworkDoc?.medium?.label || ""}</h2>
+              <h2>{artworkDoc?.size?.label || ""}</h2>
+            </div>
+
+            <div className="mt-2">
+              <p>{artworkDoc?.description || ""}</p>
+            </div>
           </div>
-        )}
-      </div>
 
-      <div className="mt-4">
-        <h1 className="text-3xl font-bold">
-          {artworkDoc ? artworkDoc.name : "Unknown Artwork"}
-        </h1>
-        {artworkDoc && artworkDoc.description && (
-          <p>{artworkDoc.description}</p>
-        )}
+          <div className="relative">
+            <div className="absolute bottom-full left-0 w-full h-full pointer-events-none bg-gradient-to-t from-background-200 to-transparent" />
+            <Footer />
+          </div>
+        </div>
       </div>
-
-      <div className="flex justify-between mt-4">
-        {prevName && (
-          <Link
-            href={`/${prevName}`}
-            className="text-blue-500 hover:underline flex items-center"
-          >
-            <IoIosArrowRoundBack size={24} />
-            <span className="ml-1">Previous</span>
-          </Link>
-        )}
-        {nextName && (
-          <Link
-            href={`/${nextName}`}
-            className="text-blue-500 hover:underline flex items-center"
-          >
-            <span className="mr-1">Next</span>
-            <IoIosArrowRoundForward size={24} />
-          </Link>
-        )}
-      </div>
-
-      <button
-        className="mt-4 text-blue-500 hover:underline"
-        onClick={() => router.back()}
-      >
-        Back to Gallery
-      </button>
     </div>
   );
 }
