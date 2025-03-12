@@ -5,7 +5,7 @@ import SocialMediaButtons from "./components/SocialMediaButtons";
 
 const Footer = () => {
   return (
-    <footer className="flex justify-center items-center w-full bg-background-200">
+    <footer className="flex justify-center items-center w-full bg-inherit">
       <div className="mx-auto flex flex-col items-center p-4">
         {/* Social icons row */}
         {/* <div className="flex space-x-4 text-foreground-100">

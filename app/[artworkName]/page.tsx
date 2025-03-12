@@ -85,72 +85,85 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
   }
 
   return (
-    <div
-      {...swipeHandlers}
-      className="relative h-[calc(100dvh-64px)] max-h-[calc(100dvh-64px)] text-foreground-100"
-    >
-      <div className="flex flex-col h-full">
-          <div className="w-fit max-h-[65%] h-[65%] mx-auto mt-24">
+    <div {...swipeHandlers} className="h-full">
+      {/* <div className="w-fit max-h-[65%] mx-auto"> */}
+      {/* <Skeleton isLoaded={loaded}> */}
+      <div className="w-fit md:h-[65%] mx-auto">
+        <div className="flex h-full">
             {artworkDoc ? (
-              // <Skeleton isLoaded={loaded}>
               <Image
-                removeWrapper
+                // removeWrapper
                 src={artworkDoc.src}
                 fallbackSrc={artworkDoc.thumbSrc}
                 alt={artworkDoc.name}
                 radius="none"
-                loading="eager"
+                loading="lazy"
                 className="w-full h-full object-contain"
                 onLoad={() => setLoaded(true)}
               />
             ) : (
-              // </Skeleton>
               <div className="flex items-center justify-center w-full h-full text-foreground-100">
                 <p>Couldn't find artwork.</p>
               </div>
             )}
+        </div>
 
-            <div className="hidden md:flex w-full md:h-10 justify-between">
-              {prevName && (
+        <div className="hidden md:flex md:h-10 justify-between">
+          {/* {prevName && ( */}
+          <Link
+            href={`/${prevName}`}
+            className="group flex justify-start items-center w-full pl-10 text-foreground-300 hover:bg-background-200"
+          >
+            <IoIosArrowRoundBack size={40} />
+          </Link>
+          {/* )} */}
+
+          {/* {nextName && ( */}
+          <Link
+            href={`/${nextName}`}
+            className="group flex justify-end items-center w-full pr-10 text-foreground-300 hover:bg-background-200"
+          >
+            <IoIosArrowRoundForward size={40} />
+          </Link>
+          {/* )} */}
+        </div>
+      </div>
+
+      {/* </Skeleton> */}
+
+      {/* <div className="hidden md:flex  md:h-10 justify-between">
+            {prevName && (
               <Link
                 href={`/${prevName}`}
                 className="group flex justify-start items-center w-full pl-10 text-foreground-300 hover:bg-background-200"
               >
                 <IoIosArrowRoundBack size={40} />
               </Link>
-              )}
+            )}
 
-              {nextName && (
+            {nextName && (
               <Link
                 href={`/${nextName}`}
                 className="group flex justify-end items-center w-full pr-10 text-foreground-300 hover:bg-background-200"
               >
                 <IoIosArrowRoundForward size={40} />
               </Link>
-              )}
-            </div>
-          </div>
+            )}
+          </div> */}
+      {/* </div> */}
 
-        <div className="relative flex flex-col justify-between w-full h-full mt-10">
-          <div className="max-w-[600px] mx-auto text-foreground-300">
-            <h1 className="text-center text-3xl font-bold">
-              {artworkDoc?.name || ""}
-            </h1>
+      <div className="max-w-[600px] mt-10 mx-auto px-2 text-foreground-300">
+        <h1 className="text-center text-3xl font-bold">
+          {artworkDoc?.name || ""}
+        </h1>
 
-            <div className="flex justify-center gap-4 font-medium text-sm">
-              <h2>{artworkDoc?.medium?.label || ""}</h2>
-              <h2>{artworkDoc?.size?.label || ""}</h2>
-            </div>
+        <div className="flex justify-center gap-4 font-medium text-sm">
+          <h2>{artworkDoc?.medium?.label || ""}</h2>
+          <h2>{artworkDoc?.size?.label || ""}</h2>
+        </div>
 
-            <div className="mt-2">
-              <p>{artworkDoc?.description || ""}</p>
-            </div>
-          </div>
-
-          <div className="relative">
-            <div className="absolute bottom-full left-0 w-full h-full pointer-events-none bg-gradient-to-t from-background-200 to-transparent" />
-            <Footer />
-          </div>
+        <div className="mt-2">
+          <p>{artworkDoc?.description || ""}</p>
         </div>
       </div>
     </div>

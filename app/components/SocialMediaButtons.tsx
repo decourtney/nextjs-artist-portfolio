@@ -12,7 +12,7 @@ const SocialMediaButtons = () => {
         // isIconOnly
         // radius="full"
         // variant="light"
-        className="text-inherit rounded-full hover:bg-background-200"
+        className="text-inherit align-middle rounded-full hover:bg-background-200"
       >
         <BsInstagram size={25} />
       </Link>

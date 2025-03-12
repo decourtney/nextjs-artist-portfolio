@@ -11,6 +11,16 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily:{
+        charm:[
+          'Charm',
+          'var(--font-charm)'
+        ],
+        openSans:[
+          'Open_Sans',
+          'var(--font-openSans)'
+        ]
+      },
       backgroundImage: {
         "test-gradient": "linear-gradient(90deg, #FFC593 0%, #BC7198 100%);",
       },

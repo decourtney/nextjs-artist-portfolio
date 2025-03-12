@@ -2,7 +2,20 @@ import { Providers } from "./providers";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Navbar from "./navbar";
+import { Charm, Open_Sans } from "next/font/google";
+
 // import Footer from "./footer";
+
+const charm = Charm({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-charm",
+});
+
+const openSans = Open_Sans({
+  subsets:['latin'],
+  variable:'--font-openSans',
+})
 
 export const metadata: Metadata = {
   title: "Gena Courtney",
@@ -53,11 +66,9 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning={true}
-      className="bg-background-100"
+      className={`bg-background-100 ${charm.variable} ${openSans.variable}`}
     >
-      <body
-        className={``}
-      >
+      <body className="font-openSans">
         <Providers>
           <Navbar />
           <main className="flex flex-col text-foreground-900">{children}</main>
