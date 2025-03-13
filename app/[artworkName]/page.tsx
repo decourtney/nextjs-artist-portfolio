@@ -109,23 +109,23 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
         </div>
 
         <div className="hidden md:flex md:h-10 justify-between">
-          {/* {prevName && ( */}
+          {prevName && (
           <Link
             href={`/${prevName}`}
             className="group flex justify-start items-center w-full pl-10 text-foreground-300 hover:bg-background-200"
           >
             <IoIosArrowRoundBack size={40} />
           </Link>
-          {/* )} */}
+          )}
 
-          {/* {nextName && ( */}
+          {nextName && (
           <Link
             href={`/${nextName}`}
             className="group flex justify-end items-center w-full pr-10 text-foreground-300 hover:bg-background-200"
           >
             <IoIosArrowRoundForward size={40} />
           </Link>
-          {/* )} */}
+          )}
         </div>
       </div>
 

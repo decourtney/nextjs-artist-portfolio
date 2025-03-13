@@ -12,9 +12,6 @@ import {
 import { useState } from "react";
 import SocialMediaButtons from "./components/SocialMediaButtons";
 import ActiveLink from "./components/ActiveLink";
-import { IoIosMenu } from "react-icons/io";
-// import { charm } from "./fonts/fonts";
-// import { BsInstagram } from "react-icons/bs";
 
 const navLinks = [
   { label: "HOME", href: "/" },
@@ -36,27 +33,16 @@ const NavBar = () => {
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
       isBlurred={false}
-      shouldHideOnScroll
+      // shouldHideOnScroll
       maxWidth="full"
     >
       <NavbarContent justify="start"></NavbarContent>
 
       <NavbarContent justify="center" className="hidden md:contents space-x-5">
-        {/* <NavbarItem> */}
         {navLinks.map((navItem) => (
           <NavbarItem key={`navbar-${navItem.label}`}>
-            <ActiveLink href={navItem.href!}>
-              {({ isActive }) => (
-                <div
-                  className={`px-1 text-lg text-foreground-500 content-center hover:shadow-[inset_0_-4px_0_hsl(var(--heroui-primary-500))] pointer-events-auto ${
-                    isActive
-                      ? "shadow-[inset_0_-4px_0_hsl(var(--heroui-primary-500))]"
-                      : ""
-                  }`}
-                >
-                  {navItem.label}
-                </div>
-              )}
+            <ActiveLink href={navItem.href}>
+              {navItem.label}
             </ActiveLink>
           </NavbarItem>
         ))}
@@ -69,25 +55,15 @@ const NavBar = () => {
 
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-          className="md:invisible text-foreground-400"
+          className="md:hidden text-foreground-400"
         />
       </NavbarContent>
 
       <NavbarMenu className="font-bold pt-10 items-center space-y-6 bg-background-100 bg-gradient-to-b from-background-200 to-transparent">
         {navLinks.map((navItem) => (
-          <NavbarMenuItem key={`navbar-${navItem.label}`} onClick={handleClose}>
-            <ActiveLink href={navItem.href!}>
-              {({ isActive }) => (
-                <div
-                  className={`px-1 text-3xl text-foreground-500 content-center hover:shadow-[inset_0_-4px_0_hsl(var(--heroui-primary-500))] pointer-events-auto ${
-                    isActive
-                      ? "shadow-[inset_0_-4px_0_hsl(var(--heroui-primary-500))]"
-                      : ""
-                  }`}
-                >
-                  {navItem.label}
-                </div>
-              )}
+          <NavbarMenuItem key={`navbarmenu-${navItem.label}`}>
+            <ActiveLink href={navItem.href!} onClick={handleClose}>
+              {navItem.label}
             </ActiveLink>
           </NavbarMenuItem>
         ))}

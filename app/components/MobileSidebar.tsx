@@ -72,7 +72,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ children }) => {
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        onClick={() => setOpen(!open)}
+        // onClick={() => setOpen(!open)}
         style={{
           width: `${panelWidth + 80}px`,
           height: "100%",
@@ -90,9 +90,9 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ children }) => {
             <MdOutlineFilter size={25} />
           </button>
 
-          <div className="p-4">
+          {/* <div className=""> */}
             {children}
-          </div>
+          {/* </div> */}
         </div>
       </div>
 
