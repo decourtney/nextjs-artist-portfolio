@@ -10,7 +10,7 @@ interface MobileSidebarProps {
 const MobileSidebar: React.FC<MobileSidebarProps> = ({ children }) => {
   const panelWidth = 200; // width of the sidebar panel in pixels
   const threshold = 30; // drag threshold to toggle open/close
-  const sensitivity = 5; // sensitivity multiplier for drag offset
+  const sensitivity = 3; // sensitivity multiplier for drag offset
   const toggleWidth = 40; // extra visible width when closed
 
   const [open, setOpen] = useState(true);
@@ -90,7 +90,9 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ children }) => {
             <MdOutlineFilter size={25} />
           </button>
 
-          <div className="p-4 ">{children}</div>
+          <div className="p-4">
+            {children}
+          </div>
         </div>
       </div>
 

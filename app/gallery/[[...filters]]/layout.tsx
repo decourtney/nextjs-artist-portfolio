@@ -106,9 +106,9 @@ const GalleryLayout = async ({
 
   // Filter content shared between mobile and desktop.
   const sidebarContent = (
-    <div className="sticky top-0 left-0">
+    <div className="sticky top-0 left-0 h-screen space-y-2 pt-2 pb-6 overflow-scroll scrollbar-hide">
       {Object.entries(groupedTags).map(([type, tagArray]) => (
-        <section key={type} className="pt-2">
+        <section key={type}>
           <h2 className="w-full md:pl-2 font-medium text-left text-xl text-foreground-200">
             {toTitleCase(type)}
           </h2>
