@@ -154,9 +154,9 @@ const GalleryLayout = async ({
   );
 
   return (
-    <div className="relative flex">
+    <div className="flex">
       {/* Desktop sidebar */}
-      <div className="hidden md:block w-[200px] min-h-[calc(100dvh-64px)] bg-content4-900 overflow-scroll">
+      <div className="hidden md:block w-[200px] min-h-[calc(100dvh-64px)] bg-content4-900">
         {sidebarContent}
       </div>
       {/* Mobile sidebar */}

@@ -10,7 +10,7 @@ interface MobileSidebarProps {
 const MobileSidebar: React.FC<MobileSidebarProps> = ({ children }) => {
   const panelWidth = 200; // width of the sidebar panel in pixels
   const threshold = 30; // drag threshold to toggle open/close
-  const sensitivity = 2; // sensitivity multiplier for drag offset
+  const sensitivity = 5; // sensitivity multiplier for drag offset
   const toggleWidth = 40; // extra visible width when closed
 
   const [open, setOpen] = useState(true);
@@ -68,7 +68,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ children }) => {
     <>
       {/* Sidebar panel (with toggle button as a child) */}
       <div
-        className={`fixed top-0 -left-[40px] h-full z-50 md:hidden transition-transform duration-300 bg-gradient-to-r from-content4-600 from-[50%] to-transparent to-[50%]`}
+        className={`fixed top-0 -left-[40px] min-h-[calc(100dvh+200px)] z-50 md:hidden transition-transform duration-300 bg-gradient-to-r from-content4-600 from-[50%] to-transparent to-[50%]`}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -77,12 +77,10 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ children }) => {
           width: `${panelWidth + 80}px`,
           height: "100%",
           transform: `translateX(${finalTranslate}px)`,
-          // background:
-          //   "linear-gradient(to right, #1e293b 0%, #1e293b 50%, transparent 50%, transparent 100%)",
         }}
       >
         <div
-          className={`relative w-[160px] h-full bg-content4-600 translate-x-[${toggleWidth}px]`}
+          className={`relative w-[160px] h-full bg-content4-600 translate-x-[40px]`}
         >
           {/* Toggle button positioned on the right edge of the panel */}
           <button
@@ -92,7 +90,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ children }) => {
             <MdOutlineFilter size={25} />
           </button>
 
-          <div className="p-4 h-full overflow-scroll scrollbar-hide">{children}</div>
+          <div className="p-4 ">{children}</div>
         </div>
       </div>
 
