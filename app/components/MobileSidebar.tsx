@@ -68,7 +68,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ children }) => {
     <>
       {/* Sidebar panel (with toggle button as a child) */}
       <div
-        className={`fixed top-0 -left-[40px] min-h-[calc(100dvh+200px)] z-50 md:hidden transition-transform duration-300 bg-gradient-to-r from-content4-600 from-[50%] to-transparent to-[50%]`}
+        className={`fixed top-0 -left-[40px] min-h-[calc(100dvh+200px)] transition-transform duration-300 bg-gradient-to-r from-content4-600 from-[50%] to-transparent to-[50%]`}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -82,7 +82,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ children }) => {
         <div
           className={`relative w-[160px] h-full bg-content4-600 translate-x-[40px]`}
         >
-          {/* Toggle button positioned on the right edge of the panel */}
+          {/* Toggle button */}
           <button
             onClick={() => setOpen(!open)}
             className="absolute bottom-1/4 -right-10 h-16 transform -translate-y-1/2 bg-content4-600 p-2 rounded-r-full"
@@ -98,7 +98,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ children }) => {
 
       {/* Overlay to capture touches outside and close the sidebar */}
       <div
-        className={`fixed inset-0 z-40 bg-black bg-opacity-50 transition-opacity duration-300 md:hidden ${
+        className={`fixed inset-0 -z-10 bg-black bg-opacity-50 transition-opacity duration-300 md:hidden ${
           open
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"

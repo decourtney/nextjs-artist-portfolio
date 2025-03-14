@@ -1,36 +1,10 @@
-// app/gallery/layout.tsx
 import dbConnect from "@/lib/dbConnect";
 import Tag, { TagDocument } from "@/models/Tag";
 import { TagType } from "@/types/tagType";
 import React from "react";
 import MobileSidebar from "@/app/components/MobileSidebar";
 import SidebarContent from "@/app/components/SidebarContent";
-
-function parseActiveFilters(segments: string[]): Record<string, string[]> {
-  // (same implementation as in SidebarContent, or import from a shared file)
-  const active: Record<string, string[]> = {};
-  for (const seg of segments) {
-    const [type, label] = splitFirst(seg, "-");
-    if (!active[type]) {
-      active[type] = [];
-    }
-    active[type].push(label);
-  }
-  return active;
-}
-
-function splitFirst(str: string, sep: string) {
-  const idx = str.indexOf(sep);
-  if (idx === -1) return [str];
-  return [str.slice(0, idx), str.slice(idx + sep.length)];
-}
-
-function toTitleCase(str: string): string {
-  return str
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
-}
+import { ParseActiveFilters } from "@/utils/filters";
 
 const GalleryLayout = async ({
   children,
@@ -52,7 +26,7 @@ const GalleryLayout = async ({
   };
 
   const currentSegments = params.filters || [];
-  const activeFilters = parseActiveFilters(currentSegments);
+  const activeFilters = ParseActiveFilters(currentSegments);
 
   const groupedTags = Object.values(TagType).reduce((acc, typeValue) => {
     acc[typeValue] = tags.filter((tag) => tag.type === typeValue);
@@ -71,14 +45,16 @@ const GalleryLayout = async ({
         />
       </div>
       {/* Mobile sidebar */}
-      <MobileSidebar>
-        <SidebarContent
-          currentSegments={currentSegments}
-          activeFilters={activeFilters}
-          groupedTags={groupedTags}
-          singleSelectTypes={singleSelectTypes}
-        />
-      </MobileSidebar>
+      <div className="block md:hidden z-50">
+        <MobileSidebar>
+          <SidebarContent
+            currentSegments={currentSegments}
+            activeFilters={activeFilters}
+            groupedTags={groupedTags}
+            singleSelectTypes={singleSelectTypes}
+          />
+        </MobileSidebar>
+      </div>
       {/* Main content */}
       <div className="flex-1">{children}</div>
     </div>

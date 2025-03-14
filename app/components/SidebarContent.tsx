@@ -1,31 +1,17 @@
-import React from "react";
-import { Link } from "@heroui/react";
-import { TagType } from "@/types/tagType";
+"use client";
+
 import { TagDocument } from "@/models/Tag";
+import { TagType } from "@/types/tagType";
+import { ParseActiveFilters } from "@/utils/filters";
+import { Link } from "@heroui/react";
+import React, { useState } from "react";
+import { toTitleCase } from "@/utils/titleCase";
 
-function toTitleCase(str: string): string {
-  return str
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
-}
-
-function splitFirst(str: string, sep: string) {
-  const idx = str.indexOf(sep);
-  if (idx === -1) return [str];
-  return [str.slice(0, idx), str.slice(idx + sep.length)];
-}
-
-function parseActiveFilters(segments: string[]): Record<string, string[]> {
-  const active: Record<string, string[]> = {};
-  for (const seg of segments) {
-    const [type, label] = splitFirst(seg, "-");
-    if (!active[type]) {
-      active[type] = [];
-    }
-    active[type].push(label);
-  }
-  return active;
+interface SidebarContentProps {
+  currentSegments: string[];
+  activeFilters: Record<string, string[]>;
+  groupedTags: Record<TagType, TagDocument[]>;
+  singleSelectTypes: Record<string, boolean>;
 }
 
 function buildNewSegments(
@@ -34,7 +20,7 @@ function buildNewSegments(
   clickedLabel: string,
   singleSelectTypes: Record<string, boolean>
 ): string[] {
-  const active = parseActiveFilters(currentSegments);
+  const active = ParseActiveFilters(currentSegments);
   if (singleSelectTypes[clickedType]) {
     const existingLabels = active[clickedType] ?? [];
     if (existingLabels.length === 1 && existingLabels[0] === clickedLabel) {
@@ -65,15 +51,6 @@ function buildNewSegments(
   return newSegments;
 }
 
-interface SidebarContentProps {
-  currentSegments: string[];
-  activeFilters: Record<string, string[]>;
-  groupedTags: Record<TagType, TagDocument[]>;
-  singleSelectTypes: Record<string, boolean>;
-}
-
-import CollapsibleSection from "./CollapsibleSection"; // the component we just created
-
 const SidebarContent: React.FC<SidebarContentProps> = ({
   currentSegments,
   activeFilters,
@@ -83,39 +60,45 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
   return (
     <div className="sticky top-0 left-0 h-screen space-y-2 p-2 pb-14 overflow-scroll scrollbar-hide">
       {Object.entries(groupedTags).map(([type, tagArray]) => (
-        <CollapsibleSection key={type} title={toTitleCase(type)}>
-          {tagArray.map((tag) => {
-            const clickedType = type;
-            const clickedLabel = tag.label;
-            const newSegments = buildNewSegments(
-              currentSegments,
-              clickedType,
-              clickedLabel,
-              singleSelectTypes
-            );
-            const href = newSegments.length
-              ? `/gallery/${newSegments.join("/")}`
-              : "/gallery";
-            const isActive = activeFilters[clickedType]?.includes(clickedLabel);
-            const textClass = isActive
-              ? "text-foreground-800 font-semibold"
-              : "text-foreground-400";
-            return (
-              <li key={tag._id}>
-                <Link
-                  href={href}
-                  className="w-full hover:bg-gradient-to-t from-content4-700 to-transparent"
-                >
-                  <p
-                    className={`w-full pl-2 md:pl-6 text-xl transition-colors ${textClass}`}
+        <details key={type} className="w-full" open>
+          <summary className="cursor-pointer w-full md:pl-2 font-medium text-left text-xl text-foreground-200">
+            {toTitleCase(type)}
+          </summary>
+          <ul>
+            {tagArray.map((tag) => {
+              const clickedType = type;
+              const clickedLabel = tag.label;
+              const newSegments = buildNewSegments(
+                currentSegments,
+                clickedType,
+                clickedLabel,
+                singleSelectTypes
+              );
+              const href = newSegments.length
+                ? `/gallery/${newSegments.join("/")}`
+                : "/gallery";
+              const isActive =
+                activeFilters[clickedType]?.includes(clickedLabel);
+              const textClass = isActive
+                ? "text-foreground-800 font-semibold"
+                : "text-foreground-400";
+              return (
+                <li key={tag._id}>
+                  <Link
+                    href={href}
+                    className="w-full hover:bg-gradient-to-t from-content4-700 to-transparent"
                   >
-                    {toTitleCase(tag.label)}
-                  </p>
-                </Link>
-              </li>
-            );
-          })}
-        </CollapsibleSection>
+                    <p
+                      className={`w-full pl-2 md:pl-6 text-xl transition-colors ${textClass}`}
+                    >
+                      {toTitleCase(tag.label)}
+                    </p>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </details>
       ))}
     </div>
   );
