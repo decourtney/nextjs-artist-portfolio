@@ -4,7 +4,7 @@ import { TagDocument } from "@/models/Tag";
 import { TagType } from "@/types/tagType";
 import { ParseActiveFilters } from "@/utils/filters";
 import { Link } from "@heroui/react";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { toTitleCase } from "@/utils/titleCase";
 
 interface SidebarContentProps {
@@ -51,55 +51,112 @@ function buildNewSegments(
   return newSegments;
 }
 
+function buildInitialSidebarState(
+  groupedTags: Record<TagType, TagDocument[]>
+): Record<string, boolean> {
+  // Attempt to read from localStorage
+  if (typeof window !== "undefined") {
+    const saved = localStorage.getItem("sidebarDetailsOpen");
+    if (saved) {
+      try {
+        // If it’s valid JSON, return it
+        return JSON.parse(saved);
+      } catch (err) {
+        console.error("Could not parse localStorage sidebarDetailsOpen", err);
+      }
+    }
+  }
+
+  // If nothing in localStorage or parse failed, build a default fallback
+  const defaultState: Record<string, boolean> = {};
+  for (const type of Object.keys(groupedTags)) {
+    defaultState[type] = false; // or true, if you want them all open
+  }
+  return defaultState;
+}
+
 const SidebarContent: React.FC<SidebarContentProps> = ({
   currentSegments,
   activeFilters,
   groupedTags,
   singleSelectTypes,
 }) => {
+  const [detailsOpen, setDetailsOpen] = useState<Record<string, boolean>>(() =>
+    buildInitialSidebarState(groupedTags)
+  );
+
+  // 3) Whenever a user toggles a <details>, update state + localStorage
+  const handleToggle = (
+    type: string,
+    e: React.SyntheticEvent<HTMLDetailsElement>
+  ) => {
+    const isOpen = e.currentTarget.open;
+    setDetailsOpen((prev) => {
+      const newState = { ...prev, [type]: isOpen };
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(
+          "sidebarDetailsOpen",
+          JSON.stringify(newState)
+        );
+      }
+      return newState;
+    });
+  };
+
   return (
     <div className="sticky top-0 left-0 h-screen space-y-2 p-2 pb-14 overflow-scroll scrollbar-hide">
-      {Object.entries(groupedTags).map(([type, tagArray]) => (
-        <details key={type} className="w-full" open>
-          <summary className="cursor-pointer w-full md:pl-2 font-medium text-left text-xl text-foreground-200">
-            {toTitleCase(type)}
-          </summary>
-          <ul>
-            {tagArray.map((tag) => {
-              const clickedType = type;
-              const clickedLabel = tag.label;
-              const newSegments = buildNewSegments(
-                currentSegments,
-                clickedType,
-                clickedLabel,
-                singleSelectTypes
-              );
-              const href = newSegments.length
-                ? `/gallery/${newSegments.join("/")}`
-                : "/gallery";
-              const isActive =
-                activeFilters[clickedType]?.includes(clickedLabel);
-              const textClass = isActive
-                ? "text-foreground-800 font-semibold"
-                : "text-foreground-400";
-              return (
-                <li key={tag._id}>
-                  <Link
-                    href={href}
-                    className="w-full hover:bg-gradient-to-t from-content4-700 to-transparent"
-                  >
-                    <p
-                      className={`w-full pl-2 md:pl-6 text-xl transition-colors ${textClass}`}
+      {Object.entries(groupedTags).map(([type, tagArray]) => {
+        // If we never set a value for this type, default to true or false.
+        const open = detailsOpen[type] ?? false;
+
+        return (
+          <details
+            key={type}
+            className="w-full"
+            open={open}
+            onToggle={(e) => handleToggle(type, e)}
+          >
+            <summary className="cursor-pointer w-full md:pl-2 font-medium text-left text-xl text-foreground-200">
+              {toTitleCase(type)}
+            </summary>
+            <ul>
+              {tagArray.map((tag) => {
+                const clickedType = type;
+                const clickedLabel = tag.label;
+                const newSegments = buildNewSegments(
+                  currentSegments,
+                  clickedType,
+                  clickedLabel,
+                  singleSelectTypes
+                );
+                const href = newSegments.length
+                  ? `/gallery/${newSegments.join("/")}`
+                  : "/gallery";
+                const isActive =
+                  activeFilters[clickedType]?.includes(clickedLabel);
+                const textClass = isActive
+                  ? "text-foreground-800 font-semibold"
+                  : "text-foreground-400";
+
+                return (
+                  <li key={tag._id}>
+                    <Link
+                      href={href}
+                      className="w-full hover:bg-gradient-to-t from-content4-700 to-transparent"
                     >
-                      {toTitleCase(tag.label)}
-                    </p>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </details>
-      ))}
+                      <p
+                        className={`w-full pl-2 md:pl-6 text-xl transition-colors ${textClass}`}
+                      >
+                        {toTitleCase(tag.label)}
+                      </p>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </details>
+        );
+      })}
     </div>
   );
 };
