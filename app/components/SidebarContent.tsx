@@ -70,22 +70,21 @@ function buildInitialSidebarState(
   // If nothing in localStorage or parse failed, build a default fallback
   const defaultState: Record<string, boolean> = {};
   for (const type of Object.keys(groupedTags)) {
-    defaultState[type] = false; // or true, if you want them all open
+    defaultState[type] = false; // False = details area collapsed by default
   }
   return defaultState;
 }
 
-const SidebarContent: React.FC<SidebarContentProps> = ({
+const SidebarContent = ({
   currentSegments,
   activeFilters,
   groupedTags,
   singleSelectTypes,
-}) => {
+}: SidebarContentProps) => {
   const [detailsOpen, setDetailsOpen] = useState<Record<string, boolean>>(() =>
     buildInitialSidebarState(groupedTags)
   );
 
-  // 3) Whenever a user toggles a <details>, update state + localStorage
   const handleToggle = (
     type: string,
     e: React.SyntheticEvent<HTMLDetailsElement>

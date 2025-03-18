@@ -33,7 +33,6 @@ const NavBar = () => {
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
       isBlurred={false}
-      // shouldHideOnScroll
       maxWidth="full"
     >
       <NavbarContent justify="start"></NavbarContent>
