@@ -20,14 +20,14 @@ const s3Client = new S3Client({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
-    const { id } = params;
+    const { id } = await params;
     // const req = await request.json();
 
-    const artwork = await Artwork.find({id});
+    const artwork = await Artwork.find({ id });
     return NextResponse.json({ artwork });
   } catch (error) {
     console.error("Unexpected error:", error);
@@ -37,11 +37,11 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
-    const { id } = params;
+    const { id } = await params;
 
     // Find the artwork document by ID
     const artwork = (await Artwork.findById(id)) as ArtworkDocument;

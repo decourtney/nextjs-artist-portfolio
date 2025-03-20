@@ -3,8 +3,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Navbar from "./navbar";
 import { Charm, Open_Sans } from "next/font/google";
-
-// import Footer from "./footer";
+import { getServerSession } from "next-auth";
+import { _nextAuthOptions } from "@/auth";
 
 const charm = Charm({
   subsets: ["latin"],
@@ -13,9 +13,9 @@ const charm = Charm({
 });
 
 const openSans = Open_Sans({
-  subsets:['latin'],
-  variable:'--font-openSans',
-})
+  subsets: ["latin"],
+  variable: "--font-openSans",
+});
 
 export const metadata: Metadata = {
   title: "Gena Courtney",
@@ -57,11 +57,13 @@ export const viewport: Viewport = {
   minimumScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getServerSession(_nextAuthOptions);
+
   return (
     <html
       lang="en"
@@ -69,10 +71,9 @@ export default function RootLayout({
       className={`bg-background-100 ${charm.variable} ${openSans.variable}`}
     >
       <body className="font-openSans">
-        <Providers>
+        <Providers session={session}>
           <Navbar />
           <main className="flex flex-col text-foreground-900">{children}</main>
-          {/* <Footer /> */}
         </Providers>
       </body>
     </html>

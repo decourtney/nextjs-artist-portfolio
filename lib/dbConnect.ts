@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import "../models";
+// import "../models";
 
 let cached = globalThis.mongoose;
 

@@ -1,5 +1,5 @@
 import { Image, Link } from "@heroui/react";
-import { charm } from "./fonts/fonts";
+import { charm } from "../fonts/fonts";
 import Footer from "./footer";
 import ContactForm from "./components/ContactForm";
 

@@ -1,3 +1,5 @@
+'use server'
+
 import dbConnect from "@/lib/dbConnect";
 import { Tag } from "@/models";
 import Artwork, { ArtworkDocument } from "@/models/Artwork";

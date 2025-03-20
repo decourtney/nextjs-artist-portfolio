@@ -6,7 +6,7 @@ import { useParams, usePathname } from "next/navigation";
 
 interface ActiveLinkProps extends LinkProps {
   children: React.ReactNode;
-  onClick?: () => void;
+  // onClick?: () => void;
 }
 
 export default function ActiveLink({ children, ...props }: ActiveLinkProps) {

@@ -1,5 +1,5 @@
-import connect from "@/lib/dbConnect";
+// import connect from "@/lib/dbConnect";
 
-export async function register() {
-  await connect();
-}
+// export async function register() {
+//   await connect();
+// }

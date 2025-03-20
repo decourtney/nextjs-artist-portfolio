@@ -1,3 +1,5 @@
+'use server'
+
 import dbConnect from "@/lib/dbConnect";
 import Tag, { TagDocument } from "@/models/Tag";
 import { TagType } from "@/types/tagType";

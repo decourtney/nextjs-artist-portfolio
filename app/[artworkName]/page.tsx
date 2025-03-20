@@ -10,13 +10,16 @@ import { FaArrowLeftLong } from "react-icons/fa6";
 import Footer from "../footer";
 import { useSwipeable } from "react-swipeable";
 import { toTitleCase } from "@/utils/titleCase";
+import { use } from "react";
 // import Image from "next/image";
 
 interface ArtworkDetailPageProps {
   params: { artworkName: string };
 }
 
-export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
+export default function ArtworkDetailPage({
+  params,
+}: {params: Promise<{artworkName: string}>}) {
   // Get the array of filtered artwork names (string[])
   const { filteredNames } = useFilteredArtworks();
   const router = useRouter();
@@ -25,6 +28,7 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
   );
   const [fetching, setfetching] = useState<boolean>(true);
   const [loaded, setLoaded] = useState(false);
+  const { artworkName } = use(params)
 
   // Fetch the ArtworkDocument for the current artworkName from the API.
   useEffect(() => {
@@ -32,7 +36,7 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
       setfetching(true);
       try {
         const res = await fetch(
-          `/api/artworkByName/${encodeURIComponent(params.artworkName)}`
+          `/api/artworkByName/${encodeURIComponent(artworkName)}`
         );
         if (!res.ok) {
           console.error("Failed to fetch artwork document.");
@@ -51,12 +55,10 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
       }
     }
     fetchArtwork();
-  }, [params.artworkName]);
+  }, [artworkName]);
 
   // Determine the current index in the filtered names array.
-  const currentIndex = filteredNames.findIndex(
-    (name) => name === params.artworkName
-  );
+  const currentIndex = filteredNames.findIndex((name) => name === artworkName);
   const notFoundInContext = currentIndex === -1;
 
   // Use wrap-around navigation:
