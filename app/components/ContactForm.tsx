@@ -5,6 +5,7 @@ import { Button, Form, Input, Textarea } from "@heroui/react";
 import { useTheme } from "next-themes";
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { FaLinkedin } from "react-icons/fa";
+import SocialMediaButtons from "./SocialMediaButtons";
 
 const ContactForm = () => {
   const { theme } = useTheme();
@@ -141,18 +142,7 @@ const ContactForm = () => {
       )}
 
       <div className="flex justify-start  mx-auto my-2 gap-4">
-        <Button
-          size="lg"
-          isIconOnly
-          radius="full"
-          variant="light"
-          className=" text-[hsl(var(--nextui-primary-100))]"
-          onPress={() => {
-            if (typeof window !== "undefined") window.open("#");
-          }}
-        >
-          <FaLinkedin size={30} />
-        </Button>
+        <SocialMediaButtons />
       </div>
     </>
   );

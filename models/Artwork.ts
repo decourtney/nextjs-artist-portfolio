@@ -59,8 +59,7 @@ const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
   ],
 });
 
-export default mongoose.models.Artwork ||
-  mongoose.model<ArtworkDocument>("Artwork", ArtworkSchema);
+export default mongoose.models.Artwork || mongoose.model<ArtworkDocument>("Artwork", ArtworkSchema);
 
 // Extended type for populated categories:
 export type PopulatedArtworkDocument = Omit<

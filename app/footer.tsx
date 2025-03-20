@@ -5,17 +5,10 @@ import SocialMediaButtons from "./components/SocialMediaButtons";
 
 const Footer = () => {
   return (
-    <footer className="h-[150px]">
-      <div className="container mx-auto flex flex-col items-center">
-        {/* Social icons row */}
-        <div className="flex space-x-4 mb-4 ">
-          <SocialMediaButtons />
-        </div>
-        {/* Footer text */}
-        <p className="text-foreground-900 text-2xl">
-          © Gena Courtney. All rights reserved.
-        </p>
-      </div>
+    <footer className="w-full p-2 text-center text-foreground-100 text-tiny bg-inherit">
+      {/* <div className="mx-auto align-middle p-2 text-foreground-100 text-tiny"> */}
+      <p>© Gena Courtney. All rights reserved.</p>
+      {/* </div> */}
     </footer>
   );
 };
