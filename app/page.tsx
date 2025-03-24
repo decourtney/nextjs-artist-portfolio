@@ -27,7 +27,7 @@ const HomePage = async () => {
         id="about"
         className="relative text-foreground-300 w-full min-h-screen mt-[100dvh] p-4 content-center bg-background-200 bg-gradient-to-b from-background-400 to-transparent "
       >
-        <div className="absolute bottom-full left-0 w-full h-1/3 md:h-1/3 pointer-events-none bg-gradient-to-t from-background-400 to-transparent" />
+        {/* <div className="absolute bottom-full left-0 w-full h-1/3 md:h-1/3 pointer-events-none bg-gradient-to-t from-background-400 to-transparent" /> */}
 
         <div className="flex flex-col justify-center items-center w-full space-y-24">
           <h3 className="font-black text-6xl">Bio</h3>

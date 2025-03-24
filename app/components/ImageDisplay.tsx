@@ -29,7 +29,7 @@ const ArtworkItem = ({ artwork }: { artwork: ArtworkDocument }) => {
           }}
         >
           <Link
-            href={`/${artwork.name}`}
+            href={`/artwork/${artwork.name}`}
             className="absolute top-0 left-0 w-full h-full"
           >
             <Image
