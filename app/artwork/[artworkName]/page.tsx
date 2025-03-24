@@ -4,10 +4,10 @@ import { ArtworkDocument, PopulatedArtworkDocument } from "@/models/Artwork";
 import { Link, Image, LinkIcon, Skeleton } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useFilteredArtworks } from "../context/FilteredArtworkContext";
+import { useFilteredArtworks } from "../../context/FilteredArtworkContext";
 import { IoIosArrowRoundBack, IoIosArrowRoundForward } from "react-icons/io";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import Footer from "../footer";
+import Footer from "../../footer";
 import { useSwipeable } from "react-swipeable";
 import { toTitleCase } from "@/utils/titleCase";
 import { use } from "react";
@@ -19,7 +19,9 @@ interface ArtworkDetailPageProps {
 
 export default function ArtworkDetailPage({
   params,
-}: {params: Promise<{artworkName: string}>}) {
+}: {
+  params: Promise<{ artworkName: string }>;
+}) {
   // Get the array of filtered artwork names (string[])
   const { filteredNames } = useFilteredArtworks();
   const router = useRouter();
@@ -28,7 +30,7 @@ export default function ArtworkDetailPage({
   );
   const [fetching, setfetching] = useState<boolean>(true);
   const [loaded, setLoaded] = useState(false);
-  const { artworkName } = use(params)
+  const { artworkName } = use(params);
 
   // Fetch the ArtworkDocument for the current artworkName from the API.
   useEffect(() => {
@@ -72,12 +74,12 @@ export default function ArtworkDetailPage({
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
       if (nextName) {
-        router.push(`/${nextName}`);
+        router.push(`/artwork/${nextName}`);
       }
     },
     onSwipedRight: () => {
       if (prevName) {
-        router.push(`/${prevName}`);
+        router.push(`/artwork/${prevName}`);
       }
     },
     trackMouse: true,
@@ -102,7 +104,7 @@ export default function ArtworkDetailPage({
         }`}
       >
         <Link
-          href={`/${prevName}`}
+          href={`/artwork/${prevName}`}
           className={`${
             !prevName && "invisible"
           } h-full w-full p-2 place-content-center`}
@@ -162,7 +164,7 @@ export default function ArtworkDetailPage({
         }`}
       >
         <Link
-          href={`/${nextName}`}
+          href={`/artwork/${nextName}`}
           className={`${
             !nextName && "invisible"
           } h-full w-full p-2 place-content-center`}
