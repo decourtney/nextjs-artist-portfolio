@@ -1,4 +1,4 @@
-'use server'
+"use server";
 
 import dbConnect from "@/lib/dbConnect";
 import Tag, { TagDocument } from "@/models/Tag";
@@ -13,9 +13,11 @@ const GalleryLayout = async ({
   params,
 }: {
   children: React.ReactNode;
-  params: { filters?: string[] };
+  params: Promise<{ filters?: string[] }>;
 }) => {
   await dbConnect();
+  const awaitedParams = await params;
+  const { filters } = awaitedParams;
 
   const tagData = await Tag.find();
   const tags = JSON.parse(JSON.stringify(tagData)) as TagDocument[];
@@ -27,7 +29,7 @@ const GalleryLayout = async ({
     size: true,
   };
 
-  const currentSegments = params.filters || [];
+  const currentSegments = filters || [];
   const activeFilters = ParseActiveFilters(currentSegments);
 
   const groupedTags = Object.values(TagType).reduce((acc, typeValue) => {

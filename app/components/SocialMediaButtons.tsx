@@ -5,7 +5,6 @@ const SocialMediaButtons = () => {
   return (
     <div className="space-x-1">
       <Link
-        as={Link}
         href="https://www.instagram.com/genacourtney/"
         target="_blank"
         // size="sm"
@@ -16,42 +15,6 @@ const SocialMediaButtons = () => {
       >
         <BsInstagram size={25} />
       </Link>
-      {/* <Button
-        as={Link}
-        href="/"
-        target="_blank"
-        size="lg"
-        isIconOnly
-        radius="full"
-        variant="light"
-        className=" text-foreground-900"
-      >
-        <BsTwitter size={40} />
-      </Button>
-      <Button
-        as={Link}
-        href="/"
-        target="_blank"
-        size="lg"
-        isIconOnly
-        radius="full"
-        variant="light"
-        className=" text-foreground-900"
-      >
-        <BsFacebook size={40} />
-      </Button>
-      <Button
-        as={Link}
-        href="/"
-        target="_blank"
-        size="lg"
-        isIconOnly
-        radius="full"
-        variant="light"
-        className=" text-foreground-900"
-      >
-        <BsLinkedin size={40} />
-      </Button> */}
     </div>
   );
 }
