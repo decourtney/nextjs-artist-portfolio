@@ -61,7 +61,7 @@ const NavBar = () => {
       <NavbarMenu className="font-bold pt-10 items-center space-y-6 bg-background-100 bg-gradient-to-b from-background-200 to-transparent">
         {navLinks.map((navItem) => (
           <NavbarMenuItem key={`navbarmenu-${navItem.label}`}>
-            <ActiveLink href={navItem.href!}>
+            <ActiveLink href={navItem.href!} onClick={handleClose}>
               {navItem.label}
             </ActiveLink>
           </NavbarMenuItem>
