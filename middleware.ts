@@ -7,22 +7,21 @@ export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret });
 
   if (!token) {
-    // Redirect to the sign-in page if not authenticated
+    // Redirect to sign in if no token
     const url = new URL("/login", req.url);
     return NextResponse.redirect(url, 302);
   }
 
-  // Example: Restrict access based on roles
-  const isDeleteAccountRoute = req.nextUrl.pathname.startsWith(
-    "/dashboard"
-  );
+  // Example: Restrict routes based on role
+  const isDashboardRoute = req.nextUrl.pathname.startsWith("/dashboard");
 
-  // if (isDeleteAccountRoute && token.role !== "admin") {
-  //   return NextResponse.json(
-  //     { error: "Forbidden: Admins only" },
-  //     { status: 403 }
-  //   );
-  // }
+  // If you only want admin to have access to /dashboard
+  if (isDashboardRoute && token.role !== "admin") {
+    return NextResponse.json(
+      { error: "Forbidden: Admins only" },
+      { status: 403 }
+    );
+  }
 
   return NextResponse.next();
 }
@@ -30,5 +29,5 @@ export async function middleware(req: NextRequest) {
 export { default } from "next-auth/middleware";
 
 export const config = {
-  matcher: ["/dashboard"],
+  matcher: ["/dashboard/:path*"],
 };
