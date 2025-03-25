@@ -4,7 +4,7 @@ import { ArtworkDocument, PopulatedArtworkDocument } from "@/models/Artwork";
 import { Link, Image, LinkIcon, Skeleton } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useFilteredArtworks } from "../../context/FilteredArtworkContext";
+import { useFilteredArtworks } from "../../../context/FilteredArtworkContext";
 import { IoIosArrowRoundBack, IoIosArrowRoundForward } from "react-icons/io";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import Footer from "../../footer";

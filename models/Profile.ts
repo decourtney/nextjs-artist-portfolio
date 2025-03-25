@@ -9,8 +9,6 @@ export interface IProfile extends Document {
     notifications: boolean;
   };
   userId: Types.ObjectId; // References NextAuth user
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 const ProfileSchema = new Schema<IProfile>(

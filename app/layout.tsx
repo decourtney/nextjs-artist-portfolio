@@ -1,10 +1,11 @@
 import { Providers } from "./providers";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import Navbar from "./navbar";
+import Navbar from "@/app/(root)/_components/Navbar";
 import { Charm, Open_Sans } from "next/font/google";
 import { getServerSession } from "next-auth";
 import { _nextAuthOptions } from "@/auth";
+import { ReactNode } from "react";
 
 const charm = Charm({
   subsets: ["latin"],
@@ -57,11 +58,7 @@ export const viewport: Viewport = {
   minimumScale: 1,
 };
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+const Layout = async ({ children }: { children: ReactNode }) => {
   const session = await getServerSession(_nextAuthOptions);
 
   return (
@@ -71,11 +68,10 @@ export default async function RootLayout({
       className={`bg-background-100 ${charm.variable} ${openSans.variable}`}
     >
       <body className="font-openSans">
-        <Providers session={session}>
-          <Navbar />
-          <main className="flex flex-col text-foreground-900">{children}</main>
-        </Providers>
+        <Providers session={session}>{children}</Providers>
       </body>
     </html>
   );
-}
+};
+
+export default Layout;

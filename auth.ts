@@ -13,42 +13,48 @@ import type { Adapter } from "next-auth/adapters";
 import { Profile } from "@/models";
 
 export const _nextAuthOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(client) as Adapter,
+  // adapter: MongoDBAdapter(client) as Adapter,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
+  session: {
+    strategy: "jwt", // Use JWT sessions
+  },
   callbacks: {
-    // Add user ID to session object
+    async jwt({ token, user }) {
+      if (user) {
+        token.sub = user.id; // Pass user ID to token
+      }
+      console.log("jwt:", token);
+      return token;
+    },
+
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.sub as string; // Safely attach user ID
       }
+      console.log("session:", session);
       return session;
     },
-    async jwt({ token, user }) {
-      if (user) {
-        token.sub = user.id; // Pass user ID to session
-      }
-      return token;
-    },
-    async signIn({ user, account, profile }) {
-      // console.log("Sign in callback:", user, account, profile);
 
-      return true;
-    },
+    // async signIn({ user, account, profile }) {
+    //   // console.log("Sign in callback:", user, account, profile);
+
+    //   return true;
+    // },
   },
   events: {
     // Perform actions after events
     signOut: async (message) => {
-      console.log("User signed out:", message);
+      // console.log("User signed out:", message);
     },
     signIn: async ({ user }) => {
       if (!user || !user.id) return;
 
-      console.log("Sign in event:", user);
+      // console.log("Sign in event:", user);
 
       await dbConnect();
 
@@ -65,13 +71,13 @@ export const _nextAuthOptions: NextAuthOptions = {
         });
 
         await newProfile.save();
-        console.log("Profile created:", newProfile);
+        // console.log("Profile created:", newProfile);
       }
     },
   },
   pages: {
-    signIn: "/signin", // Custom sign-in page
-    error: "/auth/error", // Custom error page
+    // signIn: "/signin", // Custom sign-in page
+    // error: "/auth/error", // Custom error page
   },
   logger: {
     error: (code, metadata) => {

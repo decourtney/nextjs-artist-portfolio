@@ -4,8 +4,8 @@ import dbConnect from "@/lib/dbConnect";
 import Tag, { TagDocument } from "@/models/Tag";
 import { TagType } from "@/types/tagType";
 import React from "react";
-import MobileSidebar from "@/app/components/MobileSidebar";
-import SidebarContent from "@/app/components/SidebarContent";
+import MobileSidebar from "@/app/(root)/_components/MobileSidebar";
+import SidebarContent from "@/app/(root)/_components/SidebarContent";
 import { ParseActiveFilters } from "@/utils/filters";
 
 const GalleryLayout = async ({

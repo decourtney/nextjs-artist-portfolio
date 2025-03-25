@@ -1,19 +1,17 @@
 import Artwork, { PopulatedArtworkDocument } from "@/models/Artwork";
 import Tag, { TagDocument } from "@/models/Tag";
-import FileList from "./FileList";
-import FilePicker from "./FilePicker";
-
-// const FileList = dynamic(() => import("./FileList"), {
-//   ssr: false,
-// });
+import FileList from "@/app/dashboard/_components/FileList";
+import FilePicker from "@/app/dashboard/_components/FilePicker";
 
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: { page?: string; limit?: string };
+  searchParams: Promise<{ page?: string; limit?: string }>;
 }) {
-  const page = parseInt(searchParams.page || "1");
-  const limit = parseInt(searchParams.limit || "10");
+  const awaitedSearchParams = await searchParams;
+
+  const page = parseInt(awaitedSearchParams.page || "1");
+  const limit = parseInt(awaitedSearchParams.limit || "10");
   const skip = (page - 1) * limit;
 
   // Get total count for pagination info
