@@ -7,7 +7,7 @@ import {
 import dbConnect from "@/lib/dbConnect";
 import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import { Tag } from "@/models";
-import { EditableArtwork } from "@/app/dashboard/FileList";
+import { EditableArtwork } from "@/app/(dashboard)/dashboard/FileList";
 
 // Create S3 client
 const s3Client = new S3Client({

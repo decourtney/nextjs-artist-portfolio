@@ -1,7 +1,7 @@
 import { Image, Link } from "@heroui/react";
-import { charm } from "../fonts/fonts";
-import Footer from "./footer";
-import ContactForm from "./components/ContactForm";
+import { charm } from "@/fonts/fonts";
+import Footer from "./_components/Footer";
+import ContactForm from "@/app/(root)/_components/ContactForm";
 
 const HomePage = async () => {
   return (

@@ -10,8 +10,8 @@ import {
   NavbarMenuToggle,
 } from "@heroui/react";
 import { useState } from "react";
-import SocialMediaButtons from "./components/SocialMediaButtons";
-import ActiveLink from "./components/ActiveLink";
+import SocialMediaButtons from "./SocialMediaButtons";
+import ActiveLink from "./ActiveLink";
 
 const navLinks = [
   { label: "HOME", href: "/" },
@@ -40,9 +40,7 @@ const NavBar = () => {
       <NavbarContent justify="center" className="hidden md:contents space-x-5">
         {navLinks.map((navItem) => (
           <NavbarItem key={`navbar-${navItem.label}`}>
-            <ActiveLink href={navItem.href}>
-              {navItem.label}
-            </ActiveLink>
+            <ActiveLink href={navItem.href}>{navItem.label}</ActiveLink>
           </NavbarItem>
         ))}
       </NavbarContent>
@@ -61,7 +59,7 @@ const NavBar = () => {
       <NavbarMenu className="font-bold pt-10 items-center space-y-6 bg-background-100 bg-gradient-to-b from-background-200 to-transparent">
         {navLinks.map((navItem) => (
           <NavbarMenuItem key={`navbarmenu-${navItem.label}`}>
-            <ActiveLink href={navItem.href!}>
+            <ActiveLink href={navItem.href!} onClick={handleClose}>
               {navItem.label}
             </ActiveLink>
           </NavbarMenuItem>

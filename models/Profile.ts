@@ -2,20 +2,20 @@ import { Types, Schema, Document, model, models } from "mongoose";
 
 export interface IProfile extends Document {
   username: string;
+  role: "user" | "admin";
   bio?: string;
   avatar?: string;
   preferences?: {
     theme: "light" | "dark";
     notifications: boolean;
   };
-  userId: Types.ObjectId; // References NextAuth user
-  createdAt: Date;
-  updatedAt: Date;
+  authId: String; // References NextAuth user
 }
 
 const ProfileSchema = new Schema<IProfile>(
   {
     username: { type: String, required: true, unique: true },
+    role: { type: String, enum: ["user", "admin"], default: "user" },
     bio: { type: String },
     avatar: { type: String, default: "/default-avatar.png" },
     preferences: {
@@ -23,9 +23,8 @@ const ProfileSchema = new Schema<IProfile>(
       notifications: { type: Boolean, default: true },
     },
     // Link to NextAuth user
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+    authId: {
+      type: String,
       required: true,
       unique: true,
     },

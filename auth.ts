@@ -7,71 +7,79 @@ import type { NextAuthOptions } from "next-auth";
 import { getServerSession } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import dbConnect from "@/lib/dbConnect";
-import { MongoDBAdapter } from "@auth/mongodb-adapter";
-import client from "@/lib/mongoDBAdapter";
-import type { Adapter } from "next-auth/adapters";
 import { Profile } from "@/models";
 
 export const _nextAuthOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(client) as Adapter,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
+  session: {
+    strategy: "jwt", // Use JWT sessions
+  },
   callbacks: {
-    // Add user ID to session object
+    async signIn({ user }) {
+      await dbConnect();
+      const existingProfile = await Profile.findOne({ authId: user.id });
+      if (!existingProfile) {
+        // If not found, block sign-in
+        return false;
+      }
+      return true; // If found, allow sign-in
+    },
+    async jwt({ token, user, trigger }) {
+      if (user) {
+        // user.id is our "authId", but ensure you do the correct lookup for your model
+        await dbConnect();
+        const existingProfile = await Profile.findOne({ authId: user.id });
+        if (existingProfile) {
+          // Attach the role to the token
+          token.role = existingProfile.role;
+        } else {
+          // Default to user role if not found
+          token.role = "user";
+        }
+      }
+
+      return token;
+    },
+
     async session({ session, token }) {
-      if (token && session.user) {
-        session.user.id = token.sub as string; // Safely attach user ID
+      if (session.user && token) {
+        session.user.id = token.sub as string;
+        // Attach the role to the session
+        (session.user as any).role = token.role;
       }
       return session;
     },
-    async jwt({ token, user }) {
-      if (user) {
-        token.sub = user.id; // Pass user ID to session
-      }
-      return token;
-    },
-    async signIn({ user, account, profile }) {
-      // console.log("Sign in callback:", user, account, profile);
-
-      return true;
-    },
   },
   events: {
-    // Perform actions after events
-    signOut: async (message) => {
-      console.log("User signed out:", message);
-    },
     signIn: async ({ user }) => {
       if (!user || !user.id) return;
-
-      console.log("Sign in event:", user);
-
       await dbConnect();
 
-      const userId = user.id;
-
-      const existingProfile = await Profile.findOne({ userId });
-
+      const authId = user.id as string;
+      const existingProfile = await Profile.findOne({ authId });
+      console.log("authId: ", authId);
       if (!existingProfile) {
         const newProfile = new Profile({
-          userId,
           username:
             user.name?.replace(/\s+/g, "").toLowerCase() || `user${Date.now()}`,
+          role: "user", // db defaults to 'user' if not provided
           avatar: user.image || "/default-avatar.png",
+          authId,
         });
-
         await newProfile.save();
         console.log("Profile created:", newProfile);
       }
     },
+    signOut: async ({ session, token }) => {},
   },
   pages: {
-    signIn: "/signin", // Custom sign-in page
-    error: "/auth/error", // Custom error page
+    // signIn: "/signin", // Custom sign-in page
+    // error: "/auth/error", // Custom error page
   },
   logger: {
     error: (code, metadata) => {
