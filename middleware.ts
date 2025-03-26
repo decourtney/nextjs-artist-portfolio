@@ -12,11 +12,10 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(url, 302);
   }
 
-  // Example: Restrict routes based on role
   const isDashboardRoute = req.nextUrl.pathname.startsWith("/dashboard");
 
-  // If you only want admin to have access to /dashboard
-  if (isDashboardRoute && token.role !== "admin") {
+  // Restrict dashboard routes to admins only
+  if (isDashboardRoute && token.role === "user") {
     return NextResponse.json(
       { error: "Forbidden: Admins only" },
       { status: 403 }

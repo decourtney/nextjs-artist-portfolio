@@ -20,22 +20,28 @@ export const _nextAuthOptions: NextAuthOptions = {
     strategy: "jwt", // Use JWT sessions
   },
   callbacks: {
+    async signIn({ user }) {
+      await dbConnect();
+      const existingProfile = await Profile.findOne({ authId: user.id });
+      if (!existingProfile) {
+        // If not found, block sign-in
+        return false;
+      }
+      return true; // If found, allow sign-in
+    },
     async jwt({ token, user, trigger }) {
-      // When a new user signs in (or token is refreshed), we can look up their role
       if (user) {
         // user.id is our "authId", but ensure you do the correct lookup for your model
         await dbConnect();
         const existingProfile = await Profile.findOne({ authId: user.id });
         if (existingProfile) {
-          token.role = existingProfile.role; // <-- Store the role in the token
+          // Attach the role to the token
+          token.role = existingProfile.role;
         } else {
-          // If no existing profile, default the role (e.g. "user") or do nothing
+          // Default to user role if not found
           token.role = "user";
         }
       }
-
-      // The `trigger === 'update'` case applies if you do token rotation –
-      // you could re-check the DB on each refresh if you want.
 
       return token;
     },
@@ -43,7 +49,7 @@ export const _nextAuthOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user && token) {
         session.user.id = token.sub as string;
-        // Attach the role if you want it in your session
+        // Attach the role to the session
         (session.user as any).role = token.role;
       }
       return session;
@@ -56,20 +62,20 @@ export const _nextAuthOptions: NextAuthOptions = {
 
       const authId = user.id as string;
       const existingProfile = await Profile.findOne({ authId });
-
+      console.log("authId: ", authId);
       if (!existingProfile) {
         const newProfile = new Profile({
-          authId,
           username:
             user.name?.replace(/\s+/g, "").toLowerCase() || `user${Date.now()}`,
+          role: "user", // db defaults to 'user' if not provided
           avatar: user.image || "/default-avatar.png",
-          // Optionally assign role here if needed
-          // role: 'user'
+          authId,
         });
         await newProfile.save();
         console.log("Profile created:", newProfile);
       }
     },
+    signOut: async ({ session, token }) => {},
   },
   pages: {
     // signIn: "/signin", // Custom sign-in page

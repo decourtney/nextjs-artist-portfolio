@@ -14,11 +14,15 @@ import {
 import { signIn, signOut, useSession } from "next-auth/react";
 
 const DashNav = () => {
+  const session = useSession();
+console.log(session);
   return (
     <Navbar>
+      <NavbarContent justify="start"><NavbarItem>{session.data?.user.email}</NavbarItem></NavbarContent>
+
       <NavbarContent justify="end">
         <NavbarItem>
-          <Button onPress={() => signOut({ callbackUrl: "/dashboard" })}>
+          <Button onPress={() => signOut({ callbackUrl: "/" })}>
             Logout
           </Button>
         </NavbarItem>
