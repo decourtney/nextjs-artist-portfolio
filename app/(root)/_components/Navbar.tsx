@@ -29,7 +29,7 @@ const NavBar = () => {
 
   return (
     <Navbar
-      className="bg-background-200  md:bg-transparent font-medium"
+      className="bg-background-200 md:bg-transparent font-medium pointer-events-none"
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
       isBlurred={false}

@@ -53,7 +53,7 @@ export default function ActiveLink({ children, ...props }: ActiveLinkProps) {
   return (
     <Link {...props}>
       <div
-        className={`px-1 text-lg text-foreground-500 content-center hover:shadow-[inset_0_-4px_0_hsl(var(--heroui-primary-500))] pointer-events-auto ${
+        className={`px-2 text-lg text-foreground-500 content-center hover:shadow-[inset_0_-4px_0_hsl(var(--heroui-primary-500))] pointer-events-auto ${
           isActive
             ? "shadow-[inset_0_-4px_0_hsl(var(--heroui-primary-500))]"
             : ""
