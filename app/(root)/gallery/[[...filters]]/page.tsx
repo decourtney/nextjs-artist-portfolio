@@ -4,7 +4,7 @@ import dbConnect from "@/lib/dbConnect";
 import { Tag } from "@/models";
 import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import { TagDocument } from "@/models/Tag";
-import ImageDisplay from "../../components/ImageDisplay";
+import ImageDisplay from "../../_components/ImageDisplay";
 import { ParseActiveFilters } from "@/utils/filters";
 import { BuildQueryFromFilters } from "@/utils/buildQuery";
 

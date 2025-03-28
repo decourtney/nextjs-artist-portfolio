@@ -170,13 +170,16 @@ export default function FileList({
           }
         />
         <div className="flex w-full overflow-hidden">
-          <Image
-            src={file.thumbSrc}
-            alt={file.name}
-            removeWrapper
-            radius="none"
-            className="w-12 h-12 object-cover"
-          />
+          <div className="w-24 h-24">
+            <Image
+              src={file.thumbSrc}
+              alt={file.name}
+              removeWrapper
+              radius="none"
+              className="w-full h-full object-cover"
+            />
+          </div>
+
           <div className="flex flex-col w-full h-full ml-2 gap-2 truncate">
             <div className="flex justify-between">
               <p className="truncate">{file.name}</p>
@@ -248,6 +251,8 @@ export default function FileList({
             Delete Selected
           </Button>
         </div>
+
+        {/* Render the File Cards */}
         {files.map(renderFileItem)}
       </ul>
 

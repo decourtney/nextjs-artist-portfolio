@@ -7,7 +7,8 @@ import {
 import dbConnect from "@/lib/dbConnect";
 import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import { Tag } from "@/models";
-import { EditableArtwork } from "@/app/(dashboard)/dashboard/FileList";
+import { EditableArtwork } from "@/app/dashboard/_components/FileList";
+import { SanitizeAndShortenFilename } from "@/utils/sanitizeAndShortenFilename";
 
 // Create S3 client
 const s3Client = new S3Client({
@@ -123,18 +124,13 @@ export async function PATCH(
     let newThumbSrc = artwork.thumbSrc;
 
     // If the name is being updated (and is different), handle S3 renaming
-    const sanitizedUpdatedName: string = updatedFields.name.replaceAll(
-      " ",
-      "-"
-    );
+    const sanitizedUpdatedName: string = SanitizeAndShortenFilename(updatedFields.name);
+
     if (
       sanitizedUpdatedName &&
-      sanitizedUpdatedName.toLowerCase() !== artwork.name.toLowerCase()
+      sanitizedUpdatedName !== artwork.name.toLowerCase()
     ) {
-      updatedFields.name =
-        sanitizedUpdatedName.length > 60
-          ? sanitizedUpdatedName.substring(0, 60)
-          : sanitizedUpdatedName;
+      updatedFields.name = sanitizedUpdatedName
 
       const newMainKey = `${folderPath}${updatedFields.name}.webp`;
       const newThumbKey = `${folderPath}${updatedFields.name}-thumb.webp`;

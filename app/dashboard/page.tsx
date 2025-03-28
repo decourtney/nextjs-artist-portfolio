@@ -42,7 +42,7 @@ export default async function DashboardPage({
   const allTags = { categories, mediums, sizes };
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto bg-background-100">
+    <main className="w-full max-w-[1400px] mx-auto bg-background-100">
       <div className="mx-auto">
         <FileList
           files={files}
@@ -52,6 +52,6 @@ export default async function DashboardPage({
         />
         <FilePicker />
       </div>
-    </div>
+    </main>
   );
 }
