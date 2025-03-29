@@ -62,7 +62,6 @@ export const _nextAuthOptions: NextAuthOptions = {
 
       const authId = user.id as string;
       const existingProfile = await Profile.findOne({ authId });
-      console.log("authId: ", authId);
       if (!existingProfile) {
         const newProfile = new Profile({
           username:
@@ -72,7 +71,6 @@ export const _nextAuthOptions: NextAuthOptions = {
           authId,
         });
         await newProfile.save();
-        console.log("Profile created:", newProfile);
       }
     },
     signOut: async ({ session, token }) => {},

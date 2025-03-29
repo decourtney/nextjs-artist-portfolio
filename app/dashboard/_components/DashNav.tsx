@@ -12,7 +12,6 @@ import { signOut, useSession } from "next-auth/react";
 
 const DashNav = () => {
   const session = useSession();
-  console.log(session);
   return (
     <Navbar className="bg-background-200 border-b border-divider-200">
       <NavbarContent justify="start">
