@@ -97,7 +97,6 @@ export default function FileList({
 
   // Delete selected items (calls your API DELETE route)
   const handleDelete = async () => {
-    console.log("Deleting files:", selectedIds);
     try {
       const res = await fetch(`/api/artwork/batch-delete`, {
         method: "DELETE",
