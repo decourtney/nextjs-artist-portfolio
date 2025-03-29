@@ -10,19 +10,12 @@ function setLSOpenStatus(status: boolean) {
   }
 }
 
-/** Read the open/closed boolean from localStorage; default to false if missing */
+/** Read the open/closed boolean from localStorage */
 function getLSOpenStatus(): boolean {
   if (typeof window !== "undefined") {
-    const saved = localStorage.getItem("mobileSidebarOpen");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (err) {
-        console.error(
-          "Could not parse mobileSidebarOpen from localStorage",
-          err
-        );
-      }
+    const saved = window.localStorage.getItem("mobileSidebarOpen");
+    if (saved !== null) {
+      return JSON.parse(saved);
     }
   }
   return false;
@@ -104,7 +97,7 @@ export default function MobileSidebar({ children }: MobileSidebarProps) {
     <>
       {/* The swipe/touch area */}
       <div
-        className="fixed top-0 -left-[40px] min-h-[calc(100dvh+200px)] transition-transform duration-300 bg-gradient-to-r from-content4-600 from-[50%] to-transparent to-[50%]"
+        className="fixed top-0 -left-[40px] min-h-[calc(100dvh+200px)] transition-transform duration-300 bg-gradient-to-r from-background-300 from-[50%] to-transparent to-[50%]"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -115,12 +108,12 @@ export default function MobileSidebar({ children }: MobileSidebarProps) {
         }}
       >
         {/* The actual sidebar panel */}
-        <div className="relative w-[160px] h-full bg-content4-600 translate-x-[40px]">
+        <div className="relative w-[160px] h-full bg-background-200 translate-x-[40px] border-r border-divider-200">
           <button
             onClick={() => setOpenState(!open)}
-            className="absolute bottom-1/4 -right-10 h-16 transform -translate-y-1/2 bg-content4-600 p-2 rounded-r-full"
+            className="absolute bottom-1/4 -right-10 h-16 transform -translate-y-1/2 bg-background-200 p-2 rounded-r-full border-r border-t border-b border-divider-200"
           >
-            <MdOutlineFilter size={25} />
+            <MdOutlineFilter size={25} className="text-foreground-500" />
           </button>
 
           {children}
@@ -130,7 +123,7 @@ export default function MobileSidebar({ children }: MobileSidebarProps) {
       {/* Dark overlay when sidebar is open */}
       <div
         className={`
-          fixed inset-0 -z-10 bg-black bg-opacity-50 transition-opacity duration-300 md:hidden
+          fixed inset-0 -z-10 bg-overlay-500 bg-opacity-50 transition-opacity duration-300 md:hidden
           ${
             open
               ? "opacity-100 pointer-events-auto"

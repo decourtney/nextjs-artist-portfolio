@@ -7,6 +7,8 @@ import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import sharp from "sharp";
 import { Readable } from "stream";
 import { SanitizeAndShortenFilename } from "@/utils/sanitizeAndShortenFilename";
+import { getServerSession } from "next-auth";
+import { _nextAuthOptions } from "@/auth";
 
 // Enhanced interface to also track a UUID for each file
 interface PendingImageData {
@@ -56,6 +58,15 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if user is admin
+    const session = await getServerSession(_nextAuthOptions);
+    if (!session?.user || session.user.role !== "admin") {
+      return NextResponse.json(
+        { message: "Unauthorized: Admin access required" },
+        { status: 403 }
+      );
+    }
+
     await dbConnect();
 
     const contentType = request.headers.get("content-type");

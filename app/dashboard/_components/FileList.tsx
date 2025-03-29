@@ -227,9 +227,9 @@ export default function FileList({
   };
 
   return (
-    <div className="max-w-[800px] m-1 rounded-lg border-1 text-foreground-100 bg-background-50 shadow-md">
+    <div className="max-w-[800px] m-1 rounded-lg border-1 border-divider-200 text-foreground-500 bg-background-50 shadow-md">
       <ul>
-        <div className="flex justify-between items-center border-b-2 p-2">
+        <div className="flex justify-between items-center border-b-2 border-divider-200 p-2">
           <Checkbox
             size="sm"
             isSelected={allSelected(files)}
@@ -237,7 +237,7 @@ export default function FileList({
               handleSelectAllColumn(files, e.target.checked)
             }
           >
-            <span className="font-medium text-xs text-foreground-100">
+            <span className="font-medium text-xs text-foreground-500">
               Select All
             </span>
           </Checkbox>
@@ -245,6 +245,7 @@ export default function FileList({
           <Button
             size="sm"
             color="danger"
+            variant="flat"
             onPress={handleDelete}
             isDisabled={selectedIds.length === 0}
           >
@@ -263,11 +264,11 @@ export default function FileList({
           variant="light"
           onPress={handlePrevious}
           isDisabled={currentPage === 1}
-          className="text-foreground-100 text-lg"
+          className="text-foreground-500 text-lg"
         >
           <IoIosArrowBack />
         </Button>
-        <span>
+        <span className="text-foreground-500">
           {currentPage} of {totalPages}
         </span>
         <Button
@@ -276,7 +277,7 @@ export default function FileList({
           variant="light"
           onPress={handleNext}
           isDisabled={currentPage === totalPages}
-          className="text-foreground-100 text-lg"
+          className="text-foreground-500 text-lg"
         >
           <IoIosArrowForward />
         </Button>

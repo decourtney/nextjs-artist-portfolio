@@ -40,7 +40,7 @@ const GalleryLayout = async ({
   return (
     <div className="flex">
       {/* Desktop sidebar */}
-      <div className="hidden md:block w-[200px] min-h-[calc(100dvh-64px)] bg-content4-900">
+      <div className="hidden md:block w-[200px] min-h-[calc(100dvh-64px)] bg-background-200 border-r border-divider-200">
         <SidebarContent
           currentSegments={currentSegments}
           activeFilters={activeFilters}
@@ -60,7 +60,7 @@ const GalleryLayout = async ({
         </MobileSidebar>
       </div>
       {/* Main content */}
-      <div className="flex-1">{children}</div>
+      <div className="flex-1 bg-background-100">{children}</div>
     </div>
   );
 };
