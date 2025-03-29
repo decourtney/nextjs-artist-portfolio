@@ -20,15 +20,15 @@ export const _nextAuthOptions: NextAuthOptions = {
     strategy: "jwt", // Use JWT sessions
   },
   callbacks: {
-    async signIn({ user }) {
-      await dbConnect();
-      const existingProfile = await Profile.findOne({ authId: user.id });
-      if (!existingProfile) {
-        // If not found, block sign-in
-        return false;
-      }
-      return true; // If found, allow sign-in
-    },
+    // async signIn({ user }) {
+    //   await dbConnect();
+    //   const existingProfile = await Profile.findOne({ authId: user.id });
+    //   if (!existingProfile) {
+    //     // If not found, block sign-in
+    //     return false;
+    //   }
+    //   return true; // If found, allow sign-in
+    // },
     async jwt({ token, user, trigger }) {
       if (user) {
         // user.id is our "authId", but ensure you do the correct lookup for your model
