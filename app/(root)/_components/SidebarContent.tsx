@@ -4,7 +4,7 @@ import { TagDocument } from "@/models/Tag";
 import { TagType } from "@/types/tagType";
 import { ParseActiveFilters } from "@/utils/filters";
 import { Link } from "@heroui/react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { toTitleCase } from "@/utils/titleCase";
 
 interface SidebarContentProps {

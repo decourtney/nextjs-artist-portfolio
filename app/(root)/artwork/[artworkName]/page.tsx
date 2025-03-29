@@ -1,7 +1,7 @@
 "use client";
 
-import { ArtworkDocument, PopulatedArtworkDocument } from "@/models/Artwork";
-import { Link, Image, LinkIcon, Skeleton } from "@heroui/react";
+import { PopulatedArtworkDocument } from "@/models/Artwork";
+import { Link, Image } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useFilteredArtworks } from "@/app/context/FilteredArtworkContext";
@@ -86,7 +86,7 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
   if (!artworkDoc) {
     return (
       <div className="flex justify-center items-center w-full h-[calc(100dvh-112px)] font-bold text-lg text-center text-foreground-300">
-        <p>Couldn't find the artwork.</p>
+        <p>Could not find the artwork.</p>
       </div>
     );
   }

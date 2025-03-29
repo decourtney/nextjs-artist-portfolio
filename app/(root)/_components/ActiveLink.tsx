@@ -2,7 +2,7 @@
 
 import Link, { LinkProps } from "next/link";
 import React, { useEffect, useState } from "react";
-import { useParams, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 interface ActiveLinkProps extends LinkProps {
   children: React.ReactNode;
@@ -41,7 +41,6 @@ export const useHash = () => {
 };
 
 export default function ActiveLink({ children, ...props }: ActiveLinkProps) {
-  const params = useParams();
   const pathname = usePathname();
   const [isActive, setIsActive] = useState<boolean>(false);
   const hash = useHash();

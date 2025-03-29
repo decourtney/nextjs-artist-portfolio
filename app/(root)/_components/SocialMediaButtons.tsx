@@ -1,5 +1,5 @@
-import { Button, Link, LinkIcon } from '@heroui/react';
-import { BsInstagram } from 'react-icons/bs';
+import { Link } from "@heroui/react";
+import { BsInstagram } from "react-icons/bs";
 
 const SocialMediaButtons = () => {
   return (
@@ -17,6 +17,6 @@ const SocialMediaButtons = () => {
       </Link>
     </div>
   );
-}
+};
 
-export default SocialMediaButtons
+export default SocialMediaButtons;
