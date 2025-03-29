@@ -59,7 +59,7 @@ function buildInitialSidebarState(
     const saved = localStorage.getItem("sidebarDetailsOpen");
     if (saved) {
       try {
-        // If it’s valid JSON, return it
+        // If it's valid JSON, return it
         return JSON.parse(saved);
       } catch (err) {
         console.error("Could not parse localStorage sidebarDetailsOpen", err);
@@ -103,7 +103,7 @@ const SidebarContent = ({
   };
 
   return (
-    <div className="sticky top-0 left-0 h-screen space-y-2 p-2 pb-14 overflow-scroll scrollbar-hide">
+    <div className="sticky top-[64px] left-0 h-[calc(100dvh-64px)] space-y-2 p-2 pb-14 overflow-scroll scrollbar-hide">
       {Object.entries(groupedTags).map(([type, tagArray]) => {
         // If we never set a value for this type, default to true or false.
         const open = detailsOpen[type] ?? false;
@@ -115,7 +115,7 @@ const SidebarContent = ({
             open={open}
             onToggle={(e) => handleToggle(type, e)}
           >
-            <summary className="cursor-pointer w-full md:pl-2 font-medium text-left text-xl text-foreground-200">
+            <summary className="cursor-pointer w-full md:pl-2 font-medium text-left text-xl text-foreground-500">
               {toTitleCase(type)}
             </summary>
             <ul>
@@ -134,14 +134,14 @@ const SidebarContent = ({
                 const isActive =
                   activeFilters[clickedType]?.includes(clickedLabel);
                 const textClass = isActive
-                  ? "text-foreground-800 font-semibold"
-                  : "text-foreground-400";
+                  ? "text-primary-500 font-semibold"
+                  : "text-foreground-400 hover:text-primary-500";
 
                 return (
                   <li key={tag._id}>
                     <Link
                       href={href}
-                      className="w-full hover:bg-gradient-to-t from-content4-700 to-transparent"
+                      className="w-full hover:bg-background-300 transition-colors"
                     >
                       <p
                         className={`w-full pl-2 md:pl-6 text-xl transition-colors ${textClass}`}

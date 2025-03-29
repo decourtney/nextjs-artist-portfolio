@@ -42,16 +42,23 @@ export default async function DashboardPage({
   const allTags = { categories, mediums, sizes };
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto bg-background-100">
-      <div className="mx-auto">
-        <FileList
-          files={files}
-          tags={allTags}
-          currentPage={page}
-          totalPages={totalPages}
-        />
-        <FilePicker />
+    <main className="w-full max-w-[1400px] mx-auto">
+      <div className="space-y-8">
+        <div className="bg-background-50 p-6 rounded-lg shadow-md">
+          <h1 className="text-2xl font-bold text-foreground-500 mb-4">
+            Artwork Management
+          </h1>
+          <FileList
+            files={files}
+            tags={allTags}
+            currentPage={page}
+            totalPages={totalPages}
+          />
+        </div>
+        <div className="bg-background-50 p-6 rounded-lg shadow-md">
+          <FilePicker />
+        </div>
       </div>
-    </div>
+    </main>
   );
 }

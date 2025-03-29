@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import dbConnect from "@/lib/dbConnect";
 import Artwork from "@/models/Artwork";
+import { getServerSession } from "next-auth";
+import { _nextAuthOptions } from "@/auth";
 
 // Create S3 client
 const s3Client = new S3Client({
@@ -14,6 +16,15 @@ const s3Client = new S3Client({
 
 export async function DELETE(request: NextRequest) {
   try {
+    // Check if user is admin
+    const session = await getServerSession(_nextAuthOptions);
+    if (!session?.user || session.user.role !== "admin") {
+      return NextResponse.json(
+        { message: "Unauthorized: Admin access required" },
+        { status: 403 }
+      );
+    }
+
     await dbConnect();
     const { ids } = await request.json(); // Expecting { ids: string[] }
     if (!Array.isArray(ids) || ids.length === 0) {

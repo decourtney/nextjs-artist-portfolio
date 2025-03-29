@@ -6,11 +6,14 @@ import dbConnect from "@/lib/dbConnect";
 import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import sharp from "sharp";
 import { Readable } from "stream";
+import { SanitizeAndShortenFilename } from "@/utils/sanitizeAndShortenFilename";
+import { getServerSession } from "next-auth";
+import { _nextAuthOptions } from "@/auth";
 
 // Enhanced interface to also track a UUID for each file
 interface PendingImageData {
   id: string; // The UUID passed from the client
-  truncatedBaseName: string;
+  sanitizedFilename: string;
   fileBuffer: Buffer;
   mainKey: string;
   thumbKey: string;
@@ -55,6 +58,15 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if user is admin
+    const session = await getServerSession(_nextAuthOptions);
+    if (!session?.user || session.user.role !== "admin") {
+      return NextResponse.json(
+        { message: "Unauthorized: Admin access required" },
+        { status: 403 }
+      );
+    }
+
     await dbConnect();
 
     const contentType = request.headers.get("content-type");
@@ -86,22 +98,20 @@ export async function POST(request: NextRequest) {
         const { filename } = info;
         const folderPath = process.env.NEXT_PUBLIC_AWS_IMAGES_FOLDER || "";
 
+        // Locate where the file extension starts
         const extensionIndex = filename.lastIndexOf(".");
 
+        // Get base file name without extension
         const rawBaseName =
           extensionIndex !== -1
             ? filename.substring(0, extensionIndex)
             : filename;
 
-        const safeBaseName = rawBaseName.replaceAll(" ", "-");
+        // Shorten and sanitize the filename
+        const sanitizedFilename = SanitizeAndShortenFilename(rawBaseName);
 
-        const truncatedBaseName =
-          safeBaseName.length > 60
-            ? safeBaseName.substring(0, 60)
-            : safeBaseName;
-
-        const mainKey = `${folderPath}${truncatedBaseName}.webp`;
-        const thumbKey = `${folderPath}${truncatedBaseName}-thumb.webp`;
+        const mainKey = `${folderPath}${sanitizedFilename}.webp`;
+        const thumbKey = `${folderPath}${sanitizedFilename}-thumb.webp`;
         const mainUrl = `https://${process.env.NEXT_PUBLIC_AWS_S3_BUCKET}.s3.${process.env.NEXT_PUBLIC_AWS_REGION}.amazonaws.com/${mainKey}`;
         const thumbUrl = `https://${process.env.NEXT_PUBLIC_AWS_S3_BUCKET}.s3.${process.env.NEXT_PUBLIC_AWS_REGION}.amazonaws.com/${thumbKey}`;
 
@@ -118,7 +128,7 @@ export async function POST(request: NextRequest) {
 
           pendingImages.push({
             id: assignedId,
-            truncatedBaseName,
+            sanitizedFilename,
             fileBuffer: Buffer.concat(chunks),
             mainKey,
             thumbKey,
@@ -156,7 +166,7 @@ export async function POST(request: NextRequest) {
         for (const item of pendingImages) {
           const {
             id,
-            truncatedBaseName,
+            sanitizedFilename,
             fileBuffer,
             mainKey,
             thumbKey,
@@ -209,9 +219,9 @@ export async function POST(request: NextRequest) {
 
             // Insert a document into MongoDB
             const artworkDoc: ArtworkDocument = new Artwork({
-              name: truncatedBaseName,
+              name: sanitizedFilename,
               src: mainUrl,
-              alt: truncatedBaseName,
+              alt: sanitizedFilename,
               thumbSrc: thumbUrl,
               metaWidth: originalWidth,
               metaHeight: originalHeight,

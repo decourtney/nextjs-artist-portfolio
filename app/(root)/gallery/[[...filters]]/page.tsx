@@ -4,7 +4,7 @@ import dbConnect from "@/lib/dbConnect";
 import { Tag } from "@/models";
 import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import { TagDocument } from "@/models/Tag";
-import ImageDisplay from "../../components/ImageDisplay";
+import ImageDisplay from "../../_components/ImageDisplay";
 import { ParseActiveFilters } from "@/utils/filters";
 import { BuildQueryFromFilters } from "@/utils/buildQuery";
 
@@ -34,8 +34,10 @@ const FilteredDisplayPage = async ({
   const artworks = JSON.parse(JSON.stringify(artworkData)) as ArtworkDocument[];
 
   return (
-    <div className="w-full min-h-[calc(100dvh-64px)] bg-gradient-to-t from-background-300 to-transparent">
-      <ImageDisplay artworks={artworks} />
+    <div className="w-full min-h-[calc(100dvh-64px)] bg-background-100 p-4">
+      <div className="max-w-[1400px] mx-auto">
+        <ImageDisplay artworks={artworks} />
+      </div>
     </div>
   );
 };

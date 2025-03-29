@@ -4,38 +4,30 @@ import { ArtworkDocument, PopulatedArtworkDocument } from "@/models/Artwork";
 import { Link, Image, LinkIcon, Skeleton } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useFilteredArtworks } from "../../../context/FilteredArtworkContext";
+import { useFilteredArtworks } from "@/app/context/FilteredArtworkContext";
 import { IoIosArrowRoundBack, IoIosArrowRoundForward } from "react-icons/io";
-import { FaArrowLeftLong } from "react-icons/fa6";
-import Footer from "../../footer";
 import { useSwipeable } from "react-swipeable";
 import { toTitleCase } from "@/utils/titleCase";
 import { use } from "react";
 // import Image from "next/image";
 
 interface ArtworkDetailPageProps {
-  params: { artworkName: string };
+  params: Promise<{ artworkName: string }>;
 }
 
-export default function ArtworkDetailPage({
-  params,
-}: {
-  params: Promise<{ artworkName: string }>;
-}) {
-  // Get the array of filtered artwork names (string[])
-  const { filteredNames } = useFilteredArtworks();
+export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
   const router = useRouter();
   const [artworkDoc, setArtworkDoc] = useState<PopulatedArtworkDocument | null>(
     null
   );
   const [fetching, setfetching] = useState<boolean>(true);
   const [loaded, setLoaded] = useState(false);
+  const { filteredNames } = useFilteredArtworks();
   const { artworkName } = use(params);
 
   // Fetch the ArtworkDocument for the current artworkName from the API.
   useEffect(() => {
     async function fetchArtwork() {
-      setfetching(true);
       try {
         const res = await fetch(
           `/api/artworkByName/${encodeURIComponent(artworkName)}`
@@ -44,10 +36,11 @@ export default function ArtworkDetailPage({
           console.error("Failed to fetch artwork document.");
           setArtworkDoc(null);
         } else {
-          const data = await res.json();
+          const { artwork } = (await res.json()) as {
+            artwork: PopulatedArtworkDocument;
+          };
 
-          // Expecting { artwork: ArtworkDocument } from the API.
-          setArtworkDoc(data.artwork as PopulatedArtworkDocument);
+          setArtworkDoc(artwork);
         }
       } catch (error) {
         console.error("Error fetching artwork:", error);
@@ -56,6 +49,7 @@ export default function ArtworkDetailPage({
         setfetching(false);
       }
     }
+
     fetchArtwork();
   }, [artworkName]);
 
@@ -64,7 +58,7 @@ export default function ArtworkDetailPage({
   const notFoundInContext = currentIndex === -1;
 
   // Use wrap-around navigation:
-  // If not found in context, default to index 0 for navigation purposes.
+  // If not found in context, default to index 0.
   const displayIndex = notFoundInContext ? 0 : currentIndex;
   const total = filteredNames.length;
   const prevName =
@@ -85,14 +79,20 @@ export default function ArtworkDetailPage({
     trackMouse: true,
   });
 
-  if (fetching && !loaded) {
+  if (fetching) {
+    return null;
+  }
+
+  if (!artworkDoc) {
     return (
       <div className="flex justify-center items-center w-full h-[calc(100dvh-112px)] font-bold text-lg text-center text-foreground-300">
-        Loading...
+        <p>Couldn't find the artwork.</p>
       </div>
     );
   }
 
+  // TODO: Add unmount animation for smoother transitions and maybe add a little variety to the animations.
+  // Loaded state is used to control the opacity of the image and details individually.
   return (
     <div
       {...swipeHandlers}
@@ -100,7 +100,7 @@ export default function ArtworkDetailPage({
     >
       <div
         className={`hidden md:block flex-1 min-w-fit h-full text-foreground-500 transition-opacity duration-1000 ${
-          artworkDoc === null || loaded ? "opacity-100:" : "opacity-0"
+          prevName && loaded ? "opacity-100:" : "opacity-0"
         }`}
       >
         <Link
@@ -113,9 +113,8 @@ export default function ArtworkDetailPage({
         </Link>
       </div>
 
-      {/* Image */}
-
-      {artworkDoc ? (
+      <>
+        {/* Image */}
         <div
           className={`flex h-full aspect-auto transition-opacity duration-700 ${
             loaded ? "opacity-100:" : "opacity-0"
@@ -130,37 +129,31 @@ export default function ArtworkDetailPage({
             onLoad={() => setLoaded(true)}
           />
         </div>
-      ) : (
-        <div className="mx-auto my-auto text-2xl text-foreground-100">
-          <p>Couldn't find artwork.</p>
-        </div>
-      )}
 
-      {/* Image Details */}
-      {artworkDoc && (
+        {/* Image Details */}
         <div
           className={`md:max-w-[400px] min-w-[300px] p-4 md:my-auto text-foreground-300 transition-opacity duration-700 ${
-            loaded ? "opacity-100:" : "opacity-0"
+            loaded ? "opacity-100:" : "opacity-0" // may need to change from checking loaded to checking fetching if skeleton added to image
           }`}
         >
           <h1 className="text-center text-3xl font-bold">
-            {toTitleCase(artworkDoc?.name || "")}
+            {toTitleCase(artworkDoc.name || "")}
           </h1>
 
           <div className="flex justify-center gap-4 font-medium text-sm">
-            <h2>{artworkDoc?.medium?.label || ""}</h2>
-            <h2>{artworkDoc?.size?.label || ""}</h2>
+            <h2>{artworkDoc.medium?.label || ""}</h2>
+            <h2>{artworkDoc.size?.label || ""}</h2>
           </div>
 
           <div className="mt-2">
-            <p>{artworkDoc?.description || ""}</p>
+            <p>{artworkDoc.description || ""}</p>
           </div>
         </div>
-      )}
+      </>
 
       <div
         className={`hidden md:block flex-1 min-w-fit h-full text-foreground-500 transition-opacity duration-1000 ${
-          artworkDoc === null || loaded ? "opacity-100:" : "opacity-0"
+          nextName && loaded ? "opacity-100:" : "opacity-0"
         }`}
       >
         <Link

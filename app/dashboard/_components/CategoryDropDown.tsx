@@ -1,23 +1,21 @@
 import { TagDocument } from "@/models/Tag";
-import
-  {
-    Button,
-    ButtonGroup,
-    Dropdown,
-    DropdownItem,
-    DropdownMenu,
-    DropdownTrigger,
-    Input,
-    SharedSelection,
-  } from "@heroui/react";
+import {
+  Button,
+  ButtonGroup,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Input,
+  SharedSelection,
+} from "@heroui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import
-  {
-    IoIosAdd,
-    IoIosArrowDown,
-    IoIosCheckmark,
-    IoIosClose,
-  } from "react-icons/io";
+import {
+  IoIosAdd,
+  IoIosArrowDown,
+  IoIosCheckmark,
+  IoIosClose,
+} from "react-icons/io";
 
 type CategoryDropDownProps = {
   availableItems: TagDocument[];

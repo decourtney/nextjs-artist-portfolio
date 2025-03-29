@@ -18,6 +18,7 @@ const navLinks = [
   { label: "GALLERY", href: "/gallery" },
   { label: "ABOUT", href: "/#about" },
   { label: "CONTACT", href: "/#contact" },
+  { label: "Dashboard", href: "/dashboard" },
 ];
 
 const NavBar = () => {
@@ -29,7 +30,7 @@ const NavBar = () => {
 
   return (
     <Navbar
-      className="bg-background-200  md:bg-transparent font-medium"
+      className="bg-background-200 md:bg-transparent font-medium "
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
       isBlurred={false}
@@ -45,14 +46,14 @@ const NavBar = () => {
         ))}
       </NavbarContent>
 
-      <NavbarContent justify="end" className="">
-        <NavbarItem className="text-foreground-500">
+      <NavbarContent justify="end">
+        <NavbarItem className="text-foreground-500 pointer-events-auto">
           <SocialMediaButtons />
         </NavbarItem>
 
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-          className="md:hidden text-foreground-400"
+          className="md:hidden text-foreground-400 "
         />
       </NavbarContent>
 

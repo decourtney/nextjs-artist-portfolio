@@ -7,7 +7,10 @@ import {
 import dbConnect from "@/lib/dbConnect";
 import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import { Tag } from "@/models";
-import { EditableArtwork } from "@/app/(dashboard)/dashboard/FileList";
+import { EditableArtwork } from "@/app/dashboard/_components/FileList";
+import { SanitizeAndShortenFilename } from "@/utils/sanitizeAndShortenFilename";
+import { getServerSession } from "next-auth";
+import { _nextAuthOptions } from "@/auth";
 
 // Create S3 client
 const s3Client = new S3Client({
@@ -40,6 +43,15 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Check if user is admin
+    const session = await getServerSession(_nextAuthOptions);
+    if (!session?.user || session.user.role !== "admin") {
+      return NextResponse.json(
+        { message: "Unauthorized: Admin access required" },
+        { status: 403 }
+      );
+    }
+
     await dbConnect();
     const { id } = await params;
 
@@ -91,11 +103,20 @@ export async function DELETE(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Check if user is admin
+    const session = await getServerSession(_nextAuthOptions);
+    if (!session?.user || session.user.role !== "admin") {
+      return NextResponse.json(
+        { message: "Unauthorized: Admin access required" },
+        { status: 403 }
+      );
+    }
+
     await dbConnect();
-    const { id } = params;
+    const { id } = await params;
     // Parse the incoming JSON payload containing the updated artwork fields.
     // Expected keys: name, description, size, medium, categories (array of category names), etc.
     const updatedFields: EditableArtwork = await request.json();
@@ -123,18 +144,15 @@ export async function PATCH(
     let newThumbSrc = artwork.thumbSrc;
 
     // If the name is being updated (and is different), handle S3 renaming
-    const sanitizedUpdatedName: string = updatedFields.name.replaceAll(
-      " ",
-      "-"
+    const sanitizedUpdatedName: string = SanitizeAndShortenFilename(
+      updatedFields.name
     );
+
     if (
       sanitizedUpdatedName &&
-      sanitizedUpdatedName.toLowerCase() !== artwork.name.toLowerCase()
+      sanitizedUpdatedName !== artwork.name.toLowerCase()
     ) {
-      updatedFields.name =
-        sanitizedUpdatedName.length > 60
-          ? sanitizedUpdatedName.substring(0, 60)
-          : sanitizedUpdatedName;
+      updatedFields.name = sanitizedUpdatedName;
 
       const newMainKey = `${folderPath}${updatedFields.name}.webp`;
       const newThumbKey = `${folderPath}${updatedFields.name}-thumb.webp`;
