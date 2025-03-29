@@ -1,7 +1,6 @@
 import { Providers } from "./providers";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import Navbar from "@/app/(root)/_components/Navbar";
 import { Charm, Open_Sans } from "next/font/google";
 import { getServerSession } from "next-auth";
 import { _nextAuthOptions } from "@/auth";

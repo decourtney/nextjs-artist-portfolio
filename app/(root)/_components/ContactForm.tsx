@@ -4,7 +4,6 @@ import emailjs from "@emailjs/browser";
 import { Button, Form, Input, Textarea } from "@heroui/react";
 import { useTheme } from "next-themes";
 import React, { ChangeEvent, FormEvent, useState } from "react";
-import { FaLinkedin } from "react-icons/fa";
 import SocialMediaButtons from "./SocialMediaButtons";
 
 const ContactForm = () => {
