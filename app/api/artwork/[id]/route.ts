@@ -155,7 +155,7 @@ export async function PATCH(
       updatedFields.name = sanitizedUpdatedName;
 
       const newMainKey = `${folderPath}${updatedFields.name}.webp`;
-      const newThumbKey = `${folderPath}${updatedFields.name}-thumb.webp`;
+      const newThumbKey = `${folderPath}thumbnails/${updatedFields.name}-thumb.webp`;
 
       if (newMainKey !== oldMainKey) {
         await s3Client.send(
