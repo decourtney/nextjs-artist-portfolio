@@ -134,7 +134,6 @@ export default function FileList({
   const handleModalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingFile || !editForm) return;
-    console.log("Client Updating artwork: ", editingFile._id, editForm);
     try {
       const res = await fetch(`/api/artwork/${editingFile._id}`, {
         method: "PATCH",
