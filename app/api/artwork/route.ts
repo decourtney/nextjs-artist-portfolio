@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
         const sanitizedFilename = SanitizeAndShortenFilename(rawBaseName);
 
         const mainKey = `${folderPath}${sanitizedFilename}.webp`;
-        const thumbKey = `${folderPath}${sanitizedFilename}-thumb.webp`;
+        const thumbKey = `${folderPath}thumbnails/${sanitizedFilename}-thumb.webp`;
         const mainUrl = `https://${process.env.NEXT_PUBLIC_AWS_S3_BUCKET}.s3.${process.env.NEXT_PUBLIC_AWS_REGION}.amazonaws.com/${mainKey}`;
         const thumbUrl = `https://${process.env.NEXT_PUBLIC_AWS_S3_BUCKET}.s3.${process.env.NEXT_PUBLIC_AWS_REGION}.amazonaws.com/${thumbKey}`;
 
