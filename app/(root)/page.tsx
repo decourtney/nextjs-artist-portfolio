@@ -1,6 +1,7 @@
-import { Image, Link } from "@heroui/react";
+import { Link } from "@heroui/react";
 import Footer from "./_components/Footer";
 import ContactForm from "@/app/(root)/_components/ContactForm";
+import Image from "next/image";
 
 const HomePage = async () => {
   return (
@@ -9,11 +10,11 @@ const HomePage = async () => {
       <div className="fixed top-0 left-0 w-full h-full -z-10">
         {/* <div className=""> */}
         <Image
-          src="/images/water.jpg"
+          src="/images/hero-image.jpg"
           alt="Background"
-          removeWrapper
-          radius="none"
-          className="w-full h-full object-cover "
+          fill
+          className="object-cover"
+          priority
         />
         {/* </div> */}
         <div className="absolute top-20 left-10 flex h-full z-10">
