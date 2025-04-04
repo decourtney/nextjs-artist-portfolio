@@ -1,15 +1,6 @@
 import { TagDocument } from "@/models/Tag";
-import {
-  Button,
-  ButtonGroup,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-  Input,
-  SharedSelection,
-} from "@heroui/react";
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import { Menu, Transition } from "@headlessui/react";
+import React, { Fragment, useEffect, useMemo, useState, useRef } from "react";
 import {
   IoIosAdd,
   IoIosArrowDown,
@@ -29,8 +20,8 @@ const SizeDropDown = ({
   onSelectionChange,
 }: SizeDropDownProps) => {
   const normalizedSelectedItem = selectedItem || "";
-  const [selectedKeys, setSelectedKeys] = useState<SharedSelection>(
-    new Set([normalizedSelectedItem])
+  const [selectedValue, setSelectedValue] = useState<string>(
+    normalizedSelectedItem
   );
   const [displayInput, setDisplayInput] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
@@ -38,13 +29,12 @@ const SizeDropDown = ({
   const inputContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setSelectedKeys(new Set([normalizedSelectedItem]));
+    setSelectedValue(normalizedSelectedItem);
   }, [normalizedSelectedItem]);
 
   const unionItems = useMemo(() => {
     const itemMap = new Map<string, string>();
     availableItems.forEach((availItem: TagDocument) => {
-      // Assume TagDocument has a label property.
       itemMap.set(availItem.label.toLowerCase(), availItem.label.toLowerCase());
     });
     if (
@@ -56,7 +46,6 @@ const SizeDropDown = ({
     return Array.from(itemMap.values());
   }, [availableItems, normalizedSelectedItem]);
 
-  // Detect clicks outside the input container to close input.
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -77,7 +66,7 @@ const SizeDropDown = ({
   const handleOnPress = () => {
     const trimmed = inputValue.trim();
     if (trimmed !== "") {
-      setSelectedKeys(new Set([trimmed]));
+      setSelectedValue(trimmed);
       onSelectionChange(trimmed);
     }
     closeInput();
@@ -89,98 +78,103 @@ const SizeDropDown = ({
   };
 
   return (
-    <ButtonGroup>
+    <div className="flex">
       {displayInput ? (
         <div
           ref={inputContainerRef}
-          className="flex rounded-l-xl overflow-hidden"
+          className="flex rounded-l-xl overflow-hidden border border-gray-300"
         >
-          <Input
+          <input
             type="text"
-            radius="none"
             maxLength={60}
-            fullWidth
             placeholder="Type Here"
-            className="w-[125px]"
-            onValueChange={(value) => setInputValue(value)}
-          ></Input>
+            className="w-[125px] px-3 py-2 focus:outline-none"
+            onChange={(e) => setInputValue(e.target.value)}
+            value={inputValue}
+          />
 
           {inputValue ? (
-            <Button
-              isIconOnly
-              className="text-3xl text-green-500"
-              onPress={handleOnPress}
+            <button
+              className="px-3 text-3xl text-green-500 hover:bg-gray-100"
+              onClick={handleOnPress}
             >
               <IoIosCheckmark />
-            </Button>
+            </button>
           ) : (
-            <Button
-              isIconOnly
-              className="text-2xl text-red-500"
-              onPress={closeInput}
+            <button
+              className="px-3 text-2xl text-red-500 hover:bg-gray-100"
+              onClick={closeInput}
             >
               <IoIosClose />
-            </Button>
+            </button>
           )}
         </div>
       ) : (
         <>
-          <Dropdown
-            onOpenChange={(isOpen) => {
-              setDropDownOpen(isOpen);
+          <Menu as="div" className="relative">
+            {({ open }) => {
+              useEffect(() => setDropDownOpen(open), [open]);
+              return (
+                <>
+                  <Menu.Button className="w-[125px] px-3 py-2 border border-gray-300 rounded-l-xl flex items-center justify-between hover:bg-gray-100">
+                    <span>{selectedValue || "Size"}</span>
+                    <IoIosArrowDown />
+                  </Menu.Button>
+                  <Transition
+                    as={Fragment}
+                    enter="transition ease-out duration-100"
+                    enterFrom="transform opacity-0 scale-95"
+                    enterTo="transform opacity-100 scale-100"
+                    leave="transition ease-in duration-75"
+                    leaveFrom="transform opacity-100 scale-100"
+                    leaveTo="transform opacity-0 scale-95"
+                  >
+                    <Menu.Items className="absolute z-10 mt-2 w-[125px] origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <div className="py-1">
+                        {unionItems.map((item) => (
+                          <Menu.Item key={item}>
+                            {({ active }) => (
+                              <button
+                                className={`${active ? "bg-gray-100" : ""} ${
+                                  selectedValue === item
+                                    ? "text-blue-600"
+                                    : "text-gray-900"
+                                } group flex w-full items-center px-4 py-2 text-sm`}
+                                onClick={() => {
+                                  setSelectedValue(item);
+                                  onSelectionChange(item);
+                                }}
+                              >
+                                {item}
+                              </button>
+                            )}
+                          </Menu.Item>
+                        ))}
+                      </div>
+                    </Menu.Items>
+                  </Transition>
+                </>
+              );
             }}
-          >
-            <DropdownTrigger>
-              <Button
-                variant="bordered"
-                className="w-[125px] text-foreground-100"
-              >
-                {selectedItem ? selectedItem : "Size"}
-                <span>
-                  <IoIosArrowDown />
-                </span>
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu
-              closeOnSelect={true}
-              selectionMode="single"
-              selectedKeys={selectedKeys}
-              onSelectionChange={(keys) => {
-                const newSelected = Array.from(keys as unknown as Set<string>);
-                setSelectedKeys(new Set(newSelected) as SharedSelection);
-                // If nothing is selected, pass an empty string; otherwise, pass the first item.
-                const value = newSelected.length > 0 ? newSelected[0] : "";
-                onSelectionChange(value);
-              }}
-            >
-              {unionItems.map((item) => (
-                <DropdownItem key={item} textValue={item}>
-                  {item}
-                </DropdownItem>
-              ))}
-            </DropdownMenu>
-          </Dropdown>
+          </Menu>
           {dropDownOpen ? (
-            <Button
-              isIconOnly
-              isDisabled
-              disableAnimation
-              className="text-lg pointer-events-none"
+            <button
+              disabled
+              className="px-3 py-2 border border-l-0 border-gray-300 rounded-r-xl text-lg text-gray-400"
             >
               <IoIosAdd />
-            </Button>
+            </button>
           ) : (
-            <Button
-              isIconOnly
-              className="text-2xl text-green-500"
-              onPress={() => setDisplayInput(!displayInput)}
+            <button
+              className="px-3 py-2 border border-l-0 border-gray-300 rounded-r-xl text-2xl text-green-500 hover:bg-gray-100"
+              onClick={() => setDisplayInput(!displayInput)}
             >
               <IoIosAdd />
-            </Button>
+            </button>
           )}
         </>
       )}
-    </ButtonGroup>
+    </div>
   );
 };
 

@@ -1,53 +1,45 @@
 "use client";
 
 import React from "react";
-import {
-  Button,
-  Link,
-  Navbar,
-  NavbarContent,
-  NavbarItem,
-} from "@heroui/react";
+import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 
 const DashNav = () => {
   const session = useSession();
   return (
-    <Navbar className="bg-background-200 border-b border-divider-200">
-      <NavbarContent justify="start">
-        <NavbarItem className="text-foreground-500">
-          {session.data?.user.email}
-        </NavbarItem>
-      </NavbarContent>
+    <nav className="bg-gray-100 border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex items-center">
+            <span className="text-gray-700">{session.data?.user.email}</span>
+          </div>
 
-      <NavbarContent justify="center" className="hidden md:flex gap-4">
-        <NavbarItem>
-          <Link href="/" className="text-foreground-500 hover:text-primary-500">
-            Home
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link
-            href="/gallery"
-            className="text-foreground-500 hover:text-primary-500"
-          >
-            Gallery
-          </Link>
-        </NavbarItem>
-      </NavbarContent>
+          <div className="hidden md:flex items-center space-x-8">
+            <Link
+              href="/"
+              className="text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              Home
+            </Link>
+            <Link
+              href="/gallery"
+              className="text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              Gallery
+            </Link>
+          </div>
 
-      <NavbarContent justify="end">
-        <NavbarItem>
-          <Button
-            onPress={() => signOut({ callbackUrl: "/" })}
-            color="primary"
-            variant="flat"
-          >
-            Logout
-          </Button>
-        </NavbarItem>
-      </NavbarContent>
-    </Navbar>
+          <div className="flex items-center">
+            <button
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
   );
 };
 

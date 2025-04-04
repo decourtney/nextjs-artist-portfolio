@@ -9,6 +9,26 @@ const nextConfig = {
         pathname: "/genacourtney/images/**",
       },
     ],
+    domains: ["images.unsplash.com", "source.unsplash.com"],
+  },
+  experimental: {
+    optimizePackageImports: ["@headlessui/react"],
+  },
+  // Increase timeout for chunk loading
+  webpack: (config, { isServer }) => {
+    config.watchOptions = {
+      ...config.watchOptions,
+      aggregateTimeout: 300,
+      poll: 1000,
+    };
+    return config;
+  },
+  // Improve performance
+  poweredByHeader: false,
+  reactStrictMode: true,
+  swcMinify: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production",
   },
 };
 

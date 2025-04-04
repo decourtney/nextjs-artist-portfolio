@@ -2,10 +2,9 @@
 
 import { TagDocument } from "@/models/Tag";
 import { TagType } from "@/types/tagType";
-import { ParseActiveFilters } from "@/utils/filters";
-import { Link } from "@heroui/react";
-import React, { useState } from "react";
-import { toTitleCase } from "@/utils/titleCase";
+import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
+import React from "react";
 
 interface SidebarContentProps {
   currentSegments: string[];
@@ -14,150 +13,73 @@ interface SidebarContentProps {
   singleSelectTypes: Record<string, boolean>;
 }
 
-function buildNewSegments(
-  currentSegments: string[],
-  clickedType: string,
-  clickedLabel: string,
-  singleSelectTypes: Record<string, boolean>
-): string[] {
-  const active = ParseActiveFilters(currentSegments);
-  if (singleSelectTypes[clickedType]) {
-    const existingLabels = active[clickedType] ?? [];
-    if (existingLabels.length === 1 && existingLabels[0] === clickedLabel) {
-      active[clickedType] = [];
-    } else {
-      active[clickedType] = [clickedLabel];
-    }
-  } else {
-    const existingLabels = active[clickedType] ?? [];
-    if (existingLabels.includes(clickedLabel)) {
-      active[clickedType] = existingLabels.filter(
-        (lbl) => lbl !== clickedLabel
-      );
-    } else {
-      active[clickedType] = [...existingLabels, clickedLabel];
-    }
-  }
-  let newSegments: string[] = [];
-  for (const [type, labels] of Object.entries(active)) {
-    for (const lbl of labels) {
-      if (lbl) {
-        newSegments.push(`${type}-${lbl}`);
-      }
-    }
-  }
-  newSegments = Array.from(new Set(newSegments));
-  newSegments.sort();
-  return newSegments;
-}
-
-function buildInitialSidebarState(
-  groupedTags: Record<TagType, TagDocument[]>
-): Record<string, boolean> {
-  // Attempt to read from localStorage
-  if (typeof window !== "undefined") {
-    const saved = localStorage.getItem("sidebarDetailsOpen");
-    if (saved) {
-      try {
-        // If it's valid JSON, return it
-        return JSON.parse(saved);
-      } catch (err) {
-        console.error("Could not parse localStorage sidebarDetailsOpen", err);
-      }
-    }
-  }
-
-  // If nothing in localStorage or parse failed, build a default fallback
-  const defaultState: Record<string, boolean> = {};
-  for (const type of Object.keys(groupedTags)) {
-    defaultState[type] = false; // False = details area collapsed by default
-  }
-  return defaultState;
-}
-
 const SidebarContent = ({
   currentSegments,
   activeFilters,
   groupedTags,
   singleSelectTypes,
 }: SidebarContentProps) => {
-  const [detailsOpen, setDetailsOpen] = useState<Record<string, boolean>>(() =>
-    buildInitialSidebarState(groupedTags)
-  );
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  const handleToggle = (
-    type: string,
-    e: React.SyntheticEvent<HTMLDetailsElement>
-  ) => {
-    const isOpen = e.currentTarget.open;
-    setDetailsOpen((prev) => {
-      const newState = { ...prev, [type]: isOpen };
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem(
-          "sidebarDetailsOpen",
-          JSON.stringify(newState)
-        );
+  const buildFilterPath = (type: string, label: string) => {
+    const newFilters = [...currentSegments];
+    const filterIndex = newFilters.findIndex((segment) => segment === type);
+
+    if (filterIndex !== -1) {
+      // If the filter type exists, check if the label is already selected
+      const labelIndex = newFilters.findIndex((segment) => segment === label);
+      if (labelIndex !== -1) {
+        // Remove the label if it's already selected
+        newFilters.splice(labelIndex, 1);
+      } else if (singleSelectTypes[type]) {
+        // For single-select types, replace the existing value
+        newFilters[filterIndex + 1] = label;
+      } else {
+        // For multi-select types, add the new label
+        newFilters.splice(filterIndex + 1, 0, label);
       }
-      return newState;
-    });
+    } else {
+      // Add the new filter type and label
+      newFilters.push(type, label);
+    }
+
+    return `/gallery/${newFilters.join("/")}`;
+  };
+
+  const isFilterActive = (type: string, label: string) => {
+    return activeFilters[type]?.includes(label) || false;
   };
 
   return (
-    <div className="sticky top-[64px] left-0 h-[calc(100dvh-64px)] space-y-2 p-2 pb-14 overflow-scroll scrollbar-hide">
-      {Object.entries(groupedTags).map(([type, tagArray]) => {
-        // If we never set a value for this type, default to true or false.
-        const open = detailsOpen[type] ?? false;
+    <div className="p-4 space-y-6">
+      {Object.entries(groupedTags).map(([type, tags]) => (
+        <div key={type} className="space-y-2">
+          <summary className="text-foreground-500 font-medium cursor-pointer">
+            {type.charAt(0).toUpperCase() + type.slice(1)}
+          </summary>
+          <div className="space-y-1">
+            {tags.map((tag) => {
+              const isActive = isFilterActive(type, tag.label);
+              const textClass = isActive
+                ? "text-primary-500"
+                : "text-foreground-400 hover:text-primary-500";
 
-        return (
-          <details
-            key={type}
-            className="w-full"
-            open={open}
-            onToggle={(e) => handleToggle(type, e)}
-          >
-            <summary className="cursor-pointer w-full md:pl-2 font-medium text-left text-xl text-foreground-500">
-              {toTitleCase(type)}
-            </summary>
-            <ul>
-              {tagArray.map((tag) => {
-                const clickedType = type;
-                const clickedLabel = tag.label;
-                const newSegments = buildNewSegments(
-                  currentSegments,
-                  clickedType,
-                  clickedLabel,
-                  singleSelectTypes
-                );
-                const href = newSegments.length
-                  ? `/gallery/${newSegments.join("/")}`
-                  : "/gallery";
-                const isActive =
-                  activeFilters[clickedType]?.includes(clickedLabel);
-                const textClass = isActive
-                  ? "text-primary-500 font-semibold"
-                  : "text-foreground-400 hover:text-primary-500";
-
-                return (
-                  <li key={tag._id}>
-                    <Link
-                      href={href}
-                      className="w-full hover:bg-background-300 transition-colors"
-                    >
-                      <p
-                        className={`w-full pl-2 md:pl-6 text-xl transition-colors ${textClass}`}
-                      >
-                        {toTitleCase(tag.label)}
-                      </p>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </details>
-        );
-      })}
+              return (
+                <Link
+                  key={tag._id}
+                  href={buildFilterPath(type, tag.label)}
+                  className={`block p-2 rounded-medium hover:bg-background-300 transition-colors ${textClass}`}
+                >
+                  {tag.label}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
 
-export default React.memo(SidebarContent);
+export default SidebarContent;

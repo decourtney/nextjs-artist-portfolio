@@ -1,70 +1,37 @@
 "use client";
 
-import { useFilteredArtworks } from "@/app/context/FilteredArtworkContext";
 import { ArtworkDocument } from "@/models/Artwork";
-import { Link, Skeleton } from "@heroui/react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import React from "react";
 
 interface ImageDisplayProps {
   artworks: ArtworkDocument[];
-  // Optional filtersPath (a string built from your current filters) to append to the URL
 }
 
-// Separate component for each artwork thumbnail
-const ArtworkItem = ({ artwork }: { artwork: ArtworkDocument }) => {
-  const [loaded, setLoaded] = useState(false);
-
-  return (
-    <li key={artwork._id}>
-      <Skeleton isLoaded={loaded}>
-        <div
-          style={{
-            position: "relative",
-            width: "100%",
-            paddingBottom:
-              artwork.metaWidth && artwork.metaHeight
-                ? `${(artwork.metaHeight / artwork.metaWidth) * 100}%`
-                : "100%", // fallback if missing data
-          }}
-        >
-          <Link
-            href={`/artwork/${artwork.name}`}
-            className="absolute top-0 left-0 w-full h-full"
-          >
-            <Image
-              src={artwork.thumbSrc}
-              alt={artwork.name}
-              fill
-              sizes="100%"
-              loading="lazy"
-              onLoad={() => setLoaded(true)}
-              className="w-full h-full object-cover"
-            />
-          </Link>
-        </div>
-      </Skeleton>
-    </li>
-  );
-};
-
 const ImageDisplay = ({ artworks }: ImageDisplayProps) => {
-  const { setFilteredNames } = useFilteredArtworks();
-
-  useEffect(() => {
-    // Save the filtered artworks in context
-    const artworkNames = artworks.map((artwork) => {
-      return artwork.name;
-    });
-    setFilteredNames(artworkNames);
-  }, [artworks, setFilteredNames]);
-
   return (
-    <ul className="w-full columns-1 md:columns-2 lg:columns-3 xl:columns-3 2xl:columns-4 gap-1 space-y-1">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {artworks.map((artwork) => (
-        <ArtworkItem key={artwork._id} artwork={artwork} />
+        <Link
+          key={artwork._id}
+          href={`/artwork/${artwork.name}`}
+          className="group relative aspect-square overflow-hidden rounded-medium bg-background-200"
+        >
+          <Image
+            src={artwork.thumbSrc}
+            alt={artwork.title}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+          <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-t from-black/80 to-transparent">
+            <h3 className="text-white font-medium">{artwork.title}</h3>
+            <p className="text-white/80 text-small">{artwork.description}</p>
+          </div>
+        </Link>
       ))}
-    </ul>
+    </div>
   );
 };
 
