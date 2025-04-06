@@ -11,14 +11,12 @@ export function Providers({
   session,
 }: {
   children: ReactNode;
-  session: any;
+  session: Session | null;
 }) {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <SessionProvider session={session}>
-        <Suspense fallback={<div>Loading content...</div>}>
-          <FilteredArtworkProvider>{children}</FilteredArtworkProvider>
-        </Suspense>
+        <FilteredArtworkProvider>{children}</FilteredArtworkProvider>
       </SessionProvider>
     </Suspense>
   );

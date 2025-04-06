@@ -74,9 +74,6 @@ export default async function RootLayout({
       suppressHydrationWarning={true}
       className={`${charm.variable} ${openSans.variable}`}
     >
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </head>
       <body className="font-openSans">
         <Providers session={session}>{children}</Providers>
       </body>
