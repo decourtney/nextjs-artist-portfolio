@@ -3,18 +3,18 @@ import TextureOverlay from "../../components/TextureOverlay";
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-neutral-50 relative">
+    <main className="min-h-screen relative">
       {/* Page-wide texture overlay */}
-      <TextureOverlay type="canvas" opacity={0.5} />
+      {/* <TextureOverlay type="canvas" opacity={0.5} /> */}
 
       {/* Hero Section */}
-      <section className="relative py-24 bg-white">
+      <section className="hidden py-20 px-4 relative">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-charm mb-6 text-neutral-800">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-charm mb-6 text-[#1e293b]">
               About the Artist
             </h1>
-            <p className="text-xl text-neutral-600 max-w-2xl mx-auto">
+            <p className="text-xl text-[#475569] max-w-2xl mx-auto">
               Exploring the intersection of tradition and contemporary
               expression
             </p>
@@ -23,7 +23,7 @@ export default function AboutPage() {
       </section>
 
       {/* Bio Section */}
-      <section className="py-24 bg-neutral-50 relative">
+      <section className="py-20 px-4 relative">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="grid md:grid-cols-2 gap-16 items-center">
@@ -37,10 +37,10 @@ export default function AboutPage() {
                 />
               </div>
               <div>
-                <h2 className="text-3xl font-charm mb-6 text-neutral-800">
+                <h2 className="text-3xl font-charm mb-6 text-[#1e293b]">
                   My Journey
                 </h2>
-                <div className="prose prose-lg text-neutral-600">
+                <div className="prose prose-lg text-[#475569]">
                   <p>
                     Born and raised in the American South, I developed an early
                     fascination with art history and traditional techniques. My
@@ -69,10 +69,10 @@ export default function AboutPage() {
       </section>
 
       {/* Process Section */}
-      <section className="py-24 bg-white relative">
+      <section className="py-20 px-4 relative">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-charm text-center mb-16 text-neutral-800">
+            <h2 className="text-3xl md:text-4xl font-charm text-center mb-16 text-[#1e293b]">
               My Process
             </h2>
             <div className="grid md:grid-cols-3 gap-8">
@@ -82,25 +82,25 @@ export default function AboutPage() {
                     1
                   </span>
                 </div>
-                <h3 className="text-xl font-charm mb-4 text-neutral-800">
+                <h3 className="text-xl font-charm mb-4 text-[#1e293b]">
                   Preparation
                 </h3>
-                <p className="text-neutral-600">
+                <p className="text-[#475569]">
                   Each copper panel is carefully prepared with a traditional
                   ground, creating the perfect surface for oil paint. This
                   process can take several days to ensure optimal results.
                 </p>
               </div>
               <div className="text-center">
-                <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
                   <span className="text-2xl font-charm text-neutral-800">
                     2
                   </span>
                 </div>
-                <h3 className="text-xl font-charm mb-4 text-neutral-800">
+                <h3 className="text-xl font-charm mb-4 text-[#1e293b]">
                   Creation
                 </h3>
-                <p className="text-neutral-600">
+                <p className="text-[#475569]">
                   Using traditional techniques adapted for contemporary
                   subjects, I build each painting in layers. The copper surface
                   adds a unique luminosity that changes with different lighting
@@ -108,15 +108,15 @@ export default function AboutPage() {
                 </p>
               </div>
               <div className="text-center">
-                <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
                   <span className="text-2xl font-charm text-neutral-800">
                     3
                   </span>
                 </div>
-                <h3 className="text-xl font-charm mb-4 text-neutral-800">
+                <h3 className="text-xl font-charm mb-4 text-[#1e293b]">
                   Finishing
                 </h3>
-                <p className="text-neutral-600">
+                <p className="text-[#475569]">
                   Each piece undergoes a careful finishing process, including
                   varnishing and framing. The final result is a work that
                   bridges past and present, tradition and innovation.
@@ -128,18 +128,18 @@ export default function AboutPage() {
       </section>
 
       {/* Inspiration Section */}
-      <section className="py-24 bg-neutral-50 relative">
+      <section className="py-20 px-4 relative">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-charm text-center mb-16 text-neutral-800">
+            <h2 className="text-3xl md:text-4xl font-charm text-center mb-16 text-[#1e293b]">
               Inspiration & Influences
             </h2>
             <div className="grid md:grid-cols-2 gap-12">
               <div>
-                <h3 className="text-2xl font-charm mb-6 text-neutral-800">
+                <h3 className="text-2xl font-charm mb-6 text-[#1e293b]">
                   Historical Influences
                 </h3>
-                <div className="prose prose-lg text-neutral-600">
+                <div className="prose prose-lg text-[#475569]">
                   <p>
                     My work is deeply influenced by the Renaissance masters who
                     first perfected the technique of oil on copper. Artists like
@@ -154,10 +154,10 @@ export default function AboutPage() {
                 </div>
               </div>
               <div>
-                <h3 className="text-2xl font-charm mb-6 text-neutral-800">
+                <h3 className="text-2xl font-charm mb-6 text-[#1e293b]">
                   Contemporary Context
                 </h3>
-                <div className="prose prose-lg text-neutral-600">
+                <div className="prose prose-lg text-[#475569]">
                   <p>
                     While my technique is rooted in tradition, my subjects and
                     themes are contemporary. I explore modern mythology,
@@ -177,10 +177,10 @@ export default function AboutPage() {
       </section>
 
       {/* Studio Section */}
-      <section className="py-24 bg-white relative">
+      <section className="py-20 px-4 relative">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-charm text-center mb-16 text-neutral-800">
+            <h2 className="text-3xl md:text-4xl font-charm text-center mb-16 text-[#1e293b]">
               My Studio
             </h2>
             <div className="grid md:grid-cols-2 gap-8">
@@ -204,7 +204,7 @@ export default function AboutPage() {
               </div>
             </div>
             <div className="mt-8 text-center">
-              <p className="text-neutral-600 max-w-2xl mx-auto">
+              <p className="text-[#475569] max-w-2xl mx-auto">
                 Located in the heart of Nashville, my studio is a space where
                 tradition meets innovation. It's here that I create each piece,
                 surrounded by the tools and inspiration that fuel my artistic
@@ -214,6 +214,8 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+      {/* Add gradient separators to each section */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#94a3b8] to-transparent"></div>
     </main>
   );
 }

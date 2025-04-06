@@ -1,17 +1,5 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "../globals.css";
 import Link from "next/link";
-import Navbar from "./components/Navbar";
-import { Providers } from "../providers";
-
-const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "Gina Courtney - Artist",
-  description:
-    "Contemporary artist exploring traditional techniques and modern expression",
-};
+import Navbar from "./_components/Navbar";
 
 export default function RootLayout({
   children,
@@ -19,11 +7,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <Providers session={null}>
-          <Navbar />
-          <header className="h-[500px] bg-[#e2e8f0] flex flex-col items-center justify-center">
+    <>
+      <Navbar />
+      <header className="h-[500px] bg-[#e2e8f0] flex flex-col items-center justify-center">
             <div className="max-w-4xl w-full px-4">
               <h1 className="text-6xl md:text-8xl font-bold text-[#1e293b] font-charm mb-6 text-center">
                 Gena Courtney
@@ -131,14 +117,12 @@ export default function RootLayout({
                     </svg>
                   </a>
                 </div>
-                <p className="text-[#ecf0f1] text-sm font-charm">
+                <p className="text-[#94a3b8] text-sm">
                   ©{new Date().getFullYear()} Gena Courtney
                 </p>
               </div>
             </div>
           </footer>
-        </Providers>
-      </body>
-    </html>
+    </>
   );
 }

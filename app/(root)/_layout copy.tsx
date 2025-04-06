@@ -131,7 +131,7 @@ export default function RootLayout({
                     </svg>
                   </a>
                 </div>
-                <p className="text-[#ecf0f1] text-sm font-charm">
+                <p className="text-[#94a3b8] text-sm">
                   ©{new Date().getFullYear()} Gena Courtney
                 </p>
               </div>
