@@ -1,19 +1,35 @@
-import { Link } from "@heroui/react";
-import { BsInstagram } from "react-icons/bs";
+"use client";
+
+import { FaInstagram, FaTwitter, FaFacebook } from "react-icons/fa";
+import Link from "next/link";
+import React from "react";
 
 const SocialMediaButtons = () => {
   return (
-    <div className="space-x-1">
+    <div className="flex gap-4">
       <Link
-        href="https://www.instagram.com/genacourtney/"
+        href="https://instagram.com"
         target="_blank"
-        // size="sm"
-        // isIconOnly
-        // radius="full"
-        // variant="light"
-        className="text-inherit align-middle rounded-full hover:bg-background-200"
+        rel="noopener noreferrer"
+        className="p-2 rounded-medium hover:bg-background-200 transition-colors"
       >
-        <BsInstagram size={25} />
+        <FaInstagram className="text-foreground-500 hover:text-primary-500 transition-colors" />
+      </Link>
+      <Link
+        href="https://twitter.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="p-2 rounded-medium hover:bg-background-200 transition-colors"
+      >
+        <FaTwitter className="text-foreground-500 hover:text-primary-500 transition-colors" />
+      </Link>
+      <Link
+        href="https://facebook.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="p-2 rounded-medium hover:bg-background-200 transition-colors"
+      >
+        <FaFacebook className="text-foreground-500 hover:text-primary-500 transition-colors" />
       </Link>
     </div>
   );

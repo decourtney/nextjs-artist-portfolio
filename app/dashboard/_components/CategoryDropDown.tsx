@@ -1,15 +1,6 @@
 import { TagDocument } from "@/models/Tag";
-import {
-  Button,
-  ButtonGroup,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-  Input,
-  SharedSelection,
-} from "@heroui/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Menu, Transition } from "@headlessui/react";
+import { useEffect, useMemo, useRef, useState, Fragment } from "react";
 import {
   IoIosAdd,
   IoIosArrowDown,
@@ -28,8 +19,8 @@ const CategoryDropDown = ({
   selectedItems,
   onSelectionChange,
 }: CategoryDropDownProps) => {
-  const [selectedKeys, setSelectedKeys] = useState<SharedSelection>(
-    new Set(selectedItems)
+  const [selectedValues, setSelectedValues] = useState<string[]>(
+    selectedItems || []
   );
   const [displayInput, setDisplayInput] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
@@ -37,7 +28,7 @@ const CategoryDropDown = ({
   const inputContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setSelectedKeys(new Set(selectedItems));
+    setSelectedValues(selectedItems || []);
   }, [selectedItems]);
 
   const unionItems = useMemo(() => {
@@ -56,7 +47,6 @@ const CategoryDropDown = ({
     return Array.from(itemMap.values());
   }, [availableItems, selectedItems]);
 
-  // Detect clicks outside the input container to close input.
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -75,12 +65,10 @@ const CategoryDropDown = ({
   }, [displayInput]);
 
   const handleOnPress = () => {
-    // Convert the current selection to an array of strings.
-    const currentSelection = Array.from(selectedKeys as unknown as Set<string>);
     const trimmed = inputValue.trim();
-    if (trimmed !== "" && !currentSelection.includes(trimmed)) {
-      const newSelection = [...currentSelection, trimmed];
-      setSelectedKeys(new Set(newSelection) as SharedSelection);
+    if (trimmed !== "" && !selectedValues.includes(trimmed)) {
+      const newSelection = [...selectedValues, trimmed];
+      setSelectedValues(newSelection);
       onSelectionChange(newSelection);
     }
     closeInput();
@@ -91,100 +79,109 @@ const CategoryDropDown = ({
     setInputValue("");
   };
 
+  const toggleItem = (item: string) => {
+    const newSelection = selectedValues.includes(item)
+      ? selectedValues.filter((i) => i !== item)
+      : [...selectedValues, item];
+    setSelectedValues(newSelection);
+    onSelectionChange(newSelection);
+  };
+
   return (
-    <ButtonGroup>
-      <Button
-        disabled
-        disableAnimation
-        isIconOnly
-        className="pointer-events-none"
-      >
-        {selectedItems?.length}
-      </Button>
+    <div className="flex">
+      <div className="flex items-center justify-center w-10 h-10 border border-gray-300 rounded-l-md bg-gray-50 text-gray-700">
+        {selectedValues.length}
+      </div>
       {displayInput ? (
         <div ref={inputContainerRef} className="flex">
-          <Input
+          <input
             type="text"
-            radius="none"
             maxLength={60}
-            fullWidth
             placeholder="Type Here"
-            className="w-[125px]"
-            onValueChange={(value) => setInputValue(value)}
-          ></Input>
+            className="w-[125px] px-3 py-2 border-y border-gray-300 focus:outline-none"
+            onChange={(e) => setInputValue(e.target.value)}
+            value={inputValue}
+          />
 
           {inputValue ? (
-            <Button
-              isIconOnly
-              className="text-3xl text-green-500"
-              onPress={handleOnPress}
+            <button
+              className="px-3 text-3xl text-green-500 hover:bg-gray-100 border-y border-r border-gray-300"
+              onClick={handleOnPress}
             >
               <IoIosCheckmark />
-            </Button>
+            </button>
           ) : (
-            <Button
-              isIconOnly
-              className="text-2xl text-red-500"
-              onPress={closeInput}
+            <button
+              className="px-3 text-2xl text-red-500 hover:bg-gray-100 border-y border-r border-gray-300"
+              onClick={closeInput}
             >
               <IoIosClose />
-            </Button>
+            </button>
           )}
         </div>
       ) : (
         <>
-          <Dropdown
-            onOpenChange={(isOpen) => {
-              setDropDownOpen(isOpen);
+          <Menu as="div" className="relative">
+            {({ open }) => {
+              useEffect(() => setDropDownOpen(open), [open]);
+              return (
+                <>
+                  <Menu.Button className="w-[125px] px-3 py-2 border border-gray-300 flex items-center justify-between hover:bg-gray-100">
+                    <span>Categories</span>
+                    <IoIosArrowDown />
+                  </Menu.Button>
+                  <Transition
+                    as={Fragment}
+                    enter="transition ease-out duration-100"
+                    enterFrom="transform opacity-0 scale-95"
+                    enterTo="transform opacity-100 scale-100"
+                    leave="transition ease-in duration-75"
+                    leaveFrom="transform opacity-100 scale-100"
+                    leaveTo="transform opacity-0 scale-95"
+                  >
+                    <Menu.Items className="absolute z-10 mt-2 w-[125px] origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <div className="py-1">
+                        {unionItems.map((item) => (
+                          <Menu.Item key={item}>
+                            {({ active }) => (
+                              <button
+                                className={`${active ? "bg-gray-100" : ""} ${
+                                  selectedValues.includes(item)
+                                    ? "text-blue-600"
+                                    : "text-gray-900"
+                                } group flex w-full items-center px-4 py-2 text-sm`}
+                                onClick={() => toggleItem(item)}
+                              >
+                                {item}
+                              </button>
+                            )}
+                          </Menu.Item>
+                        ))}
+                      </div>
+                    </Menu.Items>
+                  </Transition>
+                </>
+              );
             }}
-          >
-            <DropdownTrigger>
-              <Button
-                variant="bordered"
-                className="w-[125px] text-foreground-100"
-              >
-                Categories
-                <span>
-                  <IoIosArrowDown />
-                </span>
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu
-              closeOnSelect={false}
-              selectionMode="multiple"
-              selectedKeys={selectedKeys}
-              onSelectionChange={(keys) => {
-                const newSelected = Array.from(keys) as string[];
-                setSelectedKeys(new Set(newSelected));
-                onSelectionChange(newSelected);
-              }}
-            >
-              {unionItems.map((item) => (
-                <DropdownItem key={item}>{item}</DropdownItem>
-              ))}
-            </DropdownMenu>
-          </Dropdown>
+          </Menu>
           {dropDownOpen ? (
-            <Button
-              isIconOnly
-              isDisabled
-              disableAnimation
-              className="text-lg pointer-events-none"
+            <button
+              disabled
+              className="px-3 py-2 border border-l-0 border-gray-300 rounded-r-md text-lg text-gray-400"
             >
               <IoIosAdd />
-            </Button>
+            </button>
           ) : (
-            <Button
-              isIconOnly
-              className="text-2xl text-green-500"
-              onPress={() => setDisplayInput(!displayInput)}
+            <button
+              className="px-3 py-2 border border-l-0 border-gray-300 rounded-r-md text-2xl text-green-500 hover:bg-gray-100"
+              onClick={() => setDisplayInput(!displayInput)}
             >
               <IoIosAdd />
-            </Button>
+            </button>
           )}
         </>
       )}
-    </ButtonGroup>
+    </div>
   );
 };
 

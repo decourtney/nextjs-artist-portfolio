@@ -2,23 +2,11 @@
 
 import { PopulatedArtworkDocument } from "@/models/Artwork";
 import { TagDocument } from "@/models/Tag";
-import {
-  Button,
-  Checkbox,
-  Form,
-  Image,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Textarea,
-  useDisclosure,
-} from "@heroui/react";
+import { Dialog, Transition } from "@headlessui/react";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import { IoIosArrowBack, IoIosArrowForward, IoIosClose } from "react-icons/io";
+import Image from "next/image";
 import CategoryDropDown from "./CategoryDropDown";
 import MediumDropDown from "./MediumDropDown";
 import SizeDropDown from "./SizeDropDown";
@@ -55,7 +43,7 @@ export default function FileList({
   const [editingFile, setEditingFile] =
     useState<PopulatedArtworkDocument | null>(null);
   const [editForm, setEditForm] = useState<EditableArtwork | null>(null);
-  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handlePrevious = () => {
     if (currentPage > 1) {
@@ -127,7 +115,7 @@ export default function FileList({
         (category: TagDocument) => category.label
       ),
     });
-    onOpen();
+    setIsModalOpen(true);
   };
 
   // Handle modal form submission (update artwork)
@@ -147,7 +135,7 @@ export default function FileList({
       console.error("Error updating artwork", error);
     }
     setEditingFile(null);
-    onClose();
+    setIsModalOpen(false);
     router.refresh();
   };
 
@@ -160,28 +148,26 @@ export default function FileList({
     const isChecked = selectedIds.includes(file._id);
     return (
       <li key={file._id} className="flex flex-row p-2 border-b">
-        <Checkbox
-          size="sm"
-          isSelected={isChecked}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            handleSelectItem(file._id, e.target.checked)
-          }
+        <input
+          type="checkbox"
+          className="mr-2"
+          checked={isChecked}
+          onChange={(e) => handleSelectItem(file._id, e.target.checked)}
         />
         <div className="flex w-full overflow-hidden">
-          <div className="w-24 h-24">
+          <div className="w-24 h-24 relative">
             <Image
               src={file.thumbSrc}
               alt={file.name}
-              removeWrapper
-              radius="none"
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
             />
           </div>
 
           <div className="flex flex-col w-full h-full ml-2 gap-2 truncate">
             <div className="flex justify-between">
               <p className="truncate">{file.name}</p>
-              <div className="flex items-center text-tiny">
+              <div className="flex items-center text-sm">
                 {file.metaWidth}
                 <IoIosClose />
                 {file.metaHeight}
@@ -189,7 +175,7 @@ export default function FileList({
             </div>
 
             <div className="flex justify-between">
-              <div className="flex flex-row text-tiny">
+              <div className="flex flex-row text-sm">
                 {file.categories.length > 0 && (
                   <div className="px-2">
                     {file.categories.length}
@@ -199,24 +185,18 @@ export default function FileList({
                   </div>
                 )}
 
-                {file.medium && (
-                  <div className="border-l-1 px-2">{file.medium.label}</div>
-                )}
+                {file.medium && <div className="px-2">{file.medium.label}</div>}
                 {file.size && (
-                  <div className="border-l-1 px-2">
-                    {file.size && file.size.label}
-                  </div>
+                  <div className="px-2">{file.size && file.size.label}</div>
                 )}
               </div>
 
-              <Button
-                variant="light"
-                size="sm"
-                onPress={() => handleEdit(file)}
-                className="min-w-fit h-fit text-foreground-100"
+              <button
+                onClick={() => handleEdit(file)}
+                className="px-3 py-1 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-md"
               >
                 Edit
-              </Button>
+              </button>
             </div>
           </div>
         </div>
@@ -225,178 +205,202 @@ export default function FileList({
   };
 
   return (
-    <div className="max-w-[800px] m-1 rounded-lg border-1 border-divider-200 text-foreground-500 bg-background-50 shadow-md">
-      <ul>
-        <div className="flex justify-between items-center border-b-2 border-divider-200 p-2">
-          <Checkbox
-            size="sm"
-            isSelected={allSelected(files)}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              handleSelectAllColumn(files, e.target.checked)
-            }
+    <div className="p-4">
+      <div className="flex justify-between mb-4">
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={handlePrevious}
+            disabled={currentPage <= 1}
+            className={`p-2 rounded-full ${
+              currentPage <= 1
+                ? "text-gray-400 cursor-not-allowed"
+                : "hover:bg-gray-100"
+            }`}
           >
-            <span className="font-medium text-xs text-foreground-500">
-              Select All
-            </span>
-          </Checkbox>
-
-          <Button
-            size="sm"
-            color="danger"
-            variant="flat"
-            onPress={handleDelete}
-            isDisabled={selectedIds.length === 0}
+            <IoIosArrowBack />
+          </button>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={handleNext}
+            disabled={currentPage >= totalPages}
+            className={`p-2 rounded-full ${
+              currentPage >= totalPages
+                ? "text-gray-400 cursor-not-allowed"
+                : "hover:bg-gray-100"
+            }`}
           >
-            Delete Selected
-          </Button>
+            <IoIosArrowForward />
+          </button>
         </div>
 
-        {/* Render the File Cards */}
-        {files.map(renderFileItem)}
-      </ul>
-
-      <div className="flex justify-center gap-2 p-2 items-center">
-        <Button
-          isIconOnly
-          size="sm"
-          variant="light"
-          onPress={handlePrevious}
-          isDisabled={currentPage === 1}
-          className="text-foreground-500 text-lg"
-        >
-          <IoIosArrowBack />
-        </Button>
-        <span className="text-foreground-500">
-          {currentPage} of {totalPages}
-        </span>
-        <Button
-          isIconOnly
-          size="sm"
-          variant="light"
-          onPress={handleNext}
-          isDisabled={currentPage === totalPages}
-          className="text-foreground-500 text-lg"
-        >
-          <IoIosArrowForward />
-        </Button>
+        {selectedIds.length > 0 && (
+          <button
+            onClick={handleDelete}
+            className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-md"
+          >
+            Delete Selected
+          </button>
+        )}
       </div>
 
-      <Modal
-        isOpen={isOpen}
-        placement="auto"
-        onOpenChange={onOpenChange}
-        size="5xl"
-      >
-        <ModalContent>
-          {(onClose) => (
-            <div className="bg-background-50 p-4 rounded shadow-lg">
-              <ModalHeader className="flex flex-col text-tiny text-foreground-100 truncate">
-                Editing <div className="text-lg">{editForm?.name}</div>
-              </ModalHeader>
-              <ModalBody>
-                <Form
-                  onSubmit={handleModalSubmit}
-                  onReset={() => {
-                    onClose();
-                    setEditingFile(null);
-                  }}
-                  className="text-foreground-100"
-                >
-                  <div className="flex w-full">
-                    <div className="mr-4">
-                      <Image
-                        removeWrapper
-                        radius="none"
-                        src={editForm?.thumbSrc}
-                        alt={editForm?.name}
-                        className="w-full h-auto"
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Array.from({ length: 3 }).map((_, colIndex) => {
+          const filesInColumn = files.filter((_, i) => i % 3 === colIndex);
+          return (
+            <div key={colIndex} className="space-y-2">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  className="mr-2"
+                  checked={allSelected(filesInColumn)}
+                  onChange={(e) =>
+                    handleSelectAllColumn(filesInColumn, e.target.checked)
+                  }
+                />
+                <span>Select All</span>
+              </div>
+              <ul className="space-y-2">
+                {filesInColumn.map((file) => renderFileItem(file))}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+
+      <Transition appear show={isModalOpen} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-10"
+          onClose={() => setIsModalOpen(false)}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-gray-900 mb-4"
+                  >
+                    Edit Artwork
+                  </Dialog.Title>
+                  <form onSubmit={handleModalSubmit} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Name
+                      </label>
+                      <input
+                        type="text"
+                        value={editForm?.name || ""}
+                        onChange={(e) =>
+                          setEditForm((prev) =>
+                            prev ? { ...prev, name: e.target.value } : null
+                          )
+                        }
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                       />
                     </div>
-                    <div className="w-full max-w-[800px] space-y-4">
-                      <div className="flex flex-col space-y-4">
-                        <Input
-                          type="text"
-                          label="Name"
-                          value={editForm?.name || ""}
-                          onChange={(e) =>
-                            setEditForm({
-                              ...editForm!,
-                              name: e.target.value,
-                            })
-                          }
-                        />
-                        <Textarea
-                          label="Description"
-                          value={editForm?.description || ""}
-                          onChange={(e) =>
-                            setEditForm({
-                              ...editForm!,
-                              description: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
-
-                      <div className="flex justify-between">
-                        <CategoryDropDown
-                          availableItems={tags.categories}
-                          selectedItems={editForm?.categories || null}
-                          onSelectionChange={(newSelected: string[]) =>
-                            setEditForm({
-                              ...editForm!,
-                              categories: newSelected,
-                            })
-                          }
-                        />
-
-                        <MediumDropDown
-                          availableItems={tags.mediums}
-                          selectedItem={editForm?.medium || null}
-                          onSelectionChange={(newSelected: string) =>
-                            setEditForm({
-                              ...editForm!,
-                              medium: newSelected,
-                            })
-                          }
-                        />
-
-                        <SizeDropDown
-                          availableItems={tags.sizes}
-                          selectedItem={editForm?.size || null}
-                          onSelectionChange={(newSelected: string) =>
-                            setEditForm({
-                              ...editForm!,
-                              size: newSelected,
-                            })
-                          }
-                        />
-                      </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Description
+                      </label>
+                      <textarea
+                        value={editForm?.description || ""}
+                        onChange={(e) =>
+                          setEditForm((prev) =>
+                            prev
+                              ? { ...prev, description: e.target.value }
+                              : null
+                          )
+                        }
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      />
                     </div>
-                  </div>
-                  <ModalFooter className="w-full">
-                    <div className="flex space-x-2">
-                      <Button
-                        type="reset"
-                        variant="light"
-                        className="text-foreground-100"
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Medium
+                      </label>
+                      <MediumDropDown
+                        availableItems={tags.mediums}
+                        selectedItem={editForm?.medium || null}
+                        onSelectionChange={(medium) =>
+                          setEditForm((prev) =>
+                            prev ? { ...prev, medium } : null
+                          )
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Size
+                      </label>
+                      <SizeDropDown
+                        availableItems={tags.sizes}
+                        selectedItem={editForm?.size || null}
+                        onSelectionChange={(size) =>
+                          setEditForm((prev) =>
+                            prev ? { ...prev, size } : null
+                          )
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Categories
+                      </label>
+                      <CategoryDropDown
+                        availableItems={tags.categories}
+                        selectedItems={editForm?.categories || []}
+                        onSelectionChange={(categories) =>
+                          setEditForm((prev) =>
+                            prev ? { ...prev, categories } : null
+                          )
+                        }
+                      />
+                    </div>
+                    <div className="mt-4 flex justify-end space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsModalOpen(false)}
+                        className="px-3 py-1 text-sm bg-gray-500 hover:bg-gray-600 text-white rounded-md"
                       >
                         Cancel
-                      </Button>
-                      <Button
+                      </button>
+                      <button
                         type="submit"
-                        variant="light"
-                        className="text-foreground-100"
+                        className="px-3 py-1 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-md"
                       >
-                        Save
-                      </Button>
+                        Save Changes
+                      </button>
                     </div>
-                  </ModalFooter>
-                </Form>
-              </ModalBody>
+                  </form>
+                </Dialog.Panel>
+              </Transition.Child>
             </div>
-          )}
-        </ModalContent>
-      </Modal>
+          </div>
+        </Dialog>
+      </Transition>
     </div>
   );
 }
