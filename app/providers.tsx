@@ -1,12 +1,10 @@
 "use client";
 
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-import { useRouter } from "next/navigation";
-import { HeroUIProvider } from "@heroui/react";
-import { FilteredArtworksProvider } from "./context/FilteredArtworkContext";
 import { SessionProvider } from "next-auth/react";
 import type { Session } from "next-auth";
-import React, { ReactNode } from "react";
+import React, { ReactNode, Suspense } from "react";
+import { FilteredArtworkProvider } from "./context/FilteredArtworkContext";
 
 export function Providers({
   children,
@@ -15,15 +13,11 @@ export function Providers({
   children: ReactNode;
   session: Session | null;
 }) {
-  const router = useRouter();
-
   return (
-    <SessionProvider session={session}>
-      <NextThemesProvider attribute="class" defaultTheme="system" enableSystem>
-        <HeroUIProvider navigate={router.push}>
-          <FilteredArtworksProvider>{children}</FilteredArtworksProvider>
-        </HeroUIProvider>
-      </NextThemesProvider>
-    </SessionProvider>
+    <Suspense fallback={<div>Loading...</div>}>
+      <SessionProvider session={session}>
+        <FilteredArtworkProvider>{children}</FilteredArtworkProvider>
+      </SessionProvider>
+    </Suspense>
   );
 }

@@ -1,72 +1,130 @@
 "use client";
 
-import {
-  Navbar,
-  NavbarContent,
-  NavbarItem,
-  NavbarMenu,
-  NavbarMenuItem,
-  NavbarMenuToggle,
-} from "@heroui/react";
-import { useState } from "react";
-import SocialMediaButtons from "./SocialMediaButtons";
-import ActiveLink from "./ActiveLink";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 
-const navLinks = [
-  { label: "HOME", href: "/" },
-  { label: "GALLERY", href: "/gallery" },
-  { label: "ABOUT", href: "/#about" },
-  { label: "CONTACT", href: "/#contact" },
-  { label: "Dashboard", href: "/dashboard" },
-];
-
-const NavBar = () => {
+export default function Navbar() {
+  const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
 
-  const handleClose = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 100);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const navItems = [
+    { name: "Gallery", href: "/gallery" },
+    { name: "About", href: "/about" },
+    { name: "Contact", href: "/contact" },
+  ];
 
   return (
-    <Navbar
-      className="bg-background-200 md:bg-transparent font-medium "
-      isMenuOpen={isMenuOpen}
-      onMenuOpenChange={setIsMenuOpen}
-      isBlurred={false}
-      maxWidth="full"
-    >
-      <NavbarContent justify="start"></NavbarContent>
+    <>
+      {/* Floating Menu Button */}
+      <motion.button
+        initial={{ opacity: 0, y: -20 }}
+        animate={{
+          opacity: isScrolled ? 1 : 0,
+          y: isScrolled ? 0 : -20,
+        }}
+        transition={{ duration: 0.3 }}
+        className={`fixed top-6 right-6 z-50 p-3 rounded-full bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white transition-colors ${
+          isScrolled ? "pointer-events-auto" : "pointer-events-none"
+        }`}
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+        aria-label="Menu"
+      >
+        <div className="w-6 h-6 flex flex-col justify-between">
+          <span
+            className={`block w-full h-0.5 bg-black transition-transform duration-300 ${
+              isMenuOpen ? "rotate-45 translate-y-2.5" : ""
+            }`}
+          />
+          <span
+            className={`block w-full h-0.5 bg-black transition-opacity duration-300 ${
+              isMenuOpen ? "opacity-0" : ""
+            }`}
+          />
+          <span
+            className={`block w-full h-0.5 bg-black transition-transform duration-300 ${
+              isMenuOpen ? "-rotate-45 -translate-y-2.5" : ""
+            }`}
+          />
+        </div>
+      </motion.button>
 
-      <NavbarContent justify="center" className="hidden md:contents space-x-5">
-        {navLinks.map((navItem) => (
-          <NavbarItem key={`navbar-${navItem.label}`}>
-            <ActiveLink href={navItem.href}>{navItem.label}</ActiveLink>
-          </NavbarItem>
-        ))}
-      </NavbarContent>
+      {/* Floating Menu */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="fixed top-20 right-6 z-40 bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6"
+          >
+            <nav className="flex flex-col gap-6">
+              {navItems.map((item, index) => (
+                <motion.div
+                  key={item.name}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Link
+                    href={item.href}
+                    className={`group relative text-lg font-medium transition-all duration-300 ${
+                      pathname === item.href
+                        ? "text-black"
+                        : "text-gray-600 hover:text-black"
+                    }`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <span className="relative z-10">{item.name}</span>
+                    <motion.span
+                      className="absolute bottom-0 left-0 w-0 h-0.5 bg-black group-hover:w-full transition-all duration-300"
+                      initial={{ width: 0 }}
+                      animate={{ width: pathname === item.href ? "100%" : 0 }}
+                    />
+                    <motion.span
+                      className="absolute -bottom-1 left-0 w-2 h-2 rounded-full bg-black opacity-0 group-hover:opacity-100 transition-all duration-300"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: pathname === item.href ? 1 : 0 }}
+                    />
+                  </Link>
+                </motion.div>
+              ))}
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <NavbarContent justify="end">
-        <NavbarItem className="text-foreground-500 pointer-events-auto">
-          <SocialMediaButtons />
-        </NavbarItem>
-
-        <NavbarMenuToggle
-          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-          className="md:hidden text-foreground-400 "
-        />
-      </NavbarContent>
-
-      <NavbarMenu className="font-bold pt-10 items-center space-y-6 bg-background-100 bg-gradient-to-b from-background-200 to-transparent">
-        {navLinks.map((navItem) => (
-          <NavbarMenuItem key={`navbarmenu-${navItem.label}`}>
-            <ActiveLink href={navItem.href!} onClick={handleClose}>
-              {navItem.label}
-            </ActiveLink>
-          </NavbarMenuItem>
-        ))}
-      </NavbarMenu>
-    </Navbar>
+      {/* Home Link - Always visible */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{
+          opacity: isScrolled ? 1 : 0,
+          y: isScrolled ? 0 : -20,
+        }}
+        transition={{ duration: 0.3 }}
+        className={`fixed top-6 left-6 z-50 ${
+          isScrolled ? "pointer-events-auto" : "pointer-events-none"
+        }`}
+      >
+        <Link
+          href="/"
+          className="text-xl font-medium text-black hover:text-gray-600 transition-colors"
+        >
+          GC
+        </Link>
+      </motion.div>
+    </>
   );
-};
-
-export default NavBar;
+}

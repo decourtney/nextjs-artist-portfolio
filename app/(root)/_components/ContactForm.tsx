@@ -1,7 +1,6 @@
 "use client";
 
 import emailjs from "@emailjs/browser";
-import { Button, Form, Input, Textarea } from "@heroui/react";
 import { useTheme } from "next-themes";
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import SocialMediaButtons from "./SocialMediaButtons";
@@ -12,8 +11,8 @@ const ContactForm = () => {
   const [email, setEmail] = useState<string>("");
   const [message, setMessage] = useState<string>("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [isSending, setIsSending] = useState<boolean>(false); // To track email sending status
-  const [successMessage, setSuccessMessage] = useState<string>(""); // To show success message
+  const [isSending, setIsSending] = useState<boolean>(false);
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
   const validateForm = (): { [key: string]: string } => {
     const newErrors: { [key: string]: string } = {};
@@ -33,12 +32,11 @@ const ContactForm = () => {
     const userId = process.env.NEXT_PUBLIC_EMAILJS_USER_ID;
 
     if (!serviceId || !templateId || !userId) {
-      // console.error("Missing EmailJS environment variables.");
       return;
     }
 
     if (Object.keys(validationErrors).length === 0) {
-      setIsSending(true); // Start sending process
+      setIsSending(true);
       try {
         await emailjs.send(
           serviceId,
@@ -58,14 +56,12 @@ const ContactForm = () => {
         setMessage("");
       } catch (error) {
         if (error instanceof Error) {
-          // The error is a known Error object
           console.error("Failed to send email: ", error.message);
         } else {
-          // Handle any other unknown errors
           console.error("An error occurred while sending the email.");
         }
       } finally {
-        setIsSending(false); // End sending process
+        setIsSending(false);
       }
     } else {
       setErrors(validationErrors);
@@ -80,70 +76,75 @@ const ContactForm = () => {
     };
 
   return (
-    <>
-      <Form
-        onSubmit={handleSubmit}
-        className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full"
-      >
-        <div className="col-span-1">
-          <Input
-            type="text"
-            placeholder="Name"
-            name="name"
-            value={name}
-            variant="flat"
-            size="lg"
-            onChange={handleInputChange(setName)}
-            className={`w-full ${errors.name ? "border-red-500" : ""}`}
-          />
-          {errors.name && <p className="text-red-500">{errors.name}</p>}
-        </div>
-        <div className="col-span-1">
-          <Input
-            type="email"
-            placeholder="Email"
-            name="email"
-            value={email}
-            variant="flat"
-            size="lg"
-            onChange={handleInputChange(setEmail)}
-            className={`w-full ${errors.email ? "border-red-500" : ""}`}
-          />
-          {errors.email && <p className="text-red-500">{errors.email}</p>}
-        </div>
-        <div className="col-span-1 lg:col-span-2">
-          <Textarea
-            placeholder="Message"
-            name="message"
-            value={message}
-            variant="flat"
-            size="lg"
-            onChange={handleInputChange(setMessage)}
-            className={`w-full  ${errors.message ? "border-red-500" : ""}`}
-            minRows={4}
-            rows={4}
-          />
-          {errors.message && <p className="text-red-500">{errors.message}</p>}
-        </div>
-        <div className="col-span-1 lg:col-span-2 flex justify-center">
-          <Button
-            type="submit"
-            className="w-full lg:w-1/2 bg-secondary-100"
-            disabled={isSending} // Disable button while sending
-          >
-            {isSending ? "Sending..." : "Submit"}
-          </Button>
-        </div>
-      </Form>
+    <form
+      onSubmit={handleSubmit}
+      className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full"
+    >
+      <div className="col-span-1">
+        <input
+          type="text"
+          placeholder="Name"
+          name="name"
+          value={name}
+          onChange={handleInputChange(setName)}
+          className={`w-full p-3 rounded-medium bg-background-100 border border-divider-200 focus:border-primary-500 focus:outline-none transition-colors ${
+            errors.name ? "border-red-500" : ""
+          }`}
+        />
+        {errors.name && (
+          <p className="text-red-500 text-small mt-1">{errors.name}</p>
+        )}
+      </div>
+
+      <div className="col-span-1">
+        <input
+          type="email"
+          placeholder="Email"
+          name="email"
+          value={email}
+          onChange={handleInputChange(setEmail)}
+          className={`w-full p-3 rounded-medium bg-background-100 border border-divider-200 focus:border-primary-500 focus:outline-none transition-colors ${
+            errors.email ? "border-red-500" : ""
+          }`}
+        />
+        {errors.email && (
+          <p className="text-red-500 text-small mt-1">{errors.email}</p>
+        )}
+      </div>
+
+      <div className="col-span-2">
+        <textarea
+          placeholder="Message"
+          name="message"
+          value={message}
+          onChange={handleInputChange(setMessage)}
+          rows={4}
+          className={`w-full p-3 rounded-medium bg-background-100 border border-divider-200 focus:border-primary-500 focus:outline-none transition-colors ${
+            errors.message ? "border-red-500" : ""
+          }`}
+        />
+        {errors.message && (
+          <p className="text-red-500 text-small mt-1">{errors.message}</p>
+        )}
+      </div>
+
+      <div className="col-span-2 flex justify-between items-center">
+        <SocialMediaButtons />
+        <button
+          type="submit"
+          disabled={isSending}
+          className="px-6 py-3 rounded-medium bg-primary-500 text-white hover:bg-primary-600 transition-colors disabled:opacity-50"
+        >
+          {isSending ? "Sending..." : "Send Message"}
+        </button>
+      </div>
 
       {successMessage && (
-        <p className="text-green-500 text-center pt-4">{successMessage}</p>
+        <div className="col-span-2 text-center text-green-500">
+          {successMessage}
+        </div>
       )}
-
-      <div className="flex justify-start  mx-auto my-2 gap-4">
-        <SocialMediaButtons />
-      </div>
-    </>
+    </form>
   );
 };
 

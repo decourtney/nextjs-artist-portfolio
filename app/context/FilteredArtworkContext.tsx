@@ -1,36 +1,92 @@
 "use client";
-import React, { createContext, useContext, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import { ArtworkDocument } from "@/models/Artwork";
 
-interface FilteredArtworksContextValue {
-  filteredNames: string[];
-  setFilteredNames: (artworks: string[]) => void;
+interface FilteredArtworkContextType {
+  filteredArtworks: ArtworkDocument[];
+  setFilteredArtworks: (artworks: ArtworkDocument[]) => void;
+  selectedCategory: string | null;
+  setSelectedCategory: (category: string | null) => void;
+  isLoading: boolean;
+  error: string | null;
 }
 
-const FilteredArtworksContext = createContext<
-  FilteredArtworksContextValue | undefined
->(undefined);
+const FilteredArtworkContext = createContext<FilteredArtworkContextType>({
+  filteredArtworks: [],
+  setFilteredArtworks: () => {},
+  selectedCategory: null,
+  setSelectedCategory: () => {},
+  isLoading: false,
+  error: null,
+});
 
-export const FilteredArtworksProvider = ({
+export function FilteredArtworkProvider({
   children,
 }: {
   children: React.ReactNode;
-}) => {
-  const [filteredNames, setFilteredNames] = useState<string[]>([]);
+}) {
+  const [filteredArtworks, setFilteredArtworks] = useState<ArtworkDocument[]>(
+    []
+  );
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchArtworks = useCallback(async () => {
+    if (typeof window === "undefined") return; // Skip on server
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `/api/artwork${
+          selectedCategory ? `?category=${selectedCategory}` : ""
+        }`,
+        {
+          cache: "no-store",
+          next: { revalidate: 0 },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setFilteredArtworks(data);
+    } catch (error) {
+      console.error("Error fetching artworks:", error);
+      setError(error instanceof Error ? error.message : "Unknown error");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [selectedCategory]);
+
+  useEffect(() => {
+    fetchArtworks();
+  }, [fetchArtworks]);
+
   return (
-    <FilteredArtworksContext.Provider
-      value={{ filteredNames, setFilteredNames }}
+    <FilteredArtworkContext.Provider
+      value={{
+        filteredArtworks,
+        setFilteredArtworks,
+        selectedCategory,
+        setSelectedCategory,
+        isLoading,
+        error,
+      }}
     >
       {children}
-    </FilteredArtworksContext.Provider>
+    </FilteredArtworkContext.Provider>
   );
-};
+}
 
-export const useFilteredArtworks = () => {
-  const context = useContext(FilteredArtworksContext);
-  if (!context) {
-    throw new Error(
-      "useFilteredArtworks must be used within a FilteredArtworksProvider"
-    );
-  }
-  return context;
-};
+export const useFilteredArtworks = () => useContext(FilteredArtworkContext);

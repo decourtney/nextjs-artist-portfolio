@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useState, ChangeEvent, useRef, FormEvent } from "react";
-import { Button } from "@heroui/react";
 import { MdClose } from "react-icons/md";
 import { useRouter } from "next/navigation";
 
 interface FileItem {
-  id: string; // A unique UUID for each file
+  id: string;
   file: File;
   name: string;
   status: "idle" | "error";
@@ -30,7 +29,6 @@ const FilePicker = () => {
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       setSelectedFiles((prev) => {
-        // Build a set of "filename##size" to quickly detect duplicates
         const existingNameSizeSet = new Set(
           prev.map((fileItem) => `${fileItem.name}##${fileItem.file.size}`)
         );
@@ -84,21 +82,16 @@ const FilePicker = () => {
         throw new Error(`Upload failed: ${response.statusText}`);
       }
 
-      // Cast the parsed JSON to the ArtworkApiResponse type
       const data = (await response.json()) as ArtworkApiResponse;
 
-      // Remove successes
       if (data.successes) {
         setSelectedFiles((prev) =>
           prev.filter(
-            (fileItem) =>
-              // Keep item if it's NOT in successes
-              !data.successes!.some((s) => s.id === fileItem.id)
+            (fileItem) => !data.successes!.some((s) => s.id === fileItem.id)
           )
         );
       }
 
-      // Mark failures
       if (data.failures) {
         setSelectedFiles((prev) =>
           prev.map((fileItem) => {
@@ -126,15 +119,14 @@ const FilePicker = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-[800px] m-1 shadow-md rounded-md bg-background-100 text-foreground-100"
+      className="max-w-[800px] m-1 shadow-md rounded-md bg-white text-gray-900"
     >
-      {/* Hidden <input type="file" /> */}
       <input
         ref={fileInputRef}
         type="file"
         multiple
         accept="image/*"
-        style={{ display: "none" }}
+        className="hidden"
         onChange={handleFileChange}
       />
 
@@ -145,39 +137,32 @@ const FilePicker = () => {
               <span>{selectedFiles.length} </span>Selected File
               {selectedFiles.length > 1 ? <span>s</span> : null}
             </h3>
-            <ul className="[&>*:nth-child(even)]:bg-slate-200 text-foreground-100">
-              {selectedFiles.map((item, index) => {
-                // const itemStyle =
-                //   item.status === "error" ? "text-red-700 font-bold" : "";
+            <ul className="[&>*:nth-child(even)]:bg-slate-200 text-gray-900">
+              {selectedFiles.map((item, index) => (
+                <li
+                  key={item.id}
+                  className="flex justify-between items-center pr-1 pl-2 py-1"
+                >
+                  <p className="truncate">{item.name}</p>
 
-                return (
-                  <li
-                    key={item.id}
-                    className={`flex justify-between items-center pr-1 pl-2 py-1`}
-                  >
-                    <p className="truncate"> {item.name}</p>
-
-                    <div className="flex items-center space-x-2">
-                      {item.status === "error" && item.errorMessage ? (
+                  <div className="flex items-center space-x-2">
+                    {item.status === "error" && item.errorMessage ? (
                       <span className="p-1 rounded-sm text-red-500 bg-red-100 whitespace-nowrap">
                         {item.errorMessage}
                       </span>
-                      ) : null}
-                      <div className="border-l-2">
-                        <Button
-                          isIconOnly
-                          size="sm"
-                          radius="full"
-                          className="bg-transparent text-foreground-100"
-                          onPress={() => handleRemoveFile(index)}
-                        >
-                          <MdClose />
-                        </Button>
-                      </div>
+                    ) : null}
+                    <div className="border-l-2">
+                      <button
+                        type="button"
+                        className="p-1 rounded-full hover:bg-gray-100 text-gray-900"
+                        onClick={() => handleRemoveFile(index)}
+                      >
+                        <MdClose />
+                      </button>
                     </div>
-                  </li>
-                );
-              })}
+                  </div>
+                </li>
+              ))}
             </ul>
           </>
         ) : (
@@ -188,23 +173,28 @@ const FilePicker = () => {
       </div>
 
       <div className="flex justify-between p-2">
-        <Button size="sm" onPress={handleOpenFileDialog}>
+        <button
+          type="button"
+          className="px-3 py-1 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-md"
+          onClick={handleOpenFileDialog}
+        >
           Choose Files
-        </Button>
+        </button>
 
         <div className="space-x-4">
-          <Button color="danger" size="sm" onPress={handleCancel}>
+          <button
+            type="button"
+            className="px-3 py-1 text-sm bg-red-500 hover:bg-red-600 text-white rounded-md"
+            onClick={handleCancel}
+          >
             Cancel
-          </Button>
-          <Button
+          </button>
+          <button
             type="submit"
-            color="success"
-            size="sm"
-            isDisabled={selectedFiles.length === 0}
-            className="disabled:bg-gray-400"
+            className="px-3 py-1 text-sm bg-green-500 hover:bg-green-600 text-white rounded-md"
           >
             Upload
-          </Button>
+          </button>
         </div>
       </div>
     </form>

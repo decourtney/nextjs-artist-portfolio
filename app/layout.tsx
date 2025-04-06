@@ -10,11 +10,15 @@ const charm = Charm({
   subsets: ["latin"],
   weight: ["400", "700"],
   variable: "--font-charm",
+  display: "swap",
+  preload: true,
 });
 
 const openSans = Open_Sans({
   subsets: ["latin"],
   variable: "--font-openSans",
+  display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -57,20 +61,22 @@ export const viewport: Viewport = {
   minimumScale: 1,
 };
 
-const Layout = async ({ children }: { children: ReactNode }) => {
+export default async function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const session = await getServerSession(_nextAuthOptions);
 
   return (
     <html
       lang="en"
       suppressHydrationWarning={true}
-      className={`bg-background-100 ${charm.variable} ${openSans.variable}`}
+      className={`${charm.variable} ${openSans.variable}`}
     >
       <body className="font-openSans">
         <Providers session={session}>{children}</Providers>
       </body>
     </html>
   );
-};
-
-export default Layout;
+}

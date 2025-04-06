@@ -9,6 +9,7 @@ import { Readable } from "stream";
 import { SanitizeAndShortenFilename } from "@/utils/sanitizeAndShortenFilename";
 import { getServerSession } from "next-auth";
 import { _nextAuthOptions } from "@/auth";
+import { Tag } from "@/models";
 
 // Enhanced interface to also track a UUID for each file
 interface PendingImageData {
@@ -28,6 +29,12 @@ const s3Client = new S3Client({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
+  // Add additional configuration for CORS
+  requestHandler: {
+    httpOptions: {
+      timeout: 30000,
+    },
+  },
 });
 
 // Utility: Convert a Next.js ReadableStream to Node.js Readable
@@ -45,14 +52,36 @@ function streamToNodeReadable(stream: ReadableStream<Uint8Array>): Readable {
   });
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     await dbConnect();
-    const artworks = await Artwork.find({});
-    return NextResponse.json({ artworks });
+
+    const { searchParams } = new URL(request.url);
+    const category = searchParams.get("category");
+
+    let query = {};
+    if (category) {
+      const categoryTag = await Tag.findOne({
+        label: category,
+        type: "category",
+      });
+      if (categoryTag) {
+        query = { categories: categoryTag._id };
+      }
+    }
+
+    const artworks = await Artwork.find(query)
+      .populate("categories")
+      .populate("medium")
+      .populate("size");
+
+    return NextResponse.json(artworks);
   } catch (error) {
-    console.error("Unexpected error:", error);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
+    console.error("Error fetching artworks:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch artworks" },
+      { status: 500 }
+    );
   }
 }
 
