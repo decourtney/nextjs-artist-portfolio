@@ -18,7 +18,9 @@ export interface EditableArtwork {
   thumbSrc: string;
   medium: string;
   size: string;
-  categories: string[];
+  category: string[];
+  price: number;
+  available: boolean;
 }
 
 interface AllTags {
@@ -111,9 +113,11 @@ export default function FileList({
       thumbSrc: file.thumbSrc,
       medium: file.medium?.label,
       size: file.size?.label,
-      categories: file.categories.map(
+      category: file.category?.map(
         (category: TagDocument) => category.label
       ),
+      price: file.price || 0,
+      available: file.available ?? true,
     });
     setIsModalOpen(true);
   };
@@ -176,11 +180,11 @@ export default function FileList({
 
             <div className="flex justify-between">
               <div className="flex flex-row text-sm">
-                {file.categories.length > 0 && (
+                {file.category  && (
                   <div className="px-2">
-                    {file.categories.length}
+                    {file.category.length}
                     <span className="ml-1">
-                      {file.categories.length > 1 ? "Categories" : "Category"}
+                      {file.category.length > 1 ? "Categories" : "Category"}
                     </span>
                   </div>
                 )}
@@ -371,13 +375,45 @@ export default function FileList({
                       </label>
                       <CategoryDropDown
                         availableItems={tags.categories}
-                        selectedItems={editForm?.categories || []}
+                        selectedItems={editForm?.category || []}
                         onSelectionChange={(categories) =>
                           setEditForm((prev) =>
                             prev ? { ...prev, categories } : null
                           )
                         }
                       />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Price
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={editForm?.price || 0}
+                        onChange={(e) =>
+                          setEditForm((prev) =>
+                            prev ? { ...prev, price: parseFloat(e.target.value) } : null
+                          )
+                        }
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={editForm?.available}
+                          onChange={(e) =>
+                            setEditForm((prev) =>
+                              prev ? { ...prev, available: e.target.checked } : null
+                            )
+                          }
+                          className="rounded border-gray-300 text-blue-500 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-700">Available</span>
+                      </label>
                     </div>
                     <div className="mt-4 flex justify-end space-x-2">
                       <button

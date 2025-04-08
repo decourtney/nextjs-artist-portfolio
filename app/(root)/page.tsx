@@ -30,9 +30,9 @@ const featuredArtworks = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#e2e8f0]">
+    <div className="min-h-screen ">
       {/* About Section */}
-      <section className="py-20 px-4 bg-[#e2e8f0] relative">
+      <section className="py-20 px-4 relative">
         <div className="max-w-4xl mx-auto">
           <div className="flex flex-col gap-12">
             <div className="relative aspect-square max-w-2xl mx-auto w-full">
@@ -42,7 +42,7 @@ export default function Home() {
                 fill
                 className="object-cover"
               />
-              <div className="absolute inset-0 border-2 border-[#3b82f6]" />
+              <div className="absolute inset-0 border-2 border-[#1e293b]" />
             </div>
             <div className="text-center">
               <h2 className="text-3xl font-bold mb-6 text-[#1e293b] font-charm">
@@ -67,7 +67,7 @@ export default function Home() {
       </section>
 
       {/* Featured Works */}
-      <section className="py-20 px-4 bg-[#e2e8f0] relative">
+      <section className="py-20 px-4 relative">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12 text-[#1e293b] font-charm">
             Featured Works
@@ -109,7 +109,7 @@ export default function Home() {
       </section>
 
       {/* Contact Section */}
-      <section className="py-20 px-4 bg-[#e2e8f0] relative">
+      <section className="py-20 px-4 relative">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-6 text-[#1e293b] font-charm">
             Get in Touch

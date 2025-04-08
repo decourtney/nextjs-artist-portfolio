@@ -259,8 +259,8 @@ export async function PATCH(
       type: "category",
     });
 
-    // Update the artwork's categories field to only include the Tag IDs from the updated list.
-    artwork.categories = updatedTags.map((tag) => tag._id);
+    // Update the artwork's category field to only include the Tag IDs from the updated list.
+    artwork.category = updatedTags.map((tag) => tag._id);
 
     // --- Update the Artwork Document ---
     artwork.name = updatedFields.name || artwork.name;
@@ -269,6 +269,8 @@ export async function PATCH(
     artwork.medium = updatedFields.medium || artwork.medium;
     artwork.src = newSrc;
     artwork.thumbSrc = newThumbSrc;
+    artwork.price = updatedFields.price;
+    artwork.available = updatedFields.available;
 
     await artwork.save();
 

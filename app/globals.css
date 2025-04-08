@@ -95,7 +95,7 @@ body {
 
 /* Remove default button styles */
 button {
-  @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-500;
+  /* @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-500; */
 }
 
 /* Custom link styles */
