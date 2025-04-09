@@ -7,7 +7,7 @@ import {
 import dbConnect from "@/lib/dbConnect";
 import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import { Tag } from "@/models";
-import { EditableArtwork } from "@/app/dashboard/_components/FileList";
+import { EditableArtwork } from "@/app/dashboard/_components/FileManagement";
 import { SanitizeAndShortenFilename } from "@/utils/sanitizeAndShortenFilename";
 import { getServerSession } from "next-auth";
 import { _nextAuthOptions } from "@/auth";
@@ -192,8 +192,7 @@ export async function PATCH(
     }
 
     // --- Update Tag Collection ---
-    // Assume updatedFields.categories is an array of category labels.
-    const updatedCategoryLabels: string[] = updatedFields.categories || [];
+    const updatedCategoryLabel: string = updatedFields.category;
     const updatedMediumLabel: string = updatedFields.medium;
     const updatedSizeLabel: string = updatedFields.size;
 
@@ -235,32 +234,25 @@ export async function PATCH(
       }
     }
 
-    // For each category in the update, ensure it exists in the Tag collection.
-    const sanitizedCategoryLabels: string[] = updatedCategoryLabels.map(
-      (label) => {
-        return label.replaceAll(" ", "-");
-      }
-    );
-    for (const categoryLabel of sanitizedCategoryLabels) {
-      const exists = await Tag.findOne({
-        label: categoryLabel,
+    if (updatedCategoryLabel) {
+      console.log("updatedFields:", updatedCategoryLabel,artwork.category.label);
+      const sanitizedCategoryLabel = updatedCategoryLabel.replaceAll(" ", "-");
+      const categoryExists = await Tag.findOne({
+        label: sanitizedCategoryLabel,
         type: "category",
       });
 
-      if (!exists) {
-        await Tag.create({ label: categoryLabel, type: "category" });
+      if (!categoryExists) {
+        const newCategoryTag = await Tag.create({
+          label: sanitizedCategoryLabel,
+          type: "category",
+        });
+
+        updatedFields.category = newCategoryTag._id;
+      } else {
+        updatedFields.category = categoryExists._id;
       }
     }
-
-    // Update the artwork's categories:
-    // Find all Tag documents (of type "category") whose labels are in the updated list.
-    const updatedTags = await Tag.find({
-      label: { $in: sanitizedCategoryLabels },
-      type: "category",
-    });
-
-    // Update the artwork's category field to only include the Tag IDs from the updated list.
-    artwork.category = updatedTags.map((tag) => tag._id);
 
     // --- Update the Artwork Document ---
     artwork.name = updatedFields.name || artwork.name;
@@ -269,6 +261,7 @@ export async function PATCH(
     artwork.medium = updatedFields.medium || artwork.medium;
     artwork.src = newSrc;
     artwork.thumbSrc = newThumbSrc;
+    artwork.category = updatedFields.category || artwork.category;
     artwork.price = updatedFields.price;
     artwork.available = updatedFields.available;
 

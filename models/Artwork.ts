@@ -76,7 +76,7 @@ export type PopulatedArtworkDocument = Omit<
   ArtworkDocument,
   "category" | "medium" | "size"
 > & {
-  category: TagDocument[];
+  category: TagDocument;
   medium: TagDocument;
   size: TagDocument;
 };

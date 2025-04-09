@@ -101,6 +101,7 @@ export default function TagManagement({ tags }: TagManagementProps) {
         <div className="flex gap-4">
           <div className="flex-1">
             <input
+              id="tag-label"
               type="text"
               value={newTag.label}
               onChange={(e) => setNewTag({ ...newTag, label: e.target.value })}
@@ -110,6 +111,7 @@ export default function TagManagement({ tags }: TagManagementProps) {
           </div>
           <div>
             <select
+              id="tag-type"
               value={newTag.type}
               onChange={(e) => setNewTag({ ...newTag, type: e.target.value })}
               className="px-3 py-2 border rounded-md"

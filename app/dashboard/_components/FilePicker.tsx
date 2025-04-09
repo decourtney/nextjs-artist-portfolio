@@ -122,6 +122,7 @@ const FilePicker = () => {
       className="max-w-[800px] m-1 shadow-md rounded-md bg-white text-gray-900"
     >
       <input
+        id="file-input"
         ref={fileInputRef}
         type="file"
         multiple
