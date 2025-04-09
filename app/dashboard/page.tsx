@@ -1,7 +1,7 @@
 import Artwork, { PopulatedArtworkDocument } from "@/models/Artwork";
 import Tag, { TagDocument } from "@/models/Tag";
 import FileManagement from "@/app/dashboard/_components/FileManagement";
-import FilePicker from "@/app/dashboard/_components/FilePicker";
+import FileUpload from "@/app/dashboard/_components/FileUpload";
 import TagManagement from "@/app/dashboard/_components/TagManagement";
 
 export default async function DashboardPage({
@@ -54,7 +54,7 @@ export default async function DashboardPage({
 
         <TagManagement tags={allTags} />
 
-        <FilePicker />
+        <FileUpload />
       </div>
     </main>
   );

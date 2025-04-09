@@ -120,7 +120,7 @@ export default function FileManagement({
 
   const handleSubmitEdit = async () => {
     if (!editingFile || !editForm) return;
-console.log(editForm);
+    console.log(editForm);
     setIsSubmitting(true);
     setError(null);
 
@@ -442,7 +442,7 @@ console.log(editForm);
 
   return (
     <div className="bg-background-50 p-6 rounded-lg shadow-md">
-      <div className="flex justify-between  mb-4 border-b ">
+      <div className="flex justify-between mb-4 border-b ">
         <h1 className="text-2xl font-bold text-foreground-500 mb-4">
           File Management
         </h1>
@@ -455,25 +455,23 @@ console.log(editForm);
         </button>
       </div>
 
-      <div>
-        <div className="flex items-center mb-4">
-          <input
-            id="select-all"
-            type="checkbox"
-            className="mr-2"
-            checked={selectedIds.length === files.length}
-            onChange={(e) => handleSelectAll(e.target.checked)}
-          />
-          <span>Select All</span>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {files.map((file) => (
-            <div key={file._id}>{renderFileItem(file)}</div>
-          ))}
-        </div>
+      <div className="flex items-center mb-4">
+        <input
+          id="select-all"
+          type="checkbox"
+          className="mr-2"
+          checked={selectedIds.length === files.length}
+          onChange={(e) => handleSelectAll(e.target.checked)}
+        />
+        <span>Select All</span>
       </div>
 
-      {renderEditModal()}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        {files.map((file) => (
+          <div key={file._id}>{renderFileItem(file)}</div>
+        ))}
+      </div>
+
       <div className="flex justify-center items-center w-full space-x-2">
         <button
           onClick={handlePrevious}
@@ -487,7 +485,7 @@ console.log(editForm);
           <IoIosArrowBack />
         </button>
         <span>
-          Page {currentPage} of {totalPages}
+          {currentPage} of {totalPages}
         </span>
         <button
           onClick={handleNext}
@@ -501,6 +499,7 @@ console.log(editForm);
           <IoIosArrowForward />
         </button>
       </div>
+      {renderEditModal()}
     </div>
   );
 }
