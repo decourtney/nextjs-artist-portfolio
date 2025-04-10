@@ -17,7 +17,7 @@ interface ArtworkApiResponse {
   failures?: Array<{ id: string; message?: string; error?: string }>;
 }
 
-const FilePicker = () => {
+const FileUpload = () => {
   const router = useRouter();
   const [selectedFiles, setSelectedFiles] = useState<FileItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -119,9 +119,10 @@ const FilePicker = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-[800px] m-1 shadow-md rounded-md bg-white text-gray-900"
+      className="m-1 shadow-md rounded-md bg-white text-gray-900"
     >
       <input
+        id="file-input"
         ref={fileInputRef}
         type="file"
         multiple
@@ -201,4 +202,4 @@ const FilePicker = () => {
   );
 };
 
-export default FilePicker;
+export default FileUpload;

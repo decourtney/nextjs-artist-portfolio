@@ -1,7 +1,8 @@
 import Artwork, { PopulatedArtworkDocument } from "@/models/Artwork";
 import Tag, { TagDocument } from "@/models/Tag";
-import FileList from "@/app/dashboard/_components/FileList";
-import FilePicker from "@/app/dashboard/_components/FilePicker";
+import FileManagement from "@/app/dashboard/_components/FileManagement";
+import FileUpload from "@/app/dashboard/_components/FileUpload";
+import TagManagement from "@/app/dashboard/_components/TagManagement";
 
 export default async function DashboardPage({
   searchParams,
@@ -20,7 +21,7 @@ export default async function DashboardPage({
 
   // Fetch artworks with populated fields
   const artworkResponse = await Artwork.find({})
-    .populate("categories")
+    .populate("category")
     .populate("medium")
     .populate("size")
     .skip(skip)
@@ -42,22 +43,18 @@ export default async function DashboardPage({
   const allTags = { categories, mediums, sizes };
 
   return (
-    <main className="w-full max-w-[1400px] mx-auto">
+    <main className="w-full mx-auto">
       <div className="space-y-8">
-        <div className="bg-background-50 p-6 rounded-lg shadow-md">
-          <h1 className="text-2xl font-bold text-foreground-500 mb-4">
-            Artwork Management
-          </h1>
-          <FileList
-            files={files}
-            tags={allTags}
-            currentPage={page}
-            totalPages={totalPages}
-          />
-        </div>
-        <div className="bg-background-50 p-6 rounded-lg shadow-md">
-          <FilePicker />
-        </div>
+        <FileManagement
+          files={files}
+          tags={allTags}
+          currentPage={page}
+          totalPages={totalPages}
+        />
+
+        <TagManagement tags={allTags} />
+
+        <FileUpload />
       </div>
     </main>
   );

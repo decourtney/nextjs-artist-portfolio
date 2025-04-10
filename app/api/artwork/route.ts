@@ -6,7 +6,10 @@ import dbConnect from "@/lib/dbConnect";
 import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import sharp from "sharp";
 import { Readable } from "stream";
-import { SanitizeAndShortenFilename } from "@/utils/sanitizeAndShortenFilename";
+import {
+  SanitizeAndShortenString,
+  shortenName,
+} from "@/utils/sanitizeAndShortenString";
 import { getServerSession } from "next-auth";
 import { _nextAuthOptions } from "@/auth";
 import { Tag } from "@/models";
@@ -14,6 +17,7 @@ import { Tag } from "@/models";
 // Enhanced interface to also track a UUID for each file
 interface PendingImageData {
   id: string; // The UUID passed from the client
+  baseName: string;
   sanitizedFilename: string;
   fileBuffer: Buffer;
   mainKey: string;
@@ -130,15 +134,15 @@ export async function POST(request: NextRequest) {
         // Locate where the file extension starts
         const extensionIndex = filename.lastIndexOf(".");
 
-        // Get base file name without extension
-        const rawBaseName =
+        // Get base file name without extension and shorten it
+        const baseName = shortenName(
           extensionIndex !== -1
             ? filename.substring(0, extensionIndex)
-            : filename;
+            : filename
+        );
 
-        // Shorten and sanitize the filename
-        const sanitizedFilename = SanitizeAndShortenFilename(rawBaseName);
-
+        // Sanitize the filename for S3 key and image alt text
+        const sanitizedFilename = SanitizeAndShortenString(baseName);
         const mainKey = `${folderPath}${sanitizedFilename}.webp`;
         const thumbKey = `${folderPath}thumbnails/${sanitizedFilename}-thumb.webp`;
         const mainUrl = `https://${process.env.NEXT_PUBLIC_AWS_S3_BUCKET}.s3.${process.env.NEXT_PUBLIC_AWS_REGION}.amazonaws.com/${mainKey}`;
@@ -157,6 +161,7 @@ export async function POST(request: NextRequest) {
 
           pendingImages.push({
             id: assignedId,
+            baseName,
             sanitizedFilename,
             fileBuffer: Buffer.concat(chunks),
             mainKey,
@@ -195,6 +200,7 @@ export async function POST(request: NextRequest) {
         for (const item of pendingImages) {
           const {
             id,
+            baseName,
             sanitizedFilename,
             fileBuffer,
             mainKey,
@@ -248,7 +254,7 @@ export async function POST(request: NextRequest) {
 
             // Insert a document into MongoDB
             const artworkDoc: ArtworkDocument = new Artwork({
-              name: sanitizedFilename,
+              name: baseName,
               src: mainUrl,
               alt: sanitizedFilename,
               thumbSrc: thumbUrl,

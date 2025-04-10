@@ -12,7 +12,9 @@ export interface ArtworkDocument extends mongoose.Document {
   size: mongoose.Types.ObjectId;
   metaWidth: number;
   metaHeight: number;
-  categories: mongoose.Types.ObjectId[];
+  category: mongoose.Types.ObjectId;
+  price: number;
+  available: boolean;
 }
 
 const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
@@ -48,25 +50,33 @@ const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
   metaWidth: {
     type: Number,
   },
-  metaHeight: { 
-    type: Number 
+  metaHeight: {
+    type: Number,
   },
-  categories: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Tag",
-    },
-  ],
+  category: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Tag",
+  },
+  price: {
+    type: Number,
+    min: [0, "Price cannot be negative"],
+    default: 0,
+  },
+  available: {
+    type: Boolean,
+    default: true,
+  },
 });
 
-export default mongoose.models.Artwork || mongoose.model<ArtworkDocument>("Artwork", ArtworkSchema);
+export default mongoose.models.Artwork ||
+  mongoose.model<ArtworkDocument>("Artwork", ArtworkSchema);
 
 // Extended type for populated categories:
 export type PopulatedArtworkDocument = Omit<
   ArtworkDocument,
-  "categories" | "medium" | "size"
+  "category" | "medium" | "size"
 > & {
-  categories: TagDocument[];
+  category: TagDocument;
   medium: TagDocument;
   size: TagDocument;
 };

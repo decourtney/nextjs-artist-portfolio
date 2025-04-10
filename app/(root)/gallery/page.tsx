@@ -1,8 +1,10 @@
 import React from "react";
 import Link from "next/link";
 import Book3D from "@/app/components/Book3D";
+import dbConnect from "@/lib/dbConnect";
 
-const GalleryPage = () => {
+const GalleryPage = async () => {
+  // Hard coded categories
   const categories = [
     {
       name: "Landscapes",
@@ -41,8 +43,8 @@ const GalleryPage = () => {
           {categories.map((category) => (
             <div key={category.name} className="flex flex-col">
               <h2 className="text-2xl font-charm mb-4">{category.name}</h2>
-              <a
-                href={category.link}
+              <Link
+                href={`/gallery/${category.name.toLowerCase()}`}
                 className="block border-2 border-black hover:border-blue-500 transition-colors duration-300"
               >
                 <div
@@ -52,7 +54,7 @@ const GalleryPage = () => {
                     {category.name}
                   </span>
                 </div>
-              </a>
+              </Link>
               <p className="text-gray-500 text-sm italic text-center mt-3">
                 {category.description}
               </p>

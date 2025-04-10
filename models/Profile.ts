@@ -2,7 +2,7 @@ import { Types, Schema, Document, model, models } from "mongoose";
 
 export interface IProfile extends Document {
   username: string;
-  role: "user" | "admin";
+  role: "guest" | "user" | "admin";
   bio?: string;
   avatar?: string;
   preferences?: {
@@ -15,7 +15,7 @@ export interface IProfile extends Document {
 const ProfileSchema = new Schema<IProfile>(
   {
     username: { type: String, required: true, unique: true },
-    role: { type: String, enum: ["user", "admin"], default: "user" },
+    role: { type: String, enum: ["guest", "user", "admin"], default: "guest" },
     bio: { type: String },
     avatar: { type: String, default: "/default-avatar.png" },
     preferences: {

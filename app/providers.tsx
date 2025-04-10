@@ -14,10 +14,10 @@ export function Providers({
   session: Session | null;
 }) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <SessionProvider session={session}>
-        <FilteredArtworkProvider>{children}</FilteredArtworkProvider>
-      </SessionProvider>
-    </Suspense>
+    <SessionProvider session={session}>
+      {/* <FilteredArtworkProvider> */}
+        {children}
+        {/* </FilteredArtworkProvider> */}
+    </SessionProvider>
   );
 }

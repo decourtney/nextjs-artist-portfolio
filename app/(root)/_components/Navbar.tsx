@@ -12,7 +12,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100);
+      setIsScrolled(window.scrollY > 500);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -35,26 +35,27 @@ export default function Navbar() {
           y: isScrolled ? 0 : -20,
         }}
         transition={{ duration: 0.3 }}
-        className={`fixed top-6 right-6 z-50 p-3 rounded-full bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white transition-colors ${
+        className={`fixed top-6 right-6 z-50 p-3 rounded-full border-2 border-transparent hover:border-[#3b82f6] focus:border-[#3b82f6] transition-colors ${
           isScrolled ? "pointer-events-auto" : "pointer-events-none"
         }`}
+        style={{}}
         onClick={() => setIsMenuOpen(!isMenuOpen)}
         aria-label="Menu"
       >
-        <div className="w-6 h-6 flex flex-col justify-between">
+        <div className="w-4 h-4 flex flex-col justify-between">
           <span
-            className={`block w-full h-0.5 bg-black transition-transform duration-300 ${
-              isMenuOpen ? "rotate-45 translate-y-2.5" : ""
+            className={`block w-full h-0.5 bg-[#3b82f6] transition-transform duration-300 ${
+              isMenuOpen ? "rotate-45 translate-y-2" : ""
             }`}
           />
           <span
-            className={`block w-full h-0.5 bg-black transition-opacity duration-300 ${
+            className={`block w-full h-0.5 bg-[#3b82f6] transition-opacity duration-300 ${
               isMenuOpen ? "opacity-0" : ""
             }`}
           />
           <span
-            className={`block w-full h-0.5 bg-black transition-transform duration-300 ${
-              isMenuOpen ? "-rotate-45 -translate-y-2.5" : ""
+            className={`block w-full h-0.5 bg-[#3b82f6] transition-transform duration-300 ${
+              isMenuOpen ? "-rotate-45 -translate-y-2" : ""
             }`}
           />
         </div>
@@ -68,7 +69,7 @@ export default function Navbar() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed top-20 right-6 z-40 bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6"
+            className="fixed top-20 right-6 z-40 bg-[#e2e8f0] rounded-2xl shadow-xl p-6"
           >
             <nav className="flex flex-col gap-6">
               {navItems.map((item, index) => (

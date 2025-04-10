@@ -25,6 +25,7 @@ const TagSchema = new Schema<TagDocument>(
   { timestamps: true }
 );
 
+// Adding a compound index for label and type to ensure uniqueness
 TagSchema.index({ label: 1, type: 1 }, { unique: true });
 
 export default mongoose.models.Tag ||

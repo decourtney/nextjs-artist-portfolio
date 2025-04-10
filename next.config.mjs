@@ -9,7 +9,6 @@ const nextConfig = {
         pathname: "/genacourtney/images/**",
       },
     ],
-    domains: ["images.unsplash.com", "source.unsplash.com"],
   },
   experimental: {
     optimizePackageImports: ["@headlessui/react"],
