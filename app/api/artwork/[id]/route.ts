@@ -154,17 +154,9 @@ export async function PATCH(
     // Used to track any changes to be applied to the artwork document
     const updateData: Partial<ArtworkDocument> = {};
 
-    // Sanitize strings
-    const sanitizedUpdatedName: string = SanitizeAndShortenString(
-      updatedFields.name
-    );
-
     // Populate updateData with changed and sanitized fields
-    if (
-      sanitizedUpdatedName &&
-      sanitizedUpdatedName !== oldName
-    ) {
-      updateData.name = sanitizedUpdatedName;
+    if (updatedFields.name && updatedFields.name !== oldName) {
+      updateData.name = updatedFields.name;
     }
 
     if (
@@ -223,8 +215,9 @@ export async function PATCH(
     // no fallback yet
     //
     if (updateData.name) {
-      const newMainKey = `${folderPath}${updateData.name}.webp`;
-      const newThumbKey = `${folderPath}thumbnails/${updateData.name}-thumb.webp`;
+      const sanitizedName = SanitizeAndShortenString(updateData.name); // Sanitize and shorten the name for S3 key
+      const newMainKey = `${folderPath}${sanitizedName}.webp`;
+      const newThumbKey = `${folderPath}thumbnails/${sanitizedName}-thumb.webp`;
 
       if (newMainKey !== oldMainKey) {
         await s3Client.send(
@@ -263,19 +256,6 @@ export async function PATCH(
     if (Object.keys(updateData).length > 0) {
       await Artwork.updateOne({ _id: artwork._id }, { $set: updateData });
     }
-
-    // --- Update the Artwork Document ---
-    // artwork.name = updatedFields.name || oldName;
-    // artwork.description = updatedFields.description || oldDescription;
-    // artwork.size = updatedFields.size || oldSize;
-    // artwork.medium = updatedFields.medium || oldMedium;
-    // artwork.src = newSrc || oldSrc;
-    // artwork.thumbSrc = newThumbSrc || oldThumbSrc;
-    // artwork.category = updatedFields.category || artwork.category;
-    // artwork.price = updatedFields.price;
-    // artwork.available = updatedFields.available;
-
-    // await artwork.save();
 
     return NextResponse.json({ message: "Artwork updated successfully" });
   } catch (error) {
