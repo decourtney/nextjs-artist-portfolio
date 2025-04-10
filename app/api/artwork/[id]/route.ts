@@ -12,6 +12,7 @@ import { SanitizeAndShortenString } from "@/utils/sanitizeAndShortenString";
 import { getServerSession } from "next-auth";
 import { _nextAuthOptions } from "@/auth";
 import { PopulatedArtworkDocument } from "@/models/Artwork";
+import { success } from "@/ColorTheme";
 
 // Create S3 client
 const s3Client = new S3Client({
@@ -102,6 +103,7 @@ export async function DELETE(
   }
 }
 
+// Some resilience logic to handle S3 errors and rollback if necessary
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -212,49 +214,63 @@ export async function PATCH(
       updateData.available = updatedFields.available;
     }
 
-    // no fallback yet
-    //
+    try {
+      if (Object.keys(updateData).length > 0) {
+        await Artwork.updateOne({ _id: artwork._id }, { $set: updateData });
+      }
+    } catch (error) {
+      return NextResponse.json(
+        { success: false, message: "Failed to update artwork" },
+        { status: 500 }
+      );
+    }
+
     if (updateData.name) {
       const sanitizedName = SanitizeAndShortenString(updateData.name); // Sanitize and shorten the name for S3 key
       const newMainKey = `${folderPath}${sanitizedName}.webp`;
       const newThumbKey = `${folderPath}thumbnails/${sanitizedName}-thumb.webp`;
 
-      if (newMainKey !== oldMainKey) {
-        await s3Client.send(
-          new CopyObjectCommand({
-            Bucket: bucket,
-            CopySource: `${bucket}/${oldMainKey}`,
-            Key: newMainKey,
-          })
-        );
-        await s3Client.send(
-          new DeleteObjectCommand({
-            Bucket: bucket,
-            Key: oldMainKey,
-          })
-        );
-        updateData.src = `${urlPrefix}${newMainKey}`;
-      }
-      if (newThumbKey !== oldThumbKey) {
-        await s3Client.send(
-          new CopyObjectCommand({
-            Bucket: bucket,
-            CopySource: `${bucket}/${oldThumbKey}`,
-            Key: newThumbKey,
-          })
-        );
-        await s3Client.send(
-          new DeleteObjectCommand({
-            Bucket: bucket,
-            Key: oldThumbKey,
-          })
-        );
-        updateData.thumbSrc = `${urlPrefix}${newThumbKey}`;
-      }
-    }
+      try {
+        if (newMainKey !== oldMainKey) {
+          await s3Client.send(
+            new CopyObjectCommand({
+              Bucket: bucket,
+              CopySource: `${bucket}/${oldMainKey}`,
+              Key: newMainKey,
+            })
+          );
+          await s3Client.send(
+            new DeleteObjectCommand({
+              Bucket: bucket,
+              Key: oldMainKey,
+            })
+          );
+          updateData.src = `${urlPrefix}${newMainKey}`;
+        }
 
-    if (Object.keys(updateData).length > 0) {
-      await Artwork.updateOne({ _id: artwork._id }, { $set: updateData });
+        if (newThumbKey !== oldThumbKey) {
+          await s3Client.send(
+            new CopyObjectCommand({
+              Bucket: bucket,
+              CopySource: `${bucket}/${oldThumbKey}`,
+              Key: newThumbKey,
+            })
+          );
+          await s3Client.send(
+            new DeleteObjectCommand({
+              Bucket: bucket,
+              Key: oldThumbKey,
+            })
+          );
+          updateData.thumbSrc = `${urlPrefix}${newThumbKey}`;
+        }
+      } catch (error) {
+        await Artwork.updateOne({ _id: artwork._id }, { name: oldName });
+        return NextResponse.json({
+          success: false,
+          message: "Failed to update image name.",
+        });
+      }
     }
 
     return NextResponse.json({ message: "Artwork updated successfully" });
