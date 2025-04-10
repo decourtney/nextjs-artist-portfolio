@@ -6,7 +6,7 @@ import dbConnect from "@/lib/dbConnect";
 import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import sharp from "sharp";
 import { Readable } from "stream";
-import { SanitizeAndShortenFilename } from "@/utils/sanitizeAndShortenFilename";
+import { SanitizeAndShortenString } from "@/utils/sanitizeAndShortenString";
 import { getServerSession } from "next-auth";
 import { _nextAuthOptions } from "@/auth";
 import { Tag } from "@/models";
@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
             : filename;
 
         // Shorten and sanitize the filename
-        const sanitizedFilename = SanitizeAndShortenFilename(rawBaseName);
+        const sanitizedFilename = SanitizeAndShortenString(rawBaseName);
 
         const mainKey = `${folderPath}${sanitizedFilename}.webp`;
         const thumbKey = `${folderPath}thumbnails/${sanitizedFilename}-thumb.webp`;

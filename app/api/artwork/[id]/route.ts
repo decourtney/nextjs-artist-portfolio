@@ -8,9 +8,10 @@ import dbConnect from "@/lib/dbConnect";
 import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import { Tag } from "@/models";
 import { EditableArtwork } from "@/app/dashboard/_components/FileManagement";
-import { SanitizeAndShortenFilename } from "@/utils/sanitizeAndShortenFilename";
+import { SanitizeAndShortenString } from "@/utils/sanitizeAndShortenString";
 import { getServerSession } from "next-auth";
 import { _nextAuthOptions } from "@/auth";
+import { PopulatedArtworkDocument } from "@/models/Artwork";
 
 // Create S3 client
 const s3Client = new S3Client({
@@ -56,7 +57,7 @@ export async function DELETE(
     const { id } = await params;
 
     // Find the artwork document by ID
-    const artwork = (await Artwork.findById(id)) as ArtworkDocument;
+    const artwork = (await Artwork.findById(id)) as PopulatedArtworkDocument;
     if (!artwork) {
       return NextResponse.json(
         { message: "Artwork not found" },
@@ -122,7 +123,7 @@ export async function PATCH(
     const updatedFields: EditableArtwork = await request.json();
 
     // Retrieve the artwork document by ID
-    const artwork = await Artwork.findById(id);
+    const artwork = (await Artwork.findById(id)) as PopulatedArtworkDocument;
     if (!artwork) {
       return NextResponse.json(
         { message: "Artwork not found" },
@@ -136,26 +137,94 @@ export async function PATCH(
     const folderPath = process.env.NEXT_PUBLIC_AWS_IMAGES_FOLDER || "";
     const urlPrefix = `https://${bucket}.s3.${region}.amazonaws.com/`;
 
+    const oldName = artwork.name;
+    const oldDescription = artwork.description;
+    const oldSize = artwork.size?.label;
+    const oldMedium = artwork.medium?.label;
+    const oldCategory = artwork.category?.label;
+    const oldPrice = artwork.price;
+    const oldAvailable = artwork.available;
+    const oldSrc = artwork.src;
+    const oldThumbSrc = artwork.thumbSrc;
+
     // Determine current S3 keys based on stored URLs
-    const oldMainKey = artwork.src.replace(urlPrefix, "");
-    const oldThumbKey = artwork.thumbSrc.replace(urlPrefix, "");
+    const oldMainKey = oldSrc.replace(urlPrefix, "");
+    const oldThumbKey = oldThumbSrc.replace(urlPrefix, "");
 
-    let newSrc = artwork.src;
-    let newThumbSrc = artwork.thumbSrc;
+    // Used to track any changes to be applied to the artwork document
+    const updateData: Partial<ArtworkDocument> = {};
 
-    // If the name is being updated (and is different), handle S3 renaming
-    const sanitizedUpdatedName: string = SanitizeAndShortenFilename(
+    // Sanitize strings
+    const sanitizedUpdatedName: string = SanitizeAndShortenString(
       updatedFields.name
     );
 
+    // Populate updateData with changed and sanitized fields
     if (
       sanitizedUpdatedName &&
-      sanitizedUpdatedName !== artwork.name.toLowerCase()
+      sanitizedUpdatedName !== oldName
     ) {
-      updatedFields.name = sanitizedUpdatedName;
+      updateData.name = sanitizedUpdatedName;
+    }
 
-      const newMainKey = `${folderPath}${updatedFields.name}.webp`;
-      const newThumbKey = `${folderPath}thumbnails/${updatedFields.name}-thumb.webp`;
+    if (
+      updatedFields.description &&
+      updatedFields.description !== oldDescription
+    ) {
+      updateData.description = updatedFields.description;
+    }
+    if (updatedFields.size && updatedFields.size !== oldSize) {
+      const tag = await Tag.findOne({
+        label: updatedFields.size,
+        type: "size",
+      });
+      if (!tag) {
+        return NextResponse.json(
+          { message: "Size not found" },
+          { status: 404 }
+        );
+      }
+      updateData.size = tag._id;
+    }
+    if (updatedFields.medium && updatedFields.medium !== oldMedium) {
+      console.log("MEDIUM:", updatedFields.medium, oldMedium);
+      const tag = await Tag.findOne({
+        label: updatedFields.medium,
+        type: "medium",
+      });
+      if (!tag) {
+        return NextResponse.json(
+          { message: "Medium not found" },
+          { status: 404 }
+        );
+      }
+      updateData.medium = tag._id;
+    }
+    if (updatedFields.category && updatedFields.category !== oldCategory) {
+      const tag = await Tag.findOne({
+        label: updatedFields.category,
+        type: "category",
+      });
+      if (!tag) {
+        return NextResponse.json(
+          { message: "Category not found" },
+          { status: 404 }
+        );
+      }
+      updateData.category = tag._id;
+    }
+    if (updatedFields.price && updatedFields.price !== oldPrice) {
+      updateData.price = updatedFields.price;
+    }
+    if (updatedFields.available && updatedFields.available !== oldAvailable) {
+      updateData.available = updatedFields.available;
+    }
+
+    // no fallback yet
+    //
+    if (updateData.name) {
+      const newMainKey = `${folderPath}${updateData.name}.webp`;
+      const newThumbKey = `${folderPath}thumbnails/${updateData.name}-thumb.webp`;
 
       if (newMainKey !== oldMainKey) {
         await s3Client.send(
@@ -171,7 +240,7 @@ export async function PATCH(
             Key: oldMainKey,
           })
         );
-        newSrc = `https://${bucket}.s3.${region}.amazonaws.com/${newMainKey}`;
+        updateData.src = `${urlPrefix}${newMainKey}`;
       }
       if (newThumbKey !== oldThumbKey) {
         await s3Client.send(
@@ -187,89 +256,52 @@ export async function PATCH(
             Key: oldThumbKey,
           })
         );
-        newThumbSrc = `https://${bucket}.s3.${region}.amazonaws.com/${newThumbKey}`;
+        updateData.thumbSrc = `${urlPrefix}${newThumbKey}`;
       }
     }
 
-    // --- Update Tag Collection ---
-    const updatedCategoryLabel: string = updatedFields.category;
-    const updatedMediumLabel: string = updatedFields.medium;
-    const updatedSizeLabel: string = updatedFields.size;
-
-    if (updatedMediumLabel) {
-      const sanitizedMediumLabel = updatedMediumLabel.replaceAll(" ", "-");
-      const mediumExists = await Tag.findOne({
-        label: sanitizedMediumLabel,
-        type: "medium",
-      });
-
-      if (!mediumExists) {
-        const newMediumTag = await Tag.create({
-          label: sanitizedMediumLabel,
-          type: "medium",
-        });
-
-        updatedFields.medium = newMediumTag._id;
-      } else {
-        updatedFields.medium = mediumExists._id;
-      }
-    }
-
-    if (updatedSizeLabel) {
-      const sanitizedSizeLabel = updatedSizeLabel.replaceAll(" ", "-");
-      const sizeExists = await Tag.findOne({
-        label: sanitizedSizeLabel,
-        type: "size",
-      });
-
-      if (!sizeExists) {
-        const newSizeTag = await Tag.create({
-          label: sanitizedSizeLabel,
-          type: "size",
-        });
-
-        updatedFields.size = newSizeTag._id;
-      } else {
-        updatedFields.size = sizeExists._id;
-      }
-    }
-
-    if (updatedCategoryLabel) {
-      console.log("updatedFields:", updatedCategoryLabel,artwork.category.label);
-      const sanitizedCategoryLabel = updatedCategoryLabel.replaceAll(" ", "-");
-      const categoryExists = await Tag.findOne({
-        label: sanitizedCategoryLabel,
-        type: "category",
-      });
-
-      if (!categoryExists) {
-        const newCategoryTag = await Tag.create({
-          label: sanitizedCategoryLabel,
-          type: "category",
-        });
-
-        updatedFields.category = newCategoryTag._id;
-      } else {
-        updatedFields.category = categoryExists._id;
-      }
+    if (Object.keys(updateData).length > 0) {
+      await Artwork.updateOne({ _id: artwork._id }, { $set: updateData });
     }
 
     // --- Update the Artwork Document ---
-    artwork.name = updatedFields.name || artwork.name;
-    artwork.description = updatedFields.description || artwork.description;
-    artwork.size = updatedFields.size || artwork.size;
-    artwork.medium = updatedFields.medium || artwork.medium;
-    artwork.src = newSrc;
-    artwork.thumbSrc = newThumbSrc;
-    artwork.category = updatedFields.category || artwork.category;
-    artwork.price = updatedFields.price;
-    artwork.available = updatedFields.available;
+    // artwork.name = updatedFields.name || oldName;
+    // artwork.description = updatedFields.description || oldDescription;
+    // artwork.size = updatedFields.size || oldSize;
+    // artwork.medium = updatedFields.medium || oldMedium;
+    // artwork.src = newSrc || oldSrc;
+    // artwork.thumbSrc = newThumbSrc || oldThumbSrc;
+    // artwork.category = updatedFields.category || artwork.category;
+    // artwork.price = updatedFields.price;
+    // artwork.available = updatedFields.available;
 
-    await artwork.save();
+    // await artwork.save();
 
     return NextResponse.json({ message: "Artwork updated successfully" });
   } catch (error) {
     console.error("Error updating artwork:", error);
     return NextResponse.json({ message: "Server error" }, { status: 500 });
+  }
+}
+
+async function performAtomicUpdate(
+  id: string,
+  updatedFields: EditableArtwork,
+  originalArtwork: PopulatedArtworkDocument,
+  orignalS3Keys: { mainKey: string; thumbKey: string }
+) {
+  try {
+  } catch (atomicUpdateError) {
+    console.log("Atomic update error:", atomicUpdateError);
+  }
+}
+
+async function rollbackUpdate(
+  originalArtwork: PopulatedArtworkDocument,
+  originalS3Keys: { mainKey: string; thumbKey: string }
+) {
+  try {
+  } catch (rollbackError) {
+    console.log("Rollback error:", rollbackError);
   }
 }

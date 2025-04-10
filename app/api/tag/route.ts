@@ -37,11 +37,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Sanitize label
-    const sanitizedLabel = label.replaceAll(" ", "-");
-
     // Check if tag already exists
-    const existingTag = await Tag.findOne({ label: sanitizedLabel, type });
+    const existingTag = await Tag.findOne({ label, type });
     if (existingTag) {
       return NextResponse.json(
         { message: "Tag already exists" },
@@ -50,7 +47,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create new tag
-    const newTag = await Tag.create({ label: sanitizedLabel, type });
+    const newTag = await Tag.create({ label, type });
     return NextResponse.json({ tag: newTag }, { status: 201 });
   } catch (error) {
     console.error("Error creating tag:", error);

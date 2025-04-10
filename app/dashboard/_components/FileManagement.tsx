@@ -86,6 +86,11 @@ export default function FileManagement({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ids: selectedIds }),
       });
+
+      if (res.ok) {
+        setSelectedIds([]); // Clear selected IDs after deletion
+      }
+
       if (!res.ok) {
         console.error("Batch delete failed", await res.json());
       } else {
@@ -460,7 +465,7 @@ export default function FileManagement({
           id="select-all"
           type="checkbox"
           className="mr-2"
-          checked={selectedIds.length === files.length}
+          checked={selectedIds.length === files.length && files.length > 0}
           onChange={(e) => handleSelectAll(e.target.checked)}
         />
         <span>Select All</span>

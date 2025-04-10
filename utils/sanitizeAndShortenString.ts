@@ -1,4 +1,4 @@
-export const SanitizeAndShortenFilename = (filename: string) => {
+export const SanitizeAndShortenString = (filename: string) => {
   const sanitizedUpdatedName: string = filename
     .replace(/[^a-zA-Z0-9\s-]/g, "")
     .toLowerCase()
