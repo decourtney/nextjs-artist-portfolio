@@ -123,6 +123,12 @@ export async function PATCH(
     // Parse the incoming JSON payload containing the updated artwork fields.
     // Expected keys: name, description, size, medium, categories (array of category names), etc.
     const updatedFields: EditableArtwork = await request.json();
+    if (!updatedFields) {
+      return NextResponse.json(
+        { message: "No updated fields provided" },
+        { status: 400 }
+      );
+    }
 
     // Retrieve the artwork document by ID
     const artwork = (await Artwork.findById(id)) as PopulatedArtworkDocument;
@@ -214,63 +220,88 @@ export async function PATCH(
       updateData.available = updatedFields.available;
     }
 
+    // if (updateData.name) {
+    //   const sanitizedName = SanitizeAndShortenString(updateData.name); // Sanitize and shorten the name for S3 key
+    //   const newMainKey = `${folderPath}${sanitizedName}.webp`;
+    //   const newThumbKey = `${folderPath}thumbnails/${sanitizedName}-thumb.webp`;
+
+    //   try {
+    //     await s3Client.send(
+    //       new CopyObjectCommand({
+    //         Bucket: bucket,
+    //         CopySource: `${bucket}/${oldMainKey}`,
+    //         Key: newMainKey,
+    //       })
+    //     );
+    //     await s3Client.send(
+    //       new DeleteObjectCommand({
+    //         Bucket: bucket,
+    //         Key: oldMainKey,
+    //       })
+    //     );
+    //     updateData.src = `${urlPrefix}${newMainKey}`;
+
+    //     await s3Client.send(
+    //       new CopyObjectCommand({
+    //         Bucket: bucket,
+    //         CopySource: `${bucket}/${oldThumbKey}`,
+    //         Key: newThumbKey,
+    //       })
+    //     );
+    //     await s3Client.send(
+    //       new DeleteObjectCommand({
+    //         Bucket: bucket,
+    //         Key: oldThumbKey,
+    //       })
+    //     );
+    //     updateData.thumbSrc = `${urlPrefix}${newThumbKey}`;
+    //   } catch (error) {
+    //     console.log("Error during S3 copy/delete:", error);
+    //     updateData.src = oldSrc; // Rollback to original src
+    //     updateData.thumbSrc = oldThumbSrc; // Rollback to original thumbSrc
+    //     updateData.name = oldName; // Rollback to original name
+    //   }
+    // }
+
+    if (updateData.name) {
+      const s3UpdateResult = await updateS3(
+        updateData.name,
+        folderPath,
+        bucket,
+        urlPrefix,
+        oldSrc,
+        oldThumbSrc,
+        oldName,
+        oldMainKey,
+        oldThumbKey
+      );
+
+      // Update updateData with the S3 update results
+      updateData.src = s3UpdateResult.src;
+      updateData.thumbSrc = s3UpdateResult.thumbSrc;
+      updateData.name = s3UpdateResult.name;
+    }
+
     try {
       if (Object.keys(updateData).length > 0) {
         await Artwork.updateOne({ _id: artwork._id }, { $set: updateData });
       }
     } catch (error) {
+      const s3UpdateResult = await updateS3(
+        oldName,
+        folderPath,
+        bucket,
+        urlPrefix,
+        oldSrc,
+        oldThumbSrc,
+        updateData.name,
+        oldMainKey,
+        oldThumbKey
+      );
       return NextResponse.json(
         { success: false, message: "Failed to update artwork" },
         { status: 500 }
       );
-    }
-
-    if (updateData.name) {
-      const sanitizedName = SanitizeAndShortenString(updateData.name); // Sanitize and shorten the name for S3 key
-      const newMainKey = `${folderPath}${sanitizedName}.webp`;
-      const newThumbKey = `${folderPath}thumbnails/${sanitizedName}-thumb.webp`;
-
-      try {
-        if (newMainKey !== oldMainKey) {
-          await s3Client.send(
-            new CopyObjectCommand({
-              Bucket: bucket,
-              CopySource: `${bucket}/${oldMainKey}`,
-              Key: newMainKey,
-            })
-          );
-          await s3Client.send(
-            new DeleteObjectCommand({
-              Bucket: bucket,
-              Key: oldMainKey,
-            })
-          );
-          updateData.src = `${urlPrefix}${newMainKey}`;
-        }
-
-        if (newThumbKey !== oldThumbKey) {
-          await s3Client.send(
-            new CopyObjectCommand({
-              Bucket: bucket,
-              CopySource: `${bucket}/${oldThumbKey}`,
-              Key: newThumbKey,
-            })
-          );
-          await s3Client.send(
-            new DeleteObjectCommand({
-              Bucket: bucket,
-              Key: oldThumbKey,
-            })
-          );
-          updateData.thumbSrc = `${urlPrefix}${newThumbKey}`;
-        }
-      } catch (error) {
-        await Artwork.updateOne({ _id: artwork._id }, { name: oldName });
-        return NextResponse.json({
-          success: false,
-          message: "Failed to update image name.",
-        });
-      }
     }
 
     return NextResponse.json({ message: "Artwork updated successfully" });
@@ -292,12 +323,59 @@ async function performAtomicUpdate(
   }
 }
 
-async function rollbackUpdate(
-  originalArtwork: PopulatedArtworkDocument,
-  originalS3Keys: { mainKey: string; thumbKey: string }
-) {
+// FIX THIS!!!! dont know why im not using an object here. turn this into an object to unfuck these variable names
+async function updateS3(
+  _name: string,
+  _folderPath: string,
+  _bucket: string,
+  _urlPrefix: string,
+  _oldSrc: string,
+  _oldThumbSrc: string,
+  _oldName: string,
+  _oldMainKey: string,
+  _oldThumbKey: string
+): Promise<{ src: string; thumbSrc: string; name: string }> {
+  const sanitizedName = SanitizeAndShortenString(_name); // Sanitize and shorten the name for S3 key
+  const newMainKey = `${_folderPath}${sanitizedName}.webp`;
+  const newThumbKey = `${_folderPath}thumbnails/${sanitizedName}-thumb.webp`;
+
   try {
-  } catch (rollbackError) {
-    console.log("Rollback error:", rollbackError);
+    await s3Client.send(
+      new CopyObjectCommand({
+        Bucket: _bucket,
+        CopySource: `${_bucket}/${_oldMainKey}`,
+        Key: newMainKey,
+      })
+    );
+    await s3Client.send(
+      new DeleteObjectCommand({
+        Bucket: _bucket,
+        Key: _oldMainKey,
+      })
+    );
+
+    await s3Client.send(
+      new CopyObjectCommand({
+        Bucket: _bucket,
+        CopySource: `${_bucket}/${_oldThumbKey}`,
+        Key: newThumbKey,
+      })
+    );
+    await s3Client.send(
+      new DeleteObjectCommand({
+        Bucket: _bucket,
+        Key: _oldThumbKey,
+      })
+    );
+
+    return {
+      src: `${_urlPrefix}${newThumbKey}`,
+      thumbSrc: `${_urlPrefix}${newMainKey}`,
+      name: _name,
+    };
+  } catch (error) {
+    console.log("Error during S3 copy/delete:", error);
+    return { src: _oldSrc, thumbSrc: _oldThumbSrc, name: _oldName }; // Rollback to original src and thumbSrc
+    // Rollback to original name
   }
 }

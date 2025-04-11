@@ -189,8 +189,11 @@ export default function FileManagement({
             <h3 className="text-lg font-semibold truncate max-w-[70%]">
               {file.name}
             </h3>
-            <div className="text-sm text-gray-500 flex items-center">
-              {file.metaWidth} × {file.metaHeight}
+            <div>
+              <div className="text-sm text-gray-500 flex items-center">
+                {file.metaWidth} × {file.metaHeight}
+              </div>
+              <div className="text-tiny text-center text-gray-400">resolution</div>
             </div>
           </div>
 
