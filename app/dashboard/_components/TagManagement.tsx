@@ -93,7 +93,10 @@ export default function TagManagement({ tags }: TagManagementProps) {
   );
 
   return (
-    <div className="space-y-6 bg-background-50 p-6 rounded-lg shadow-md">
+    <section
+      id="tag-management"
+      className="space-y-6 bg-background-50 p-6 rounded-lg shadow-md"
+    >
       <h2 className="text-2xl font-bold text-foreground-500">Tag Management</h2>
 
       {/* Add new tag form */}
@@ -146,6 +149,6 @@ export default function TagManagement({ tags }: TagManagementProps) {
         {renderTagList(tags.mediums, "mediums")}
         {renderTagList(tags.sizes, "sizes")}
       </div>
-    </div>
+    </section>
   );
 }

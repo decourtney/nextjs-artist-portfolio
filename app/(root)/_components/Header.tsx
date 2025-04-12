@@ -32,10 +32,8 @@ const Header = () => {
         <h1 className="text-6xl md:text-8xl font-bold text-[#1e293b] font-charm mb-6 text-center">
           Gena Courtney
         </h1>
-        <div className="flex justify-between items-center mb-8">
-          <p className="text-md text-[#64748b]">Macon, GA</p>
-          <p className="text-md text-[#64748b]">Southern Artist</p>
-          <p className="text-md text-[#64748b]">(478) 555-0123</p>
+        <div className="relative flex justify-center items-center mb-8">
+          <p className="text-md bg-inherit text-[#64748b]">Artist</p>
         </div>
 
         <nav className="relative mt-8 pb-4 w-full h-[64px] content-end">

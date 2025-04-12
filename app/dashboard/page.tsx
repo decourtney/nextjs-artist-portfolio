@@ -5,6 +5,7 @@ import FileUpload from "@/app/dashboard/_components/FileUpload";
 import TagManagement from "@/app/dashboard/_components/TagManagement";
 import dbConnect from "@/lib/dbConnect";
 import { notFound } from "next/navigation";
+import ProfileManagement from "./_components/ProfileManagement";
 
 export default async function DashboardPage({
   searchParams,
@@ -12,9 +13,7 @@ export default async function DashboardPage({
   searchParams: Promise<{ page?: string; limit?: string }>;
 }) {
   try {
-    // Explicitly connect to database before queries
     await dbConnect();
-
     const awaitedSearchParams = await searchParams;
 
     const page = parseInt(awaitedSearchParams.page || "1");
@@ -51,6 +50,7 @@ export default async function DashboardPage({
     return (
       <main className="w-full mx-auto">
         <div className="space-y-8">
+          <ProfileManagement />
           <FileManagement
             files={files}
             tags={allTags}

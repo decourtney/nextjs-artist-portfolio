@@ -103,6 +103,28 @@ export async function DELETE(
   }
 }
 
+type S3dbUpdateData = {
+  newName: string;
+  s3FolderPath: string;
+  s3Bucket: string;
+  s3url: string;
+  currentName: string;
+  currentSrc: string;
+  currentThumbSrc: string;
+};
+
+type CurrentArtworkData = {
+  name: string;
+  description?: string;
+  size?: string;
+  medium?: string;
+  category?: string;
+  price: number;
+  available: boolean;
+  src: string;
+  thumbSrc: string;
+};
+
 // Some resilience logic to handle S3 errors and rollback if necessary
 export async function PATCH(
   request: NextRequest,
@@ -120,10 +142,11 @@ export async function PATCH(
 
     await dbConnect();
     const { id } = await params;
+
     // Parse the incoming JSON payload containing the updated artwork fields.
     // Expected keys: name, description, size, medium, categories (array of category names), etc.
-    const updatedFields: EditableArtwork = await request.json();
-    if (!updatedFields) {
+    const newArtworkData: EditableArtwork = await request.json();
+    if (!newArtworkData) {
       return NextResponse.json(
         { message: "No updated fields provided" },
         { status: 400 }
@@ -139,43 +162,47 @@ export async function PATCH(
       );
     }
 
-    // Setup S3 details
+    // S3 details
     const bucket = process.env.NEXT_PUBLIC_AWS_S3_BUCKET!;
     const region = process.env.NEXT_PUBLIC_AWS_REGION!;
     const folderPath = process.env.NEXT_PUBLIC_AWS_IMAGES_FOLDER || "";
     const urlPrefix = `https://${bucket}.s3.${region}.amazonaws.com/`;
 
-    const oldName = artwork.name;
-    const oldDescription = artwork.description;
-    const oldSize = artwork.size?.label;
-    const oldMedium = artwork.medium?.label;
-    const oldCategory = artwork.category?.label;
-    const oldPrice = artwork.price;
-    const oldAvailable = artwork.available;
-    const oldSrc = artwork.src;
-    const oldThumbSrc = artwork.thumbSrc;
+    const currentArtworkData: CurrentArtworkData = {
+      name: artwork.name,
+      description: artwork.description,
+      size: artwork.size.label,
+      medium: artwork.medium.label,
+      category: artwork.category.label,
+      price: artwork.price,
+      available: artwork.available,
+      src: artwork.src,
+      thumbSrc: artwork.thumbSrc,
+    };
 
-    // Determine current S3 keys based on stored URLs
-    const oldMainKey = oldSrc.replace(urlPrefix, "");
-    const oldThumbKey = oldThumbSrc.replace(urlPrefix, "");
+    // Changes for database if present
+    const dbUpdateData: Partial<ArtworkDocument> = {};
 
-    // Used to track any changes to be applied to the artwork document
-    const updateData: Partial<ArtworkDocument> = {};
-
-    // Populate updateData with changed and sanitized fields
-    if (updatedFields.name && updatedFields.name !== oldName) {
-      updateData.name = updatedFields.name;
+    // Populate dbUpdateData with changed fields
+    if (
+      newArtworkData.name &&
+      newArtworkData.name !== currentArtworkData.name
+    ) {
+      dbUpdateData.name = newArtworkData.name;
     }
 
     if (
-      updatedFields.description &&
-      updatedFields.description !== oldDescription
+      newArtworkData.description &&
+      newArtworkData.description !== currentArtworkData.description
     ) {
-      updateData.description = updatedFields.description;
+      dbUpdateData.description = newArtworkData.description;
     }
-    if (updatedFields.size && updatedFields.size !== oldSize) {
+    if (
+      newArtworkData.size &&
+      newArtworkData.size !== currentArtworkData.size
+    ) {
       const tag = await Tag.findOne({
-        label: updatedFields.size,
+        label: newArtworkData.size,
         type: "size",
       });
       if (!tag) {
@@ -184,12 +211,14 @@ export async function PATCH(
           { status: 404 }
         );
       }
-      updateData.size = tag._id;
+      dbUpdateData.size = tag._id;
     }
-    if (updatedFields.medium && updatedFields.medium !== oldMedium) {
-      console.log("MEDIUM:", updatedFields.medium, oldMedium);
+    if (
+      newArtworkData.medium &&
+      newArtworkData.medium !== currentArtworkData.medium
+    ) {
       const tag = await Tag.findOne({
-        label: updatedFields.medium,
+        label: newArtworkData.medium,
         type: "medium",
       });
       if (!tag) {
@@ -198,11 +227,14 @@ export async function PATCH(
           { status: 404 }
         );
       }
-      updateData.medium = tag._id;
+      dbUpdateData.medium = tag._id;
     }
-    if (updatedFields.category && updatedFields.category !== oldCategory) {
+    if (
+      newArtworkData.category &&
+      newArtworkData.category !== currentArtworkData.category
+    ) {
       const tag = await Tag.findOne({
-        label: updatedFields.category,
+        label: newArtworkData.category,
         type: "category",
       });
       if (!tag) {
@@ -211,93 +243,44 @@ export async function PATCH(
           { status: 404 }
         );
       }
-      updateData.category = tag._id;
+      dbUpdateData.category = tag._id;
     }
-    if (updatedFields.price && updatedFields.price !== oldPrice) {
-      updateData.price = updatedFields.price;
+    if (
+      newArtworkData.price &&
+      newArtworkData.price !== currentArtworkData.price
+    ) {
+      dbUpdateData.price = newArtworkData.price;
     }
-    if (updatedFields.available && updatedFields.available !== oldAvailable) {
-      updateData.available = updatedFields.available;
+    if (
+      newArtworkData.available &&
+      newArtworkData.available !== currentArtworkData.available
+    ) {
+      dbUpdateData.available = newArtworkData.available;
     }
 
-    // if (updateData.name) {
-    //   const sanitizedName = SanitizeAndShortenString(updateData.name); // Sanitize and shorten the name for S3 key
-    //   const newMainKey = `${folderPath}${sanitizedName}.webp`;
-    //   const newThumbKey = `${folderPath}thumbnails/${sanitizedName}-thumb.webp`;
+    if (dbUpdateData.name) {
+      const s3UpdateResult = await updateS3({
+        newName: dbUpdateData.name,
+        s3FolderPath: folderPath,
+        s3Bucket: bucket,
+        s3url: urlPrefix,
+        currentName: currentArtworkData.name,
+        currentSrc: currentArtworkData.src,
+        currentThumbSrc: currentArtworkData.thumbSrc,
+      });
 
-    //   try {
-    //     await s3Client.send(
-    //       new CopyObjectCommand({
-    //         Bucket: bucket,
-    //         CopySource: `${bucket}/${oldMainKey}`,
-    //         Key: newMainKey,
-    //       })
-    //     );
-    //     await s3Client.send(
-    //       new DeleteObjectCommand({
-    //         Bucket: bucket,
-    //         Key: oldMainKey,
-    //       })
-    //     );
-    //     updateData.src = `${urlPrefix}${newMainKey}`;
-
-    //     await s3Client.send(
-    //       new CopyObjectCommand({
-    //         Bucket: bucket,
-    //         CopySource: `${bucket}/${oldThumbKey}`,
-    //         Key: newThumbKey,
-    //       })
-    //     );
-    //     await s3Client.send(
-    //       new DeleteObjectCommand({
-    //         Bucket: bucket,
-    //         Key: oldThumbKey,
-    //       })
-    //     );
-    //     updateData.thumbSrc = `${urlPrefix}${newThumbKey}`;
-    //   } catch (error) {
-    //     console.log("Error during S3 copy/delete:", error);
-    //     updateData.src = oldSrc; // Rollback to original src
-    //     updateData.thumbSrc = oldThumbSrc; // Rollback to original thumbSrc
-    //     updateData.name = oldName; // Rollback to original name
-    //   }
-    // }
-
-    if (updateData.name) {
-      const s3UpdateResult = await updateS3(
-        updateData.name,
-        folderPath,
-        bucket,
-        urlPrefix,
-        oldSrc,
-        oldThumbSrc,
-        oldName,
-        oldMainKey,
-        oldThumbKey
-      );
-
-      // Update updateData with the S3 update results
-      updateData.src = s3UpdateResult.src;
-      updateData.thumbSrc = s3UpdateResult.thumbSrc;
-      updateData.name = s3UpdateResult.name;
+      // Update dbUpdateData with the S3 update results
+      dbUpdateData.src = s3UpdateResult.src;
+      dbUpdateData.thumbSrc = s3UpdateResult.thumbSrc;
+      dbUpdateData.name = s3UpdateResult.name;
     }
 
     try {
-      if (Object.keys(updateData).length > 0) {
-        await Artwork.updateOne({ _id: artwork._id }, { $set: updateData });
+      if (Object.keys(dbUpdateData).length > 0) {
+        await Artwork.updateOne({ _id: artwork._id }, { $set: dbUpdateData });
       }
     } catch (error) {
-      const s3UpdateResult = await updateS3(
-        oldName,
-        folderPath,
-        bucket,
-        urlPrefix,
-        oldSrc,
-        oldThumbSrc,
-        updateData.name,
-        oldMainKey,
-        oldThumbKey
-      );
+      console.error("Error updating artwork in database:", error);
       return NextResponse.json(
         { success: false, message: "Failed to update artwork" },
         { status: 500 }
@@ -313,7 +296,7 @@ export async function PATCH(
 
 async function performAtomicUpdate(
   id: string,
-  updatedFields: EditableArtwork,
+  newArtworkData: EditableArtwork,
   originalArtwork: PopulatedArtworkDocument,
   orignalS3Keys: { mainKey: string; thumbKey: string }
 ) {
@@ -325,57 +308,55 @@ async function performAtomicUpdate(
 
 // FIX THIS!!!! dont know why im not using an object here. turn this into an object to unfuck these variable names
 async function updateS3(
-  _name: string,
-  _folderPath: string,
-  _bucket: string,
-  _urlPrefix: string,
-  _oldSrc: string,
-  _oldThumbSrc: string,
-  _oldName: string,
-  _oldMainKey: string,
-  _oldThumbKey: string
+  s3Data: S3dbUpdateData
 ): Promise<{ src: string; thumbSrc: string; name: string }> {
-  const sanitizedName = SanitizeAndShortenString(_name); // Sanitize and shorten the name for S3 key
-  const newMainKey = `${_folderPath}${sanitizedName}.webp`;
-  const newThumbKey = `${_folderPath}thumbnails/${sanitizedName}-thumb.webp`;
+  const sanitizedName = SanitizeAndShortenString(s3Data.newName); // Sanitize and shorten the name for S3 key
+  const newMainKey = `${s3Data.s3FolderPath}${sanitizedName}.webp`;
+  const newThumbKey = `${s3Data.s3FolderPath}thumbnails/${sanitizedName}-thumb.webp`;
+  const oldMainKey = s3Data.currentSrc.replace(s3Data.s3url, "");
+  const oldThumbKey = s3Data.currentThumbSrc.replace(s3Data.s3url, "");
 
   try {
+    // Create a copy of the image and thumbnail with the new key then delete the old images
     await s3Client.send(
       new CopyObjectCommand({
-        Bucket: _bucket,
-        CopySource: `${_bucket}/${_oldMainKey}`,
+        Bucket: s3Data.s3Bucket,
+        CopySource: `${s3Data.s3Bucket}/${oldMainKey}`,
         Key: newMainKey,
       })
     );
     await s3Client.send(
       new DeleteObjectCommand({
-        Bucket: _bucket,
-        Key: _oldMainKey,
+        Bucket: s3Data.s3Bucket,
+        Key: oldMainKey,
       })
     );
 
     await s3Client.send(
       new CopyObjectCommand({
-        Bucket: _bucket,
-        CopySource: `${_bucket}/${_oldThumbKey}`,
+        Bucket: s3Data.s3Bucket,
+        CopySource: `${s3Data.s3Bucket}/${oldThumbKey}`,
         Key: newThumbKey,
       })
     );
     await s3Client.send(
       new DeleteObjectCommand({
-        Bucket: _bucket,
-        Key: _oldThumbKey,
+        Bucket: s3Data.s3Bucket,
+        Key: oldThumbKey,
       })
     );
 
     return {
-      src: `${_urlPrefix}${newThumbKey}`,
-      thumbSrc: `${_urlPrefix}${newMainKey}`,
-      name: _name,
+      src: `${s3Data.s3url}${newThumbKey}`,
+      thumbSrc: `${s3Data.s3url}${newMainKey}`,
+      name: s3Data.newName,
     };
   } catch (error) {
     console.log("Error during S3 copy/delete:", error);
-    return { src: _oldSrc, thumbSrc: _oldThumbSrc, name: _oldName }; // Rollback to original src and thumbSrc
-    // Rollback to original name
+    return {
+      src: s3Data.currentSrc,
+      thumbSrc: s3Data.currentThumbSrc,
+      name: s3Data.currentName,
+    };
   }
 }

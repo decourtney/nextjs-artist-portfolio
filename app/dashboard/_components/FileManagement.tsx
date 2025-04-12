@@ -193,7 +193,9 @@ export default function FileManagement({
               <div className="text-sm text-gray-500 flex items-center">
                 {file.metaWidth} × {file.metaHeight}
               </div>
-              <div className="text-tiny text-center text-gray-400">resolution</div>
+              <div className="text-tiny text-center text-gray-400">
+                resolution
+              </div>
             </div>
           </div>
 
@@ -449,14 +451,17 @@ export default function FileManagement({
   };
 
   return (
-    <div className="bg-background-50 p-6 rounded-lg shadow-md">
+    <section
+      id="file-management"
+      className="bg-background-50 p-6 rounded-lg shadow-md"
+    >
       <div className="flex justify-between mb-4 border-b ">
         <h1 className="text-2xl font-bold text-foreground-500 mb-4">
           File Management
         </h1>
         <button
           onClick={handleDelete}
-          className="h-fit px-2 py-1 text-sm text-white bg-red-500 hover:bg-red-600 rounded-md"
+          className="h-fit px-4 py-2  text-sm text-white bg-red-500 hover:bg-red-600 rounded-md"
           style={{ display: selectedIds.length > 0 ? "block" : "none" }}
         >
           Delete Selected
@@ -508,6 +513,6 @@ export default function FileManagement({
         </button>
       </div>
       {renderEditModal()}
-    </div>
+    </section>
   );
 }

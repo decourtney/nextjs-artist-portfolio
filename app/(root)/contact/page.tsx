@@ -27,6 +27,7 @@ export default function ContactPage() {
       <section className="py-20 px-4 relative">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
+
             <div className="grid md:grid-cols-2 gap-16">
               {/* Contact Information */}
               <div>
@@ -39,7 +40,7 @@ export default function ContactPage() {
                       Studio Location
                     </h3>
                     <p className="text-[#475569]">
-                      Nashville, Tennessee
+                      Macon, Georgia
                       <br />
                       United States
                     </p>
@@ -51,7 +52,7 @@ export default function ContactPage() {
                     <p className="text-[#475569]">
                       <a
                         href="mailto:contact@genacourtney.com"
-                        className="group relative inline-block text-[#475569] hover:text-white transition-colors duration-300"
+                        className="group relative inline-block text-[#475569] hover:text-[#3b82f6] transition-colors duration-300"
                       >
                         contact@genacourtney.com
                       </a>
@@ -66,28 +67,25 @@ export default function ContactPage() {
                         href="https://instagram.com"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group relative inline-block text-[#475569] hover:text-white transition-colors duration-300"
+                        className="group relative inline-block text-[#475569] hover:text-[#3b82f6] transition-colors duration-300"
                       >
                         <span className="relative z-10">Instagram</span>
-                        <span className="absolute inset-0 w-full h-full bg-[#3b82f6] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </a>
                       <a
                         href="https://facebook.com"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group relative inline-block text-[#475569] hover:text-white transition-colors duration-300"
+                        className="group relative inline-block text-[#475569] hover:text-[#3b82f6] transition-colors duration-300"
                       >
                         <span className="relative z-10">Facebook</span>
-                        <span className="absolute inset-0 w-full h-full bg-[#3b82f6] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </a>
                       <a
                         href="https://twitter.com"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group relative inline-block text-[#475569] hover:text-white transition-colors duration-300"
+                        className="group relative inline-block text-[#475569] hover:text-[#3b82f6] transition-colors duration-300"
                       >
                         <span className="relative z-10">Twitter</span>
-                        <span className="absolute inset-0 w-full h-full bg-[#3b82f6] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </a>
                     </div>
                   </div>
