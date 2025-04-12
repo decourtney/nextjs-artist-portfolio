@@ -12,7 +12,7 @@ export default function RootLayout({
       {/* Header */}
       <Header />
       {/* Main */}
-      <main>{children}</main>
+      <main className="max-w-[1200px] mx-auto">{children}</main>
       {/* Footer */}
       <footer className="bg-[#2c3e50] text-white py-8">
         <div className="max-w-6xl mx-auto px-4">

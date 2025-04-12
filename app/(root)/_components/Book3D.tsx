@@ -5,7 +5,7 @@ import { Canvas, useFrame, RootState } from "@react-three/fiber";
 import { SoftShadows, Plane, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { easing } from "maath";
-import { BookModel } from "./BookModel";
+import { BookModel } from "../../components/BookModel";
 
 function Backdrop() {
   return (
@@ -44,7 +44,7 @@ export default function Book3D({ title }: { title: string }) {
     <div className="w-full h-[500px]">
       <Canvas
         camera={{
-          position: [0.5, 1.1, 0.5],
+          position: [0.5, 1.1, 0.6],
           fov: 50,
         }}
         shadows
@@ -55,14 +55,13 @@ export default function Book3D({ title }: { title: string }) {
           position={[-1, 3, 3]}
           intensity={1}
           shadow-mapSize={[2048, 2048]}
-          shadow-bias={-0.0001}
+          // shadow-bias={-0.0001}
         >
           <orthographicCamera
             attach="shadow-camera"
             args={[-5, 5, -5, 5, 0.1, 50]}
           />
         </directionalLight>
-        {/* <pointLight position={[2, 3, -2]} intensity={0.1} /> */}
         <Backdrop />
         <BookModel
           rotation={[0, Math.PI / 6, 0]}
@@ -71,11 +70,6 @@ export default function Book3D({ title }: { title: string }) {
             Midnight at 
             Kyrie Eleison Castle`}
         />
-        {/* <OrbitControls
-          enableZoom={false}
-          minPolarAngle={Math.PI / 4}
-          maxPolarAngle={Math.PI / 2}
-        /> */}
       </Canvas>
     </div>
   );

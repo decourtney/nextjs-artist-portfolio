@@ -171,9 +171,9 @@ export async function PATCH(
     const currentArtworkData: CurrentArtworkData = {
       name: artwork.name,
       description: artwork.description,
-      size: artwork.size.label,
-      medium: artwork.medium.label,
-      category: artwork.category.label,
+      size: artwork.size?.label,
+      medium: artwork.medium?.label,
+      category: artwork.category?.label,
       price: artwork.price,
       available: artwork.available,
       src: artwork.src,
@@ -251,10 +251,7 @@ export async function PATCH(
     ) {
       dbUpdateData.price = newArtworkData.price;
     }
-    if (
-      newArtworkData.available &&
-      newArtworkData.available !== currentArtworkData.available
-    ) {
+    if (newArtworkData.available !== currentArtworkData.available) {
       dbUpdateData.available = newArtworkData.available;
     }
 

@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import SectionSeparator from "../_components/SectionSeparator";
 
 export const metadata: Metadata = {
   title: "Contact | Gena Courtney",
@@ -27,7 +28,6 @@ export default function ContactPage() {
       <section className="py-20 px-4 relative">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-
             <div className="grid md:grid-cols-2 gap-16">
               {/* Contact Information */}
               <div>
@@ -179,6 +179,7 @@ export default function ContactPage() {
             </div>
           </div>
         </div>
+        <SectionSeparator />
       </section>
 
       {/* FAQ Section */}
