@@ -123,6 +123,17 @@ const FileUpload = () => {
       onSubmit={handleSubmit}
       className="p-6 shadow-md rounded-lg bg-background-50 text-gray-900"
     >
+      <div className="relative flex justify-between mb-4 border-b">
+        <h1 className="text-2xl font-bold text-foreground-500 mb-4">
+          Upload Image
+        </h1>
+        {selectedFiles.length > 0 ? (
+          <h3 className="px-4 py-2 text-center text-sm font-semibold text-gray-700">
+            <span>{selectedFiles.length} </span>File
+            {selectedFiles.length > 1 ? <span>s</span> : null} Selected
+          </h3>
+        ) : null}
+      </div>
       <input
         id="file-input"
         ref={fileInputRef}
@@ -136,10 +147,6 @@ const FileUpload = () => {
       <div className="min-h-[200px] max-h-[500px] overflow-y-auto rounded-lg bg-white shadow-sm">
         {selectedFiles.length > 0 ? (
           <>
-            <h3 className="px-4 py-2 text-center bg-gray-100 font-semibold text-gray-700">
-              <span>{selectedFiles.length} </span>Selected File
-              {selectedFiles.length > 1 ? <span>s</span> : null}
-            </h3>
             <ul className="[&>*:nth-child(even)]:bg-gray-50 text-gray-900">
               {selectedFiles.map((item, index) => (
                 <li

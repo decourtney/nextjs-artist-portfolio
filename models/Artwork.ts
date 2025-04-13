@@ -14,7 +14,10 @@ export interface ArtworkDocument extends mongoose.Document {
   metaHeight: number;
   category: mongoose.Types.ObjectId;
   price: number;
-  available: boolean;
+  isAvailable: boolean;
+  isMainImage: boolean;
+  isFeatured: boolean;
+  isCategoryImage: boolean;
 }
 
 const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
@@ -62,10 +65,49 @@ const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
     min: [0, "Price cannot be negative"],
     default: 0,
   },
-  available: {
+  isAvailable: {
     type: Boolean,
     default: true,
   },
+  isMainImage: {
+    type: Boolean,
+    default: false,
+  },
+  isFeatured: {
+    type: Boolean,
+    default: false,
+  },
+  isCategoryImage: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+// Pre-save middleware to enforce constraints
+ArtworkSchema.pre('save', async function(next) {
+  const model = this.constructor as mongoose.Model<ArtworkDocument>;
+
+  // Ensure only one home main image
+  if (this.isMainImage) {
+    await model.updateMany(
+      { _id: { $ne: this._id }, isMainImage: true }, 
+      { $set: { isMainImage: false } }
+    );
+  }
+
+  // Limit featured artworks to 3
+  if (this.isFeatured) {
+    const featuredCount = await model.countDocuments({ 
+      _id: { $ne: this._id }, 
+      isFeatured: true 
+    });
+
+    if (featuredCount >= 3) {
+      throw new Error('Maximum of 3 featured artworks allowed');
+    }
+  }
+
+  next();
 });
 
 export default mongoose.models.Artwork ||

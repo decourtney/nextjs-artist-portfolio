@@ -21,7 +21,10 @@ export interface EditableArtwork {
   size: string;
   category: string;
   price: number;
-  available: boolean;
+  isAvailable: boolean;
+  isMainImage: boolean;
+  isFeatured: boolean;
+  isCategoryImage: boolean;
 }
 
 interface AllTags {
@@ -118,7 +121,10 @@ export default function FileManagement({
       size: file.size?.label || "",
       category: file.category?.label || "",
       price: file.price || 0,
-      available: file.available ?? true,
+      isAvailable: file.isAvailable ?? true,
+      isMainImage: file.isMainImage ?? false,
+      isFeatured: file.isFeatured ?? false,
+      isCategoryImage: file.isCategoryImage ?? false,
     });
     setIsModalOpen(true);
   };
@@ -259,6 +265,8 @@ export default function FileManagement({
               Edit
             </button>
           </div>
+
+          <div>Display Icons</div>
         </div>
       </div>
     );
@@ -317,6 +325,7 @@ export default function FileManagement({
               </label>
             </div>
 
+            {/* Tags */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -382,14 +391,14 @@ export default function FileManagement({
               </div>
             </div>
 
+            {/* Price and Availability */}
             <div className="grid grid-cols-2 gap-4">
-              <div>
+              <div className="">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Price
                   <input
                     id="artwork-price"
                     type="number"
-                    // value={editForm.price}
                     placeholder={editForm.price.toString()}
                     onChange={(e) =>
                       setEditForm({
@@ -402,21 +411,75 @@ export default function FileManagement({
                     className="w-full p-2 border rounded-md"
                   />
                 </label>
-              </div>
-
-              <div className="flex items-center">
-                <label className="flex items-center cursor-pointer">
+                <label className="flex ml-2 cursor-pointer">
                   <input
                     id="artwork-available"
                     type="checkbox"
-                    checked={editForm.available}
+                    checked={editForm.isAvailable}
                     onChange={(e) =>
-                      setEditForm({ ...editForm, available: e.target.checked })
+                      setEditForm({
+                        ...editForm,
+                        isAvailable: e.target.checked,
+                      })
                     }
                     className="mr-2"
                   />
                   <span className="text-sm font-medium text-gray-700">
                     Available
+                  </span>
+                </label>
+              </div>
+
+              {/* Radio buttons for Home page, featured, and category images */}
+              <div className="flex flex-col justify-between">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    id="artwork-featured"
+                    type="checkbox"
+                    checked={editForm.isMainImage}
+                    onChange={(e) =>
+                      setEditForm({
+                        ...editForm,
+                        isMainImage: e.target.checked,
+                      })
+                    }
+                    className="mr-2"
+                  />
+                  <span className="text-sm font-medium text-gray-700">
+                    Home Page Image
+                  </span>
+                </label>
+
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    id="artwork-featured"
+                    type="checkbox"
+                    checked={editForm.isFeatured}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, isFeatured: e.target.checked })
+                    }
+                    className="mr-2"
+                  />
+                  <span className="text-sm font-medium text-gray-700">
+                    Featured
+                  </span>
+                </label>
+
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    id="artwork-featured"
+                    type="checkbox"
+                    checked={editForm.isCategoryImage}
+                    onChange={(e) =>
+                      setEditForm({
+                        ...editForm,
+                        isCategoryImage: e.target.checked,
+                      })
+                    }
+                    className="mr-2"
+                  />
+                  <span className="text-sm font-medium text-gray-700">
+                    Category Image
                   </span>
                 </label>
               </div>

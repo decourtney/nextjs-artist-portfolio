@@ -12,7 +12,6 @@ import { SanitizeAndShortenString } from "@/utils/sanitizeAndShortenString";
 import { getServerSession } from "next-auth";
 import { _nextAuthOptions } from "@/auth";
 import { PopulatedArtworkDocument } from "@/models/Artwork";
-import { success } from "@/ColorTheme";
 
 // Create S3 client
 const s3Client = new S3Client({
@@ -120,7 +119,10 @@ type CurrentArtworkData = {
   medium?: string;
   category?: string;
   price: number;
-  available: boolean;
+  isAvailable: boolean;
+  isMainImage: boolean;
+  isFeatured: boolean;
+  isCategoryImage: boolean;
   src: string;
   thumbSrc: string;
 };
@@ -175,7 +177,10 @@ export async function PATCH(
       medium: artwork.medium?.label,
       category: artwork.category?.label,
       price: artwork.price,
-      available: artwork.available,
+      isAvailable: artwork.isAvailable,
+      isMainImage: artwork.isMainImage,
+      isFeatured: artwork.isFeatured,
+      isCategoryImage: artwork.isCategoryImage,
       src: artwork.src,
       thumbSrc: artwork.thumbSrc,
     };
@@ -251,8 +256,20 @@ export async function PATCH(
     ) {
       dbUpdateData.price = newArtworkData.price;
     }
-    if (newArtworkData.available !== currentArtworkData.available) {
-      dbUpdateData.available = newArtworkData.available;
+    if (newArtworkData.isAvailable !== currentArtworkData.isAvailable) {
+      dbUpdateData.isAvailable = newArtworkData.isAvailable;
+    }
+    if (newArtworkData.isMainImage !== currentArtworkData.isMainImage) {
+      dbUpdateData.isMainImage = newArtworkData.isMainImage;
+    }
+    if (newArtworkData.isFeatured !== currentArtworkData.isFeatured) {
+      dbUpdateData.isFeatured = newArtworkData.isFeatured;
+    }
+    if (
+      newArtworkData.isCategoryImage !==
+      currentArtworkData.isCategoryImage
+    ) {
+      dbUpdateData.isCategoryImage = newArtworkData.isCategoryImage;
     }
 
     if (dbUpdateData.name) {
