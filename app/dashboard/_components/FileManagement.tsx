@@ -9,6 +9,11 @@ import {
   IoIosArrowForward,
   IoIosClose,
   IoIosWarning,
+  IoIosCheckmarkCircle,
+  IoIosCloseCircle,
+  IoIosHome,
+  IoIosStar,
+  IoIosImages,
 } from "react-icons/io";
 import Image from "next/image";
 
@@ -266,7 +271,49 @@ export default function FileManagement({
             </button>
           </div>
 
-          <div>Display Icons</div>
+          <div className="flex space-x-2 mt-2">
+            {/* Availability Icon */}
+            {file.isAvailable ? (
+              <IoIosCheckmarkCircle
+                className="text-green-500"
+                title="Available"
+                size={20}
+              />
+            ) : (
+              <IoIosCloseCircle
+                className="text-red-500"
+                title="Unavailable"
+                size={20}
+              />
+            )}
+
+            {/* Main Page Image Icon */}
+            {file.isMainImage && (
+              <IoIosHome
+                className="text-blue-500"
+                title="Home Page Image"
+                size={20}
+              />
+            )}
+
+            {/* Featured Icon */}
+            {file.isFeatured && (
+              <IoIosStar
+                className="text-yellow-500 fill-current"
+                title="Featured"
+                size={20}
+              />
+            )}
+
+            {/* Category Image Icon */}
+            {file.isCategoryImage && (
+              <IoIosImages
+                className="text-purple-500"
+                title="Category Image"
+                size={20}
+              />
+            )}
+          </div>
         </div>
       </div>
     );
@@ -411,61 +458,154 @@ export default function FileManagement({
                     className="w-full p-2 border rounded-md"
                   />
                 </label>
-                <label className="flex ml-2 cursor-pointer">
-                  <input
-                    id="artwork-available"
-                    type="checkbox"
-                    checked={editForm.isAvailable}
-                    onChange={(e) =>
-                      setEditForm({
-                        ...editForm,
-                        isAvailable: e.target.checked,
-                      })
-                    }
-                    className="mr-2"
-                  />
-                  <span className="text-sm font-medium text-gray-700">
-                    Available
-                  </span>
-                </label>
+                <div
+                  className={`ml-2 cursor-pointer ${
+                    editForm.isAvailable ? "text-blue-500" : "text-gray-300"
+                  }`}
+                  onClick={(e) =>
+                    setEditForm({
+                      ...editForm,
+                      isAvailable: !editForm.isAvailable,
+                    })
+                  }
+                >
+                  {editForm.isAvailable ? (
+                    <div className="flex flex-row items-center space-x-2">
+                      <IoIosCheckmarkCircle
+                        className="text-green-500"
+                        title="Available"
+                        size={20}
+                      />
+                      <span className="text-sm font-medium text-gray-700">
+                        Available
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-row items-center space-x-2">
+                      <IoIosCloseCircle
+                        className="text-red-500"
+                        title="Unavailable"
+                        size={20}
+                      />
+                      <span className="text-sm font-medium text-gray-700">
+                        Unavailable
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Radio buttons for Home page, featured, and category images */}
               <div className="flex flex-col justify-between">
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    id="artwork-featured"
-                    type="checkbox"
-                    checked={editForm.isMainImage}
-                    onChange={(e) =>
-                      setEditForm({
-                        ...editForm,
-                        isMainImage: e.target.checked,
-                      })
-                    }
-                    className="mr-2"
-                  />
-                  <span className="text-sm font-medium text-gray-700">
-                    Home Page Image
-                  </span>
-                </label>
+                <div
+                  className={`cursor-pointer ${
+                    editForm.isMainImage ? "text-blue-500" : "text-gray-300"
+                  }`}
+                  onClick={(e) =>
+                    setEditForm({
+                      ...editForm,
+                      isMainImage: !editForm.isMainImage,
+                    })
+                  }
+                >
+                  {editForm.isMainImage ? (
+                    <div className="flex flex-row items-center space-x-2">
+                      <IoIosHome
+                        className="text-blue-500"
+                        title="Home Page Image"
+                        size={20}
+                      />
+                      <span className="text-sm font-medium text-gray-700">
+                        Home Page Image
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="group flex flex-row items-center space-x-2">
+                      <IoIosHome
+                        className="text-gray-300 group-hover:text-blue-300"
+                        title="Home Page Image"
+                        size={20}
+                      />
+                      <span className="text-sm font-medium text-gray-300 group-hover:text-blue-300">
+                        Home Page Image
+                      </span>
+                    </div>
+                  )}
+                </div>
 
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    id="artwork-featured"
-                    type="checkbox"
-                    checked={editForm.isFeatured}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, isFeatured: e.target.checked })
-                    }
-                    className="mr-2"
-                  />
-                  <span className="text-sm font-medium text-gray-700">
-                    Featured
-                  </span>
-                </label>
+                <div
+                  className={`cursor-pointer ${
+                    editForm.isFeatured ? "text-blue-500" : "text-gray-300"
+                  }`}
+                  onClick={(e) =>
+                    setEditForm({
+                      ...editForm,
+                      isFeatured: !editForm.isFeatured,
+                    })
+                  }
+                >
+                  {editForm.isFeatured ? (
+                    <div className="flex flex-row items-center space-x-2">
+                      <IoIosStar
+                        className="text-yellow-500 fill-current"
+                        title="Featured"
+                        size={20}
+                      />
+                      <span className="text-sm font-medium text-gray-700">
+                        Featured Image
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="group flex flex-row items-center space-x-2">
+                      <IoIosStar
+                        className="text-gray-300 group-hover:text-blue-300 fill-current"
+                        title="Featured"
+                        size={20}
+                      />
+                      <span className="text-sm font-medium text-gray-300 group-hover:text-blue-300">
+                        Featured Image
+                      </span>
+                    </div>
+                  )}
+                </div>
 
-                <label className="flex items-center cursor-pointer">
+                <div
+                  className={`cursor-pointer ${
+                    editForm.isCategoryImage ? "text-blue-500" : "text-gray-300"
+                  }`}
+                  onClick={(e) =>
+                    setEditForm({
+                      ...editForm,
+                      isCategoryImage: !editForm.isCategoryImage,
+                    })
+                  }
+                >
+                  {editForm.isCategoryImage ? (
+                    <div className="flex flex-row items-center space-x-2">
+                      <IoIosImages
+                        className="text-purple-500"
+                        title="Category Image"
+                        size={20}
+                      />
+                      <span className="text-sm font-medium text-gray-700">
+                        Category Image
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="group flex flex-row items-center space-x-2">
+                      <IoIosImages
+                        className="text-gray-300 group-hover:text-blue-300"
+                        title="Category Image"
+                        size={20}
+                      />
+                      <span className="text-sm font-medium text-gray-300 group-hover:text-blue-300">
+                        Category Image
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* <label className="flex items-center cursor-pointer space-x-2">
                   <input
                     id="artwork-featured"
                     type="checkbox"
@@ -476,12 +616,16 @@ export default function FileManagement({
                         isCategoryImage: e.target.checked,
                       })
                     }
-                    className="mr-2"
+                  />
+                  <IoIosImages
+                    className="text-purple-500"
+                    title="Category Image"
+                    size={20}
                   />
                   <span className="text-sm font-medium text-gray-700">
                     Category Image
                   </span>
-                </label>
+                </label> */}
               </div>
             </div>
           </div>
