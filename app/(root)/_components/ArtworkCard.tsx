@@ -29,7 +29,7 @@ const ArtworkCard = ({ artwork }: ArtworkCardProps) => {
         <div className="flex justify-between mb-2 px-4 py-1 text-sm">
           <p>{artwork.size?.label}</p>
           <p>
-            {artwork.available && artwork.price > 0
+            {artwork.isAvailable && artwork.price > 0
               ? `$${artwork.price.toFixed(2)}`
               : "Unavailable"}
           </p>

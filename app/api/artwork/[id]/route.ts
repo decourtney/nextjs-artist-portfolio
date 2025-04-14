@@ -265,10 +265,7 @@ export async function PATCH(
     if (newArtworkData.isFeatured !== currentArtworkData.isFeatured) {
       dbUpdateData.isFeatured = newArtworkData.isFeatured;
     }
-    if (
-      newArtworkData.isCategoryImage !==
-      currentArtworkData.isCategoryImage
-    ) {
+    if (newArtworkData.isCategoryImage !== currentArtworkData.isCategoryImage) {
       dbUpdateData.isCategoryImage = newArtworkData.isCategoryImage;
     }
 
@@ -293,6 +290,8 @@ export async function PATCH(
       if (Object.keys(dbUpdateData).length > 0) {
         await Artwork.updateOne({ _id: artwork._id }, { $set: dbUpdateData });
       }
+
+      artwork.save();
     } catch (error) {
       console.error("Error updating artwork in database:", error);
       return NextResponse.json(
@@ -308,19 +307,6 @@ export async function PATCH(
   }
 }
 
-async function performAtomicUpdate(
-  id: string,
-  newArtworkData: EditableArtwork,
-  originalArtwork: PopulatedArtworkDocument,
-  orignalS3Keys: { mainKey: string; thumbKey: string }
-) {
-  try {
-  } catch (atomicUpdateError) {
-    console.log("Atomic update error:", atomicUpdateError);
-  }
-}
-
-// FIX THIS!!!! dont know why im not using an object here. turn this into an object to unfuck these variable names
 async function updateS3(
   s3Data: S3dbUpdateData
 ): Promise<{ src: string; thumbSrc: string; name: string }> {

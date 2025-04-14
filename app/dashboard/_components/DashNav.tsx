@@ -18,7 +18,7 @@ const DashNav = () => {
 
           <div className="m-4 space-x-4">
             {hashPaths.map((path) => (
-              <HashNavButton params={path} />
+              <HashNavButton key={path} params={path} />
             ))}
           </div>
 

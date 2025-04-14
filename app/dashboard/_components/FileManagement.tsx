@@ -136,7 +136,6 @@ export default function FileManagement({
 
   const handleSubmitEdit = async () => {
     if (!editingFile || !editForm) return;
-    console.log(editForm);
     setIsSubmitting(true);
     setError(null);
 
@@ -319,6 +318,7 @@ export default function FileManagement({
     );
   };
 
+  // MODAL
   const renderEditModal = () => {
     if (!isModalOpen || !editForm) return null;
 

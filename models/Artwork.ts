@@ -84,26 +84,28 @@ const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
 });
 
 // Pre-save middleware to enforce constraints
-ArtworkSchema.pre('save', async function(next) {
+ArtworkSchema.pre("save", async function (next) {
   const model = this.constructor as mongoose.Model<ArtworkDocument>;
 
   // Ensure only one home main image
   if (this.isMainImage) {
+    console.log("CHANGING MAIN IMAGE:", this);
     await model.updateMany(
-      { _id: { $ne: this._id }, isMainImage: true }, 
+      { _id: { $ne: this._id }, isMainImage: true },
       { $set: { isMainImage: false } }
     );
   }
 
   // Limit featured artworks to 3
   if (this.isFeatured) {
-    const featuredCount = await model.countDocuments({ 
-      _id: { $ne: this._id }, 
-      isFeatured: true 
+    console.log("CHANGING FEATURED:", this);
+    const featuredCount = await model.countDocuments({
+      _id: { $ne: this._id },
+      isFeatured: true,
     });
 
     if (featuredCount >= 3) {
-      throw new Error('Maximum of 3 featured artworks allowed');
+      throw new Error("Maximum of 3 featured artworks allowed");
     }
   }
 

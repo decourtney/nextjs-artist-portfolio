@@ -10,7 +10,7 @@ interface HashNavButtonProps {
 
 const HashNavButton = ({params}:HashNavButtonProps) => {
   const path = usePathname();
-  console.log(path, params);
+  
   return (
     <Link
       href={`${path}/#${params}`}
