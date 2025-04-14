@@ -89,7 +89,6 @@ ArtworkSchema.pre("save", async function (next) {
 
   // Ensure only one home main image
   if (this.isMainImage) {
-    console.log("CHANGING MAIN IMAGE:", this);
     await model.updateMany(
       { _id: { $ne: this._id }, isMainImage: true },
       { $set: { isMainImage: false } }
@@ -98,7 +97,6 @@ ArtworkSchema.pre("save", async function (next) {
 
   // Limit featured artworks to 3
   if (this.isFeatured) {
-    console.log("CHANGING FEATURED:", this);
     const featuredCount = await model.countDocuments({
       _id: { $ne: this._id },
       isFeatured: true,

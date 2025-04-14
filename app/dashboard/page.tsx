@@ -34,7 +34,7 @@ export default async function DashboardPage({
       Tag.find({}).lean().maxTimeMS(10000),
     ]);
 
-    const files: PopulatedArtworkDocument[] = JSON.parse(
+    const artworkDocuments: PopulatedArtworkDocument[] = JSON.parse(
       JSON.stringify(artworkResponse)
     );
     const tags: TagDocument[] = JSON.parse(JSON.stringify(tagsResponse));
@@ -52,7 +52,7 @@ export default async function DashboardPage({
         <div className="space-y-8">
           <ProfileManagement />
           <FileManagement
-            files={files}
+            files={artworkDocuments}
             tags={allTags}
             currentPage={page}
             totalPages={totalCount}

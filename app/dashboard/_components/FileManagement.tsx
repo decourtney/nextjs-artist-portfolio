@@ -16,6 +16,7 @@ import {
   IoIosImages,
 } from "react-icons/io";
 import Image from "next/image";
+import FileItem from "./FileItem";
 
 // Define a type for the editable fields.
 export interface EditableArtwork {
@@ -49,6 +50,7 @@ export default function FileManagement({
   totalPages: number;
 }) {
   const router = useRouter();
+  const [filesState, setFilesState] = useState<PopulatedArtworkDocument[]>(files)
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [editingDoc, setEditingDoc] = useState<PopulatedArtworkDocument | null>(
     null
@@ -83,7 +85,7 @@ export default function FileManagement({
 
   // Global Select All
   const handleSelectAll = (isSelected: boolean) => {
-    setSelectedIds(isSelected ? files.map((file) => file._id) : []);
+    setSelectedIds(isSelected ? filesState.map((file) => file._id) : []);
   };
 
   // Delete selected items (calls your API DELETE route)
@@ -145,6 +147,15 @@ export default function FileManagement({
         throw new Error(data.message || "Failed to update artwork");
       }
 
+      const updatedFile = await response.json();
+
+      // Update the filesState by replacing the old file with the updated one
+      setFilesState((prevFiles) =>
+        prevFiles.map((file) =>
+          file._id === updatedFile._id ? updatedFile : file
+        )
+      );
+
       closeEditModal();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -160,163 +171,6 @@ export default function FileManagement({
     setError(null);
   };
 
-  // Render a single file item with a checkbox, thumbnail, and an edit button.
-  const renderFileItem = (file: PopulatedArtworkDocument) => {
-    const isChecked = selectedIds.includes(file._id);
-    return (
-      <div
-        className={`
-        flex items-center p-4 border rounded-lg transition-all duration-200
-        ${isChecked ? "bg-blue-50 border-blue-200" : "bg-white border-gray-200"}
-        hover:shadow-md
-      `}
-      >
-        {/* Checkbox */}
-        <input
-          id={`checkbox-${file._id}`}
-          type="checkbox"
-          className="mr-4 focus:ring-blue-500"
-          checked={isChecked}
-          onChange={(e) => handleSelectItem(file._id, e.target.checked)}
-        />
-
-        {/* Thumbnail */}
-        <div className="w-32 h-32 mr-4 flex-shrink-0 relative">
-          <Image
-            src={file.thumbSrc}
-            alt={file.name}
-            fill
-            sizes="100%"
-            className="object-cover rounded-md shadow-sm"
-          />
-        </div>
-
-        {/* File Details */}
-        <div className="flex-grow min-w-0">
-          <div className="flex justify-between items-start mb-2">
-            <h3 className="text-lg font-semibold truncate max-w-[70%]">
-              {file.name}
-            </h3>
-            <div>
-              <div className="text-sm text-gray-500 flex items-center">
-                {file.metaWidth} × {file.metaHeight}
-              </div>
-              <div className="text-tiny text-center text-gray-400">
-                resolution
-              </div>
-            </div>
-          </div>
-
-          {/* Metadata Tags */}
-          <div className="flex flex-wrap gap-2 mb-2">
-            {file.category ? (
-              <span className="px-2 py-1 bg-gray-100 text-xs rounded-full">
-                {file.category.label || "Uncategorized"}
-              </span>
-            ) : (
-              <div className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full flex items-center">
-                <IoIosWarning className="mr-1" />
-                Uncategorized
-              </div>
-            )}
-            {file.medium ? (
-              <span className="px-2 py-1 bg-gray-100 text-xs rounded-full">
-                {file.medium.label || "Unknown Medium"}
-              </span>
-            ) : (
-              <div className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full flex items-center">
-                <IoIosWarning className="mr-1" />
-                Unknown Medium
-              </div>
-            )}
-            {file.size ? (
-              <span className="px-2 py-1 bg-gray-100 text-xs rounded-full">
-                {file.size.label || "Unknown Size"}
-              </span>
-            ) : (
-              <div className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full flex items-center">
-                <IoIosWarning className="mr-1" />
-                Unknown Size
-              </div>
-            )}
-          </div>
-
-          {/* Actions */}
-          <div className="flex justify-between items-center">
-            <div className="text-sm text-gray-600">
-              {file.price > 0 ? `$${file.price.toFixed(2)}` : "Not for sale"}
-            </div>
-
-            {!file.description && (
-              <div className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full flex items-center">
-                <IoIosWarning className="mr-1" />
-                No Description
-              </div>
-            )}
-
-            <button
-              onClick={() => handleEdit(file)}
-              className="
-              px-3 py-1 text-sm 
-              bg-blue-500 text-white 
-              rounded-md 
-              hover:bg-blue-600 
-              transition-colors
-            "
-            >
-              Edit
-            </button>
-          </div>
-
-          <div className="flex space-x-2 mt-2">
-            {/* Availability Icon */}
-            {file.isAvailable ? (
-              <IoIosCheckmarkCircle
-                className="text-green-500"
-                title="Available"
-                size={20}
-              />
-            ) : (
-              <IoIosCloseCircle
-                className="text-red-500"
-                title="Unavailable"
-                size={20}
-              />
-            )}
-
-            {/* Main Page Image Icon */}
-            {file.isMainImage && (
-              <IoIosHome
-                className="text-blue-500"
-                title="Home Page Image"
-                size={20}
-              />
-            )}
-
-            {/* Featured Icon */}
-            {file.isFeatured && (
-              <IoIosStar
-                className="text-yellow-500 fill-current"
-                title="Featured"
-                size={20}
-              />
-            )}
-
-            {/* Category Image Icon */}
-            {file.isCategoryImage && (
-              <IoIosImages
-                className="text-purple-500"
-                title="Category Image"
-                size={20}
-              />
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // MODAL
   const renderEditModal = () => {
     if (!isModalOpen || !editForm) return null;
 
@@ -656,15 +510,22 @@ export default function FileManagement({
           id="select-all"
           type="checkbox"
           className="mr-2"
-          checked={selectedIds.length === files.length && files.length > 0}
+          checked={
+            selectedIds.length === filesState.length && filesState.length > 0
+          }
           onChange={(e) => handleSelectAll(e.target.checked)}
         />
         <span>Select All</span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        {files.map((file) => (
-          <div key={file._id}>{renderFileItem(file)}</div>
+        {filesState.map((file) => (
+          <FileItem
+            key={file._id}
+            file={file}
+            handleSelectItem={handleSelectItem}
+            handleEdit={handleEdit}
+          />
         ))}
       </div>
 

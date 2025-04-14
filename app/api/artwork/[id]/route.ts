@@ -220,7 +220,14 @@ export async function PATCH(
     }
 
     const updatedArtwork = await artwork.save();
-    return NextResponse.json({ message: "Artwork updated successfully" });
+    const populatedArtwork = await updatedArtwork.populate(
+      "category medium size"
+    );
+
+    return NextResponse.json(populatedArtwork, {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
     console.error("Error updating artwork:", error);
     return NextResponse.json({ message: "Server error" }, { status: 500 });
