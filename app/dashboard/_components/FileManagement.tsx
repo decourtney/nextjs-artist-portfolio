@@ -21,7 +21,6 @@ import Image from "next/image";
 export interface EditableArtwork {
   name: string;
   description: string;
-  thumbSrc: string;
   medium: string;
   size: string;
   category: string;
@@ -51,8 +50,9 @@ export default function FileManagement({
 }) {
   const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [editingFile, setEditingFile] =
-    useState<PopulatedArtworkDocument | null>(null);
+  const [editingDoc, setEditingDoc] = useState<PopulatedArtworkDocument | null>(
+    null
+  );
   const [editForm, setEditForm] = useState<EditableArtwork | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -102,30 +102,22 @@ export default function FileManagement({
       if (!res.ok) {
         console.error("Batch delete failed", await res.json());
       } else {
-        router.refresh();
+        // router.refresh();
       }
     } catch (error) {
       console.error("Error deleting files", error);
     }
   };
 
-  const closeEditModal = () => {
-    setIsModalOpen(false);
-    setEditingFile(null);
-    setEditForm(null);
-    setError(null);
-  };
-
   const handleEdit = (file: PopulatedArtworkDocument) => {
-    setEditingFile(file);
+    setEditingDoc(file);
     setEditForm({
       name: file.name,
-      description: file.description || "",
-      thumbSrc: file.thumbSrc,
-      medium: file.medium?.label || "",
-      size: file.size?.label || "",
-      category: file.category?.label || "",
-      price: file.price || 0,
+      description: file.description ?? undefined,
+      medium: file.medium?.label ?? undefined,
+      size: file.size?.label ?? undefined,
+      category: file.category?.label ?? undefined,
+      price: file.price ?? undefined,
       isAvailable: file.isAvailable ?? true,
       isMainImage: file.isMainImage ?? false,
       isFeatured: file.isFeatured ?? false,
@@ -135,12 +127,12 @@ export default function FileManagement({
   };
 
   const handleSubmitEdit = async () => {
-    if (!editingFile || !editForm) return;
+    if (!editingDoc || !editForm) return;
     setIsSubmitting(true);
     setError(null);
 
     try {
-      const response = await fetch(`/api/artwork/${editingFile._id}`, {
+      const response = await fetch(`/api/artwork/${editingDoc._id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -154,12 +146,18 @@ export default function FileManagement({
       }
 
       closeEditModal();
-      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const closeEditModal = () => {
+    setIsModalOpen(false);
+    setEditingDoc(null);
+    setEditForm(null);
+    setError(null);
   };
 
   // Render a single file item with a checkbox, thumbnail, and an edit button.
@@ -604,28 +602,6 @@ export default function FileManagement({
                     </div>
                   )}
                 </div>
-
-                {/* <label className="flex items-center cursor-pointer space-x-2">
-                  <input
-                    id="artwork-featured"
-                    type="checkbox"
-                    checked={editForm.isCategoryImage}
-                    onChange={(e) =>
-                      setEditForm({
-                        ...editForm,
-                        isCategoryImage: e.target.checked,
-                      })
-                    }
-                  />
-                  <IoIosImages
-                    className="text-purple-500"
-                    title="Category Image"
-                    size={20}
-                  />
-                  <span className="text-sm font-medium text-gray-700">
-                    Category Image
-                  </span>
-                </label> */}
               </div>
             </div>
           </div>

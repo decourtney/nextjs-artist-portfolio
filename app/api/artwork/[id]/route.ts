@@ -185,93 +185,26 @@ export async function PATCH(
       thumbSrc: artwork.thumbSrc,
     };
 
-    // Changes for database if present
-    const dbUpdateData: Partial<ArtworkDocument> = {};
+    const { category, medium, size, ...restData } = newArtworkData;
 
-    // Populate dbUpdateData with changed fields
-    if (
-      newArtworkData.name &&
-      newArtworkData.name !== currentArtworkData.name
-    ) {
-      dbUpdateData.name = newArtworkData.name;
-    }
+    const [categoryTag, sizeTag, mediumTag] = await Promise.all([
+      category ? Tag.findOne({ label: category, type: "category" }) : null,
+      size ? Tag.findOne({ label: size, type: "size" }) : null,
+      medium ? Tag.findOne({ label: medium, type: "medium" }) : null,
+    ]);
 
-    if (
-      newArtworkData.description &&
-      newArtworkData.description !== currentArtworkData.description
-    ) {
-      dbUpdateData.description = newArtworkData.description;
-    }
-    if (
-      newArtworkData.size &&
-      newArtworkData.size !== currentArtworkData.size
-    ) {
-      const tag = await Tag.findOne({
-        label: newArtworkData.size,
-        type: "size",
-      });
-      if (!tag) {
-        return NextResponse.json(
-          { message: "Size not found" },
-          { status: 404 }
-        );
-      }
-      dbUpdateData.size = tag._id;
-    }
-    if (
-      newArtworkData.medium &&
-      newArtworkData.medium !== currentArtworkData.medium
-    ) {
-      const tag = await Tag.findOne({
-        label: newArtworkData.medium,
-        type: "medium",
-      });
-      if (!tag) {
-        return NextResponse.json(
-          { message: "Medium not found" },
-          { status: 404 }
-        );
-      }
-      dbUpdateData.medium = tag._id;
-    }
-    if (
-      newArtworkData.category &&
-      newArtworkData.category !== currentArtworkData.category
-    ) {
-      const tag = await Tag.findOne({
-        label: newArtworkData.category,
-        type: "category",
-      });
-      if (!tag) {
-        return NextResponse.json(
-          { message: "Category not found" },
-          { status: 404 }
-        );
-      }
-      dbUpdateData.category = tag._id;
-    }
-    if (
-      newArtworkData.price &&
-      newArtworkData.price !== currentArtworkData.price
-    ) {
-      dbUpdateData.price = newArtworkData.price;
-    }
-    if (newArtworkData.isAvailable !== currentArtworkData.isAvailable) {
-      dbUpdateData.isAvailable = newArtworkData.isAvailable;
-    }
-    if (newArtworkData.isMainImage !== currentArtworkData.isMainImage) {
-      dbUpdateData.isMainImage = newArtworkData.isMainImage;
-    }
-    if (newArtworkData.isFeatured !== currentArtworkData.isFeatured) {
-      dbUpdateData.isFeatured = newArtworkData.isFeatured;
-    }
-    if (newArtworkData.isCategoryImage !== currentArtworkData.isCategoryImage) {
-      dbUpdateData.isCategoryImage = newArtworkData.isCategoryImage;
-    }
+    Object.assign(artwork, {
+      ...restData,
+      ...(categoryTag && { category: categoryTag._id }),
+      ...(sizeTag && { size: sizeTag._id }),
+      ...(mediumTag && { medium: mediumTag._id }),
+    });
 
-    if (dbUpdateData.name) {
+    // if (category && !categoryTag) throw new Error("Invalid category name");
+
+    if (newArtworkData.name !== currentArtworkData.name) {
       const s3UpdateResult = await updateS3({
-        newName: dbUpdateData.name,
+        newName: newArtworkData.name,
         s3FolderPath: folderPath,
         s3Bucket: bucket,
         s3url: urlPrefix,
@@ -280,26 +213,13 @@ export async function PATCH(
         currentThumbSrc: currentArtworkData.thumbSrc,
       });
 
-      // Update dbUpdateData with the S3 update results
-      dbUpdateData.src = s3UpdateResult.src;
-      dbUpdateData.thumbSrc = s3UpdateResult.thumbSrc;
-      dbUpdateData.name = s3UpdateResult.name;
+      // Update artwork with the S3 update results
+      artwork.src = s3UpdateResult.src;
+      artwork.thumbSrc = s3UpdateResult.thumbSrc;
+      artwork.name = s3UpdateResult.name;
     }
 
-    try {
-      if (Object.keys(dbUpdateData).length > 0) {
-        await Artwork.updateOne({ _id: artwork._id }, { $set: dbUpdateData });
-      }
-
-      artwork.save();
-    } catch (error) {
-      console.error("Error updating artwork in database:", error);
-      return NextResponse.json(
-        { success: false, message: "Failed to update artwork" },
-        { status: 500 }
-      );
-    }
-
+    const updatedArtwork = await artwork.save();
     return NextResponse.json({ message: "Artwork updated successfully" });
   } catch (error) {
     console.error("Error updating artwork:", error);
@@ -353,6 +273,7 @@ async function updateS3(
     };
   } catch (error) {
     console.log("Error during S3 copy/delete:", error);
+    // return old name so doc and file stay sync
     return {
       src: s3Data.currentSrc,
       thumbSrc: s3Data.currentThumbSrc,
