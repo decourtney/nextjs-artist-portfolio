@@ -12,7 +12,6 @@ import { SanitizeAndShortenString } from "@/utils/sanitizeAndShortenString";
 import { getServerSession } from "next-auth";
 import { _nextAuthOptions } from "@/auth";
 import { PopulatedArtworkDocument } from "@/models/Artwork";
-import { success } from "@/ColorTheme";
 
 // Create S3 client
 const s3Client = new S3Client({
@@ -103,6 +102,31 @@ export async function DELETE(
   }
 }
 
+type S3dbUpdateData = {
+  newName: string;
+  s3FolderPath: string;
+  s3Bucket: string;
+  s3url: string;
+  currentName: string;
+  currentSrc: string;
+  currentThumbSrc: string;
+};
+
+type CurrentArtworkData = {
+  name: string;
+  description?: string;
+  size?: string;
+  medium?: string;
+  category?: string;
+  price: number;
+  isAvailable: boolean;
+  isMainImage: boolean;
+  isFeatured: boolean;
+  isCategoryImage: boolean;
+  src: string;
+  thumbSrc: string;
+};
+
 // Some resilience logic to handle S3 errors and rollback if necessary
 export async function PATCH(
   request: NextRequest,
@@ -120,9 +144,16 @@ export async function PATCH(
 
     await dbConnect();
     const { id } = await params;
+
     // Parse the incoming JSON payload containing the updated artwork fields.
     // Expected keys: name, description, size, medium, categories (array of category names), etc.
-    const updatedFields: EditableArtwork = await request.json();
+    const newArtworkData: EditableArtwork = await request.json();
+    if (!newArtworkData) {
+      return NextResponse.json(
+        { message: "No updated fields provided" },
+        { status: 400 }
+      );
+    }
 
     // Retrieve the artwork document by ID
     const artwork = (await Artwork.findById(id)) as PopulatedArtworkDocument;
@@ -133,171 +164,127 @@ export async function PATCH(
       );
     }
 
-    // Setup S3 details
+    // S3 details
     const bucket = process.env.NEXT_PUBLIC_AWS_S3_BUCKET!;
     const region = process.env.NEXT_PUBLIC_AWS_REGION!;
     const folderPath = process.env.NEXT_PUBLIC_AWS_IMAGES_FOLDER || "";
     const urlPrefix = `https://${bucket}.s3.${region}.amazonaws.com/`;
 
-    const oldName = artwork.name;
-    const oldDescription = artwork.description;
-    const oldSize = artwork.size?.label;
-    const oldMedium = artwork.medium?.label;
-    const oldCategory = artwork.category?.label;
-    const oldPrice = artwork.price;
-    const oldAvailable = artwork.available;
-    const oldSrc = artwork.src;
-    const oldThumbSrc = artwork.thumbSrc;
+    const currentArtworkData: CurrentArtworkData = {
+      name: artwork.name,
+      description: artwork.description,
+      size: artwork.size?.label,
+      medium: artwork.medium?.label,
+      category: artwork.category?.label,
+      price: artwork.price,
+      isAvailable: artwork.isAvailable,
+      isMainImage: artwork.isMainImage,
+      isFeatured: artwork.isFeatured,
+      isCategoryImage: artwork.isCategoryImage,
+      src: artwork.src,
+      thumbSrc: artwork.thumbSrc,
+    };
 
-    // Determine current S3 keys based on stored URLs
-    const oldMainKey = oldSrc.replace(urlPrefix, "");
-    const oldThumbKey = oldThumbSrc.replace(urlPrefix, "");
+    const { category, medium, size, ...restData } = newArtworkData;
 
-    // Used to track any changes to be applied to the artwork document
-    const updateData: Partial<ArtworkDocument> = {};
+    const [categoryTag, sizeTag, mediumTag] = await Promise.all([
+      category ? Tag.findOne({ label: category, type: "category" }) : null,
+      size ? Tag.findOne({ label: size, type: "size" }) : null,
+      medium ? Tag.findOne({ label: medium, type: "medium" }) : null,
+    ]);
 
-    // Populate updateData with changed and sanitized fields
-    if (updatedFields.name && updatedFields.name !== oldName) {
-      updateData.name = updatedFields.name;
-    }
+    Object.assign(artwork, {
+      ...restData,
+      ...(categoryTag && { category: categoryTag._id }),
+      ...(sizeTag && { size: sizeTag._id }),
+      ...(mediumTag && { medium: mediumTag._id }),
+    });
 
-    if (
-      updatedFields.description &&
-      updatedFields.description !== oldDescription
-    ) {
-      updateData.description = updatedFields.description;
-    }
-    if (updatedFields.size && updatedFields.size !== oldSize) {
-      const tag = await Tag.findOne({
-        label: updatedFields.size,
-        type: "size",
+    // if (category && !categoryTag) throw new Error("Invalid category name");
+
+    if (newArtworkData.name !== currentArtworkData.name) {
+      const s3UpdateResult = await updateS3({
+        newName: newArtworkData.name,
+        s3FolderPath: folderPath,
+        s3Bucket: bucket,
+        s3url: urlPrefix,
+        currentName: currentArtworkData.name,
+        currentSrc: currentArtworkData.src,
+        currentThumbSrc: currentArtworkData.thumbSrc,
       });
-      if (!tag) {
-        return NextResponse.json(
-          { message: "Size not found" },
-          { status: 404 }
-        );
-      }
-      updateData.size = tag._id;
-    }
-    if (updatedFields.medium && updatedFields.medium !== oldMedium) {
-      console.log("MEDIUM:", updatedFields.medium, oldMedium);
-      const tag = await Tag.findOne({
-        label: updatedFields.medium,
-        type: "medium",
-      });
-      if (!tag) {
-        return NextResponse.json(
-          { message: "Medium not found" },
-          { status: 404 }
-        );
-      }
-      updateData.medium = tag._id;
-    }
-    if (updatedFields.category && updatedFields.category !== oldCategory) {
-      const tag = await Tag.findOne({
-        label: updatedFields.category,
-        type: "category",
-      });
-      if (!tag) {
-        return NextResponse.json(
-          { message: "Category not found" },
-          { status: 404 }
-        );
-      }
-      updateData.category = tag._id;
-    }
-    if (updatedFields.price && updatedFields.price !== oldPrice) {
-      updateData.price = updatedFields.price;
-    }
-    if (updatedFields.available && updatedFields.available !== oldAvailable) {
-      updateData.available = updatedFields.available;
+
+      // Update artwork with the S3 update results
+      artwork.src = s3UpdateResult.src;
+      artwork.thumbSrc = s3UpdateResult.thumbSrc;
+      artwork.name = s3UpdateResult.name;
     }
 
-    try {
-      if (Object.keys(updateData).length > 0) {
-        await Artwork.updateOne({ _id: artwork._id }, { $set: updateData });
-      }
-    } catch (error) {
-      return NextResponse.json(
-        { success: false, message: "Failed to update artwork" },
-        { status: 500 }
-      );
-    }
+    const updatedArtwork = await artwork.save();
+    const populatedArtwork = await updatedArtwork.populate(
+      "category medium size"
+    );
 
-    if (updateData.name) {
-      const sanitizedName = SanitizeAndShortenString(updateData.name); // Sanitize and shorten the name for S3 key
-      const newMainKey = `${folderPath}${sanitizedName}.webp`;
-      const newThumbKey = `${folderPath}thumbnails/${sanitizedName}-thumb.webp`;
-
-      try {
-        if (newMainKey !== oldMainKey) {
-          await s3Client.send(
-            new CopyObjectCommand({
-              Bucket: bucket,
-              CopySource: `${bucket}/${oldMainKey}`,
-              Key: newMainKey,
-            })
-          );
-          await s3Client.send(
-            new DeleteObjectCommand({
-              Bucket: bucket,
-              Key: oldMainKey,
-            })
-          );
-          updateData.src = `${urlPrefix}${newMainKey}`;
-        }
-
-        if (newThumbKey !== oldThumbKey) {
-          await s3Client.send(
-            new CopyObjectCommand({
-              Bucket: bucket,
-              CopySource: `${bucket}/${oldThumbKey}`,
-              Key: newThumbKey,
-            })
-          );
-          await s3Client.send(
-            new DeleteObjectCommand({
-              Bucket: bucket,
-              Key: oldThumbKey,
-            })
-          );
-          updateData.thumbSrc = `${urlPrefix}${newThumbKey}`;
-        }
-      } catch (error) {
-        await Artwork.updateOne({ _id: artwork._id }, { name: oldName });
-        return NextResponse.json({
-          success: false,
-          message: "Failed to update image name.",
-        });
-      }
-    }
-
-    return NextResponse.json({ message: "Artwork updated successfully" });
+    return NextResponse.json(populatedArtwork, {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
     console.error("Error updating artwork:", error);
     return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
 
-async function performAtomicUpdate(
-  id: string,
-  updatedFields: EditableArtwork,
-  originalArtwork: PopulatedArtworkDocument,
-  orignalS3Keys: { mainKey: string; thumbKey: string }
-) {
-  try {
-  } catch (atomicUpdateError) {
-    console.log("Atomic update error:", atomicUpdateError);
-  }
-}
+async function updateS3(
+  s3Data: S3dbUpdateData
+): Promise<{ src: string; thumbSrc: string; name: string }> {
+  const sanitizedName = SanitizeAndShortenString(s3Data.newName); // Sanitize and shorten the name for S3 key
+  const newMainKey = `${s3Data.s3FolderPath}${sanitizedName}.webp`;
+  const newThumbKey = `${s3Data.s3FolderPath}thumbnails/${sanitizedName}-thumb.webp`;
+  const oldMainKey = s3Data.currentSrc.replace(s3Data.s3url, "");
+  const oldThumbKey = s3Data.currentThumbSrc.replace(s3Data.s3url, "");
 
-async function rollbackUpdate(
-  originalArtwork: PopulatedArtworkDocument,
-  originalS3Keys: { mainKey: string; thumbKey: string }
-) {
   try {
-  } catch (rollbackError) {
-    console.log("Rollback error:", rollbackError);
+    // Create a copy of the image and thumbnail with the new key then delete the old images
+    await s3Client.send(
+      new CopyObjectCommand({
+        Bucket: s3Data.s3Bucket,
+        CopySource: `${s3Data.s3Bucket}/${oldMainKey}`,
+        Key: newMainKey,
+      })
+    );
+    await s3Client.send(
+      new DeleteObjectCommand({
+        Bucket: s3Data.s3Bucket,
+        Key: oldMainKey,
+      })
+    );
+
+    await s3Client.send(
+      new CopyObjectCommand({
+        Bucket: s3Data.s3Bucket,
+        CopySource: `${s3Data.s3Bucket}/${oldThumbKey}`,
+        Key: newThumbKey,
+      })
+    );
+    await s3Client.send(
+      new DeleteObjectCommand({
+        Bucket: s3Data.s3Bucket,
+        Key: oldThumbKey,
+      })
+    );
+
+    return {
+      src: `${s3Data.s3url}${newThumbKey}`,
+      thumbSrc: `${s3Data.s3url}${newMainKey}`,
+      name: s3Data.newName,
+    };
+  } catch (error) {
+    console.log("Error during S3 copy/delete:", error);
+    // return old name so doc and file stay sync
+    return {
+      src: s3Data.currentSrc,
+      thumbSrc: s3Data.currentThumbSrc,
+      name: s3Data.currentName,
+    };
   }
 }

@@ -3,59 +3,68 @@ import Tag, { TagDocument } from "@/models/Tag";
 import FileManagement from "@/app/dashboard/_components/FileManagement";
 import FileUpload from "@/app/dashboard/_components/FileUpload";
 import TagManagement from "@/app/dashboard/_components/TagManagement";
+import dbConnect from "@/lib/dbConnect";
+import { notFound } from "next/navigation";
+import ProfileManagement from "./_components/ProfileManagement";
 
 export default async function DashboardPage({
   searchParams,
 }: {
   searchParams: Promise<{ page?: string; limit?: string }>;
 }) {
-  const awaitedSearchParams = await searchParams;
+  try {
+    await dbConnect();
+    const awaitedSearchParams = await searchParams;
 
-  const page = parseInt(awaitedSearchParams.page || "1");
-  const limit = parseInt(awaitedSearchParams.limit || "10");
-  const skip = (page - 1) * limit;
+    const page = parseInt(awaitedSearchParams.page || "1");
+    const limit = parseInt(awaitedSearchParams.limit || "10");
+    const skip = (page - 1) * limit;
 
-  // Get total count for pagination info
-  const totalCount = await Artwork.countDocuments({});
-  const totalPages = Math.ceil(totalCount / limit);
+    const [totalCount, artworkResponse, tagsResponse] = await Promise.all([
+      Artwork.countDocuments({}).maxTimeMS(10000),
+      Artwork.find({})
+        .populate("category")
+        .populate("medium")
+        .populate("size")
+        .skip(skip)
+        .limit(limit)
+        .lean()
+        .maxTimeMS(10000),
+      Tag.find({}).lean().maxTimeMS(10000),
+    ]);
 
-  // Fetch artworks with populated fields
-  const artworkResponse = await Artwork.find({})
-    .populate("category")
-    .populate("medium")
-    .populate("size")
-    .skip(skip)
-    .limit(limit)
-    .lean();
+    const artworkDocuments: PopulatedArtworkDocument[] = JSON.parse(
+      JSON.stringify(artworkResponse)
+    );
+    const tags: TagDocument[] = JSON.parse(JSON.stringify(tagsResponse));
 
-  // Fetch all tags (all types)
-  const tagsResponse = await Tag.find({}).lean();
+    // Split tags by type
+    const categories = tags.filter(
+      (tag: TagDocument) => tag.type === "category"
+    );
+    const mediums = tags.filter((tag: TagDocument) => tag.type === "medium");
+    const sizes = tags.filter((tag: TagDocument) => tag.type === "size");
+    const allTags = { categories, mediums, sizes };
 
-  const files: PopulatedArtworkDocument[] = JSON.parse(
-    JSON.stringify(artworkResponse)
-  );
-  const tags: TagDocument[] = JSON.parse(JSON.stringify(tagsResponse));
+    return (
+      <main className="w-full mx-auto">
+        <div className="space-y-8">
+          <ProfileManagement />
+          <FileManagement
+            files={artworkDocuments}
+            tags={allTags}
+            currentPage={page}
+            totalPages={totalCount}
+          />
 
-  // Split tags by type
-  const categories = tags.filter((tag: TagDocument) => tag.type === "category");
-  const mediums = tags.filter((tag: TagDocument) => tag.type === "medium");
-  const sizes = tags.filter((tag: TagDocument) => tag.type === "size");
-  const allTags = { categories, mediums, sizes };
+          <TagManagement tags={allTags} />
 
-  return (
-    <main className="w-full mx-auto">
-      <div className="space-y-8">
-        <FileManagement
-          files={files}
-          tags={allTags}
-          currentPage={page}
-          totalPages={totalPages}
-        />
-
-        <TagManagement tags={allTags} />
-
-        <FileUpload />
-      </div>
-    </main>
-  );
+          <FileUpload />
+        </div>
+      </main>
+    );
+  } catch (error) {
+    console.error("Dashboard data fetch error:", error);
+    notFound();
+  }
 }

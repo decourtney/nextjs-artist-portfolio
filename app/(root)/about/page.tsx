@@ -1,5 +1,7 @@
 import Image from "next/image";
 import TextureOverlay from "../../components/TextureOverlay";
+import GetInTouchSection from "../_components/GetInTouchSection";
+import SectionSeparator from "../_components/SectionSeparator";
 
 export default function AboutPage() {
   return (
@@ -8,7 +10,7 @@ export default function AboutPage() {
       {/* <TextureOverlay type="canvas" opacity={0.5} /> */}
 
       {/* Hero Section */}
-      <section className="hidden py-20 px-4 relative">
+      <section className="hidden relative py-20 px-4">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-charm mb-6 text-[#1e293b]">
@@ -29,7 +31,7 @@ export default function AboutPage() {
             <div className="grid md:grid-cols-2 gap-16 items-center">
               <div className="relative aspect-[3/4]">
                 <Image
-                  src="https://general-purpose-chumbucket-001.s3.us-east-2.amazonaws.com/genacourtney/images/viking-longship-oil-on-copper-12-x-12.webp"
+                  src="/images/artist.jpg"
                   alt="Gena Courtney in her studio"
                   fill
                   className="object-cover"
@@ -66,6 +68,7 @@ export default function AboutPage() {
             </div>
           </div>
         </div>
+        <SectionSeparator />
       </section>
 
       {/* Process Section */}
@@ -125,6 +128,7 @@ export default function AboutPage() {
             </div>
           </div>
         </div>
+        <SectionSeparator />
       </section>
 
       {/* Inspiration Section */}
@@ -174,6 +178,7 @@ export default function AboutPage() {
             </div>
           </div>
         </div>
+        <SectionSeparator />
       </section>
 
       {/* Studio Section */}
@@ -213,7 +218,10 @@ export default function AboutPage() {
             </div>
           </div>
         </div>
+        <SectionSeparator />
       </section>
+
+      <GetInTouchSection />
       {/* Add gradient separators to each section */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#94a3b8] to-transparent"></div>
     </main>

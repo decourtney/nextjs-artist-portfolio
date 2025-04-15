@@ -1,47 +1,48 @@
 import Image from "next/image";
 import Link from "next/link";
+import GetInTouchSection from "./_components/GetInTouchSection";
+import SectionSeparator from "./_components/SectionSeparator";
+import dbConnect from "@/lib/dbConnect";
+import { Artwork } from "@/models";
+import { ArtworkDocument, PopulatedArtworkDocument } from "@/models/Artwork";
 
-const featuredArtworks = [
-  {
-    title: "Viking Longship",
-    medium: "Oil on copper",
-    size: "12 x 12",
-    src: "https://general-purpose-chumbucket-001.s3.us-east-2.amazonaws.com/genacourtney/images/viking-longship-oil-on-copper-12-x-12.webp",
-    thumbSrc:
-      "https://general-purpose-chumbucket-001.s3.us-east-2.amazonaws.com/genacourtney/images/thumbnails/viking-longship-oil-on-copper-12-x-12-thumb.webp",
-  },
-  {
-    title: "Viking Longship Rigging",
-    medium: "Oil on copper",
-    size: "10 x 12",
-    src: "https://general-purpose-chumbucket-001.s3.us-east-2.amazonaws.com/genacourtney/images/viking-longship-rigging-oil-on-copper-10-x-12.webp",
-    thumbSrc:
-      "https://general-purpose-chumbucket-001.s3.us-east-2.amazonaws.com/genacourtney/images/thumbnails/viking-longship-rigging-oil-on-copper-10-x-12-thumb.webp",
-  },
-  {
-    title: "Weary Travelers",
-    medium: "Oil on copper",
-    size: "11 x 10",
-    src: "https://general-purpose-chumbucket-001.s3.us-east-2.amazonaws.com/genacourtney/images/weary-travelers-oil-on-copper-11-x-10.webp",
-    thumbSrc:
-      "https://general-purpose-chumbucket-001.s3.us-east-2.amazonaws.com/genacourtney/images/thumbnails/weary-travelers-oil-on-copper-11-x-10-thumb.webp",
-  },
-];
+export default async function Home() {
+  await dbConnect();
+  const mainImageArtwork = await Artwork.findOne({ isMainImage: true })
+    .lean()
+    .maxTimeMS(10000)
+    .exec() as unknown as ArtworkDocument;
+  const featuredArtworks = await Artwork.find({
+    isFeatured: true,
+  })
+    .limit(3)
+    .populate("category")
+    .populate("medium")
+    .populate("size")
+    .lean()
+    .maxTimeMS(10000)
+    .exec() as unknown as PopulatedArtworkDocument[];
 
-export default function Home() {
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen">
       {/* About Section */}
       <section className="py-20 px-4 relative">
         <div className="max-w-4xl mx-auto">
           <div className="flex flex-col gap-12">
             <div className="relative aspect-square max-w-2xl mx-auto w-full">
-              <Image
-                src={featuredArtworks[1].src}
-                alt="Artist's work"
-                fill
-                className="object-cover"
-              />
+              {mainImageArtwork ? (
+                <Image
+                  src={mainImageArtwork.src}
+                  alt="Artist's work"
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="flex justify-center items-center w-full h-full">
+                  Image not found
+                </div>
+              )}
+
               <div className="absolute inset-0 border-2 border-[#1e293b]" />
             </div>
             <div className="text-center">
@@ -63,7 +64,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#94a3b8] to-transparent"></div>
+        <SectionSeparator />
       </section>
 
       {/* Featured Works */}
@@ -72,27 +73,22 @@ export default function Home() {
           <h2 className="text-3xl font-bold text-center mb-12 text-[#1e293b] font-charm">
             Featured Works
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {featuredArtworks.map((artwork) => (
-              <div key={artwork.title} className="group">
-                <div className="relative aspect-square mb-4">
-                  <Image
-                    src={artwork.thumbSrc}
-                    alt={artwork.title}
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 border-2 border-[#1e293b] group-hover:border-[#3b82f6] transition-colors duration-300" />
-                  <div className="absolute inset-0 bg-[#1e293b] opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
+          <div className="flex justify-around items-center">
+            {featuredArtworks &&
+              featuredArtworks.map((artwork) => (
+                <div key={artwork.name} className="group">
+                  <div className="relative aspect-square mb-4 h-[350px]">
+                    <Image
+                      src={artwork.thumbSrc}
+                      alt={artwork.name}
+                      fill
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 border-2 border-[#1e293b] group-hover:border-[#3b82f6] transition-colors duration-300" />
+                    <div className="absolute inset-0 bg-[#1e293b] opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-[#1e293b] font-charm">
-                  {artwork.title}
-                </h3>
-                <p className="text-[#64748b]">
-                  {artwork.medium}, {artwork.size}
-                </p>
-              </div>
-            ))}
+              ))}
           </div>
           <div className="text-center mt-12">
             <Link
@@ -105,30 +101,10 @@ export default function Home() {
             </Link>
           </div>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#94a3b8] to-transparent"></div>
+        <SectionSeparator />
       </section>
 
-      {/* Contact Section */}
-      <section className="py-20 px-4 relative">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-6 text-[#1e293b] font-charm">
-            Get in Touch
-          </h2>
-          <p className="text-[#475569] mb-8 max-w-2xl mx-auto">
-            Interested in commissioning a piece or learning more about my work?
-            I'd love to hear from you.
-          </p>
-          <Link
-            href="/contact"
-            className="group relative inline-block px-8 py-4 text-lg font-medium text-[#1e293b] hover:text-white transition-colors duration-300"
-          >
-            <span className="relative z-10">Contact Me</span>
-            <span className="absolute inset-0 w-full h-full bg-[#3b82f6] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <span className="absolute inset-0 w-full h-full border-2 border-[#1e293b] group-hover:border-[#3b82f6] transition-colors duration-300" />
-          </Link>
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#94a3b8] to-transparent"></div>
-      </section>
+      <GetInTouchSection />
     </div>
   );
 }

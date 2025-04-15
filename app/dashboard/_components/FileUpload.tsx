@@ -2,6 +2,7 @@
 
 import React, { useState, ChangeEvent, useRef, FormEvent } from "react";
 import { MdClose } from "react-icons/md";
+import { IoIosWarning } from "react-icons/io";
 import { useRouter } from "next/navigation";
 
 interface FileItem {
@@ -118,9 +119,21 @@ const FileUpload = () => {
 
   return (
     <form
+      id="file-upload"
       onSubmit={handleSubmit}
-      className="m-1 shadow-md rounded-md bg-white text-gray-900"
+      className="p-6 shadow-md rounded-lg bg-background-50 text-gray-900"
     >
+      <div className="relative flex justify-between mb-4 border-b">
+        <h1 className="text-2xl font-bold text-foreground-500 mb-4">
+          Upload Image
+        </h1>
+        {selectedFiles.length > 0 ? (
+          <h3 className="px-4 py-2 text-center text-sm font-semibold text-gray-700">
+            <span>{selectedFiles.length} </span>File
+            {selectedFiles.length > 1 ? <span>s</span> : null} Selected
+          </h3>
+        ) : null}
+      </div>
       <input
         id="file-input"
         ref={fileInputRef}
@@ -131,14 +144,10 @@ const FileUpload = () => {
         onChange={handleFileChange}
       />
 
-      <div className="min-h-[200px] max-h-[500px] overflow-y-scroll rounded-lg">
+      <div className="min-h-[200px] max-h-[500px] overflow-y-auto rounded-lg bg-white shadow-sm">
         {selectedFiles.length > 0 ? (
           <>
-            <h3 className="px-4 py-1 text-center bg-slate-200">
-              <span>{selectedFiles.length} </span>Selected File
-              {selectedFiles.length > 1 ? <span>s</span> : null}
-            </h3>
-            <ul className="[&>*:nth-child(even)]:bg-slate-200 text-gray-900">
+            <ul className="[&>*:nth-child(even)]:bg-gray-50 text-gray-900">
               {selectedFiles.map((item, index) => (
                 <li
                   key={item.id}
@@ -148,7 +157,8 @@ const FileUpload = () => {
 
                   <div className="flex items-center space-x-2">
                     {item.status === "error" && item.errorMessage ? (
-                      <span className="p-1 rounded-sm text-red-500 bg-red-100 whitespace-nowrap">
+                      <span className="px-2 py-1 rounded-full text-red-800 bg-red-100 text-xs whitespace-nowrap flex items-center">
+                        <IoIosWarning className="mr-1" />
                         {item.errorMessage}
                       </span>
                     ) : null}
@@ -167,16 +177,16 @@ const FileUpload = () => {
             </ul>
           </>
         ) : (
-          <div className="h-[200px] content-center flex items-center justify-center">
-            <span>No files selected</span>
+          <div className="h-[200px] content-center flex items-center justify-center text-gray-500">
+            <span className="text-sm">No files selected</span>
           </div>
         )}
       </div>
 
-      <div className="flex justify-between p-2">
+      <div className="flex justify-between mt-4">
         <button
           type="button"
-          className="px-3 py-1 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-md"
+          className="px-4 py-2 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors"
           onClick={handleOpenFileDialog}
         >
           Choose Files
@@ -185,14 +195,14 @@ const FileUpload = () => {
         <div className="space-x-4">
           <button
             type="button"
-            className="px-3 py-1 text-sm bg-red-500 hover:bg-red-600 text-white rounded-md"
+            className="px-4 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors"
             onClick={handleCancel}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-3 py-1 text-sm bg-green-500 hover:bg-green-600 text-white rounded-md"
+            className="px-4 py-2 text-sm bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors"
           >
             Upload
           </button>

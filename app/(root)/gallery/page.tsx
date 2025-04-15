@@ -1,38 +1,45 @@
 import React from "react";
 import Link from "next/link";
-import Book3D from "@/app/components/Book3D";
+import Book3D from "@/app/(root)/_components/Book3D";
 import dbConnect from "@/lib/dbConnect";
+import { Tag } from "@/models";
+import { TagDocument } from "@/models/Tag";
+import GetInTouchSection from "../_components/GetInTouchSection";
+import SectionSeparator from "../_components/SectionSeparator";
 
 const GalleryPage = async () => {
+  await dbConnect();
+  const categories = (await Tag.find({ type: "category" })) as TagDocument[];
+
   // Hard coded categories
-  const categories = [
-    {
-      name: "Landscapes",
-      description: "Explore the beauty of natural landscapes captured in art.",
-      color: "bg-emerald-100",
-      link: "/gallery/landscapes",
-    },
-    {
-      name: "Seascapes",
-      description: "Discover the serene and powerful scenes of the sea.",
-      color: "bg-blue-100",
-      link: "/gallery/seascapes",
-    },
-    {
-      name: "Still Lifes",
-      description:
-        "Appreciate the intricate details of still life compositions.",
-      color: "bg-amber-100",
-      link: "/gallery/still-lifes",
-    },
-    {
-      name: "Portraits",
-      description:
-        "See the expressive and detailed portraits of various subjects.",
-      color: "bg-rose-100",
-      link: "/gallery/portraits",
-    },
-  ];
+  // const categories = [
+  //   {
+  //     name: "Landscapes",
+  //     description: "Explore the beauty of natural landscapes captured in art.",
+  //     color: "bg-emerald-100",
+  //     link: "/gallery/landscapes",
+  //   },
+  //   {
+  //     name: "Seascapes",
+  //     description: "Discover the serene and powerful scenes of the sea.",
+  //     color: "bg-blue-100",
+  //     link: "/gallery/seascapes",
+  //   },
+  //   {
+  //     name: "Still Lifes",
+  //     description:
+  //       "Appreciate the intricate details of still life compositions.",
+  //     color: "bg-amber-100",
+  //     link: "/gallery/still-lifes",
+  //   },
+  //   {
+  //     name: "Portraits",
+  //     description:
+  //       "See the expressive and detailed portraits of various subjects.",
+  //     color: "bg-rose-100",
+  //     link: "/gallery/portraits",
+  //   },
+  // ];
 
   return (
     <>
@@ -41,27 +48,27 @@ const GalleryPage = async () => {
         <h1 className="sr-only">Art Categories</h1>
         <div className="max-w-6xl mx-auto relative grid grid-cols-1 md:grid-cols-2 gap-8 pb-16">
           {categories.map((category) => (
-            <div key={category.name} className="flex flex-col">
-              <h2 className="text-2xl font-charm mb-4">{category.name}</h2>
+            <div key={category.label} className="flex flex-col">
+              <h2 className="text-2xl font-charm mb-4">{category.label}</h2>
               <Link
-                href={`/gallery/${category.name.toLowerCase()}`}
+                href={`/gallery/${category.label.replace(" ", "-")}`}
                 className="block border-2 border-black hover:border-blue-500 transition-colors duration-300"
               >
                 <div
-                  className={`w-full aspect-square ${category.color} flex items-center justify-center`}
+                  className={`w-full aspect-square flex items-center justify-center`}
                 >
                   <span className="text-2xl font-charm text-gray-700">
-                    {category.name}
+                    {category.label}
                   </span>
                 </div>
               </Link>
-              <p className="text-gray-500 text-sm italic text-center mt-3">
+              {/* <p className="text-gray-500 text-sm italic text-center mt-3">
                 {category.description}
-              </p>
+              </p> */}
             </div>
           ))}
 
-          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#94a3b8] to-transparent"></div>
+          <SectionSeparator />
         </div>
       </section>
 
@@ -95,29 +102,10 @@ const GalleryPage = async () => {
             </div>
           </div>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#94a3b8] to-transparent"></div>
+        <SectionSeparator />
       </section>
 
-      {/* Contact Section */}
-      <section className="py-20 px-4 relative">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-6 text-[#1e293b] font-charm">
-            Get in Touch
-          </h2>
-          <p className="text-[#475569] mb-8 max-w-2xl mx-auto">
-            Interested in commissioning a piece or learning more about my work?
-            I'd love to hear from you.
-          </p>
-          <Link
-            href="/contact"
-            className="group relative inline-block px-8 py-4 text-lg font-medium text-[#1e293b] hover:text-white transition-colors duration-300"
-          >
-            <span className="relative z-10">Contact Me</span>
-            <span className="absolute inset-0 w-full h-full bg-[#3b82f6] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <span className="absolute inset-0 w-full h-full border-2 border-[#1e293b] group-hover:border-[#3b82f6] transition-colors duration-300" />
-          </Link>
-        </div>
-      </section>
+      <GetInTouchSection />
     </>
   );
 };
