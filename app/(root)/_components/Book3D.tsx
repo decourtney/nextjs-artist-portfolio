@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { Canvas, useFrame, RootState } from "@react-three/fiber";
-import { SoftShadows, Plane, OrbitControls } from "@react-three/drei";
-import * as THREE from "three";
-import { easing } from "maath";
-import { BookModel } from "../../components/BookModel";
+import { Plane, SoftShadows } from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+import { useEffect, useState } from "react";
+import { BookModel } from "./BookModel";
 
 function Backdrop() {
   return (

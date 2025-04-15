@@ -20,7 +20,6 @@ export default async function DashboardPage({
     const limit = parseInt(awaitedSearchParams.limit || "10");
     const skip = (page - 1) * limit;
 
-    // Wrap database operations with timeout
     const [totalCount, artworkResponse, tagsResponse] = await Promise.all([
       Artwork.countDocuments({}).maxTimeMS(10000),
       Artwork.find({})
