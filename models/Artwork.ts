@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
-import { TagDocument } from "./Tag";
+import Tag, { TagDocument } from "./Tag";
+import { TagType } from "@/types/tagType";
 
 export interface ArtworkDocument extends mongoose.Document {
   _id: string;
@@ -8,10 +9,11 @@ export interface ArtworkDocument extends mongoose.Document {
   src: string;
   thumbSrc: string;
   alt: string;
-  medium: mongoose.Types.ObjectId;
-  size: mongoose.Types.ObjectId;
   metaWidth: number;
   metaHeight: number;
+  substance: mongoose.Types.ObjectId;
+  medium: mongoose.Types.ObjectId;
+  size: mongoose.Types.ObjectId;
   category: mongoose.Types.ObjectId;
   price: number;
   isAvailable: boolean;
@@ -42,6 +44,16 @@ const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
     type: String,
     maxlength: [255, "Alt text cannot be more than 255 characters long"],
   },
+  metaWidth: {
+    type: Number,
+  },
+  metaHeight: {
+    type: Number,
+  },
+  substance: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Tag",
+  },
   medium: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Tag",
@@ -49,12 +61,6 @@ const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
   size: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Tag",
-  },
-  metaWidth: {
-    type: Number,
-  },
-  metaHeight: {
-    type: Number,
   },
   category: {
     type: mongoose.Schema.Types.ObjectId,
@@ -107,6 +113,22 @@ ArtworkSchema.pre("save", async function (next) {
     }
   }
 
+  if (this.isCategoryImage) {
+    // Count the number of category tags dynamically
+    const categoryTagCount = await Tag.countDocuments({
+      type: TagType.CATEGORY,
+    });
+
+    const categoryCount = await model.countDocuments({
+      _id: { $ne: this._id },
+      isCategoryImage: true,
+    });
+
+    if (categoryCount >= categoryTagCount) {
+      throw new Error(`Maximum of ${categoryTagCount} category images allowed`);
+    }
+  }
+
   next();
 });
 
@@ -116,9 +138,10 @@ export default mongoose.models.Artwork ||
 // Extended type for populated categories:
 export type PopulatedArtworkDocument = Omit<
   ArtworkDocument,
-  "category" | "medium" | "size"
+  "substance" | "medium" | "size" | "category"
 > & {
-  category: TagDocument;
+  substance: TagDocument;
   medium: TagDocument;
   size: TagDocument;
+  category: TagDocument;
 };

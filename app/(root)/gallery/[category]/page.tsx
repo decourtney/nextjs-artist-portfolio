@@ -30,9 +30,10 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
   const rawArtworkDocs = (await Artwork.find({
     category: categoryDoc._id,
   })
-    .populate("category")
+    .populate("substance")
     .populate("medium")
     .populate("size")
+    .populate("category")
     .lean()
     .exec()) as unknown as PopulatedArtworkDocument[];
 
@@ -64,7 +65,6 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_600px_1fr] min-h-screen mx-auto py-8 lg:gap-y-8">
-      
       <div className="flex flex-col mb-8 px-4">
         <h1 className="text-3xl font-bold">{categoryDoc.label}</h1>
         <p className="text-sm text-gray-600 mt-2">

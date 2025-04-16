@@ -10,37 +10,6 @@ import SectionSeparator from "../_components/SectionSeparator";
 const GalleryPage = async () => {
   await dbConnect();
   const categories = (await Tag.find({ type: "category" })) as TagDocument[];
-
-  // Hard coded categories
-  // const categories = [
-  //   {
-  //     name: "Landscapes",
-  //     description: "Explore the beauty of natural landscapes captured in art.",
-  //     color: "bg-emerald-100",
-  //     link: "/gallery/landscapes",
-  //   },
-  //   {
-  //     name: "Seascapes",
-  //     description: "Discover the serene and powerful scenes of the sea.",
-  //     color: "bg-blue-100",
-  //     link: "/gallery/seascapes",
-  //   },
-  //   {
-  //     name: "Still Lifes",
-  //     description:
-  //       "Appreciate the intricate details of still life compositions.",
-  //     color: "bg-amber-100",
-  //     link: "/gallery/still-lifes",
-  //   },
-  //   {
-  //     name: "Portraits",
-  //     description:
-  //       "See the expressive and detailed portraits of various subjects.",
-  //     color: "bg-rose-100",
-  //     link: "/gallery/portraits",
-  //   },
-  // ];
-
   return (
     <>
       {/* Gallery Section */}

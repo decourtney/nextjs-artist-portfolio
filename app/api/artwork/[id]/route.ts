@@ -5,13 +5,16 @@ import {
   CopyObjectCommand,
 } from "@aws-sdk/client-s3";
 import dbConnect from "@/lib/dbConnect";
-import Artwork, { ArtworkDocument } from "@/models/Artwork";
+import Artwork, {
+  ArtworkDocument,
+  PopulatedArtworkDocument,
+} from "@/models/Artwork";
 import { Tag } from "@/models";
 import { EditableArtwork } from "@/app/dashboard/_components/FileManagement";
 import { SanitizeAndShortenString } from "@/utils/sanitizeAndShortenString";
 import { getServerSession } from "next-auth";
 import { _nextAuthOptions } from "@/auth";
-import { PopulatedArtworkDocument } from "@/models/Artwork";
+import { TagDocument } from "@/models/Tag";
 
 // Create S3 client
 const s3Client = new S3Client({
@@ -57,7 +60,7 @@ export async function DELETE(
     const { id } = await params;
 
     // Find the artwork document by ID
-    const artwork = (await Artwork.findById(id)) as PopulatedArtworkDocument;
+    const artwork = (await Artwork.findById(id)) as ArtworkDocument;
     if (!artwork) {
       return NextResponse.json(
         { message: "Artwork not found" },
@@ -115,6 +118,7 @@ type S3dbUpdateData = {
 type CurrentArtworkData = {
   name: string;
   description?: string;
+  substance?: string;
   size?: string;
   medium?: string;
   category?: string;
@@ -156,7 +160,10 @@ export async function PATCH(
     }
 
     // Retrieve the artwork document by ID
-    const artwork = (await Artwork.findById(id)) as PopulatedArtworkDocument;
+    const artwork = (await Artwork.findById(id)
+      .maxTimeMS(10000)
+      .exec()) as ArtworkDocument;
+
     if (!artwork) {
       return NextResponse.json(
         { message: "Artwork not found" },
@@ -170,12 +177,14 @@ export async function PATCH(
     const folderPath = process.env.NEXT_PUBLIC_AWS_IMAGES_FOLDER || "";
     const urlPrefix = `https://${bucket}.s3.${region}.amazonaws.com/`;
 
+    // Maintain current artwork document data for rollback if necessary
     const currentArtworkData: CurrentArtworkData = {
       name: artwork.name,
       description: artwork.description,
-      size: artwork.size?.label,
-      medium: artwork.medium?.label,
-      category: artwork.category?.label,
+      substance: artwork.substance?._id.toString(),
+      size: artwork.size?._id.toString(),
+      medium: artwork.medium?._id.toString(),
+      category: artwork.category?._id.toString(),
       price: artwork.price,
       isAvailable: artwork.isAvailable,
       isMainImage: artwork.isMainImage,
@@ -185,23 +194,41 @@ export async function PATCH(
       thumbSrc: artwork.thumbSrc,
     };
 
-    const { category, medium, size, ...restData } = newArtworkData;
+    // Deconstruct new data
+    const { category, medium, size, substance, ...restData } = newArtworkData;
 
-    const [categoryTag, sizeTag, mediumTag] = await Promise.all([
-      category ? Tag.findOne({ label: category, type: "category" }) : null,
-      size ? Tag.findOne({ label: size, type: "size" }) : null,
-      medium ? Tag.findOne({ label: medium, type: "medium" }) : null,
+    // Swap tag name for id
+    const [categoryTag, sizeTag, mediumTag, substanceTag] = await Promise.all([
+      category
+        ? Tag.findOne({ label: category, type: "category" })
+            .maxTimeMS(10000)
+            .exec()
+        : null,
+      size
+        ? Tag.findOne({ label: size, type: "size" }).maxTimeMS(10000).exec()
+        : null,
+      medium
+        ? Tag.findOne({ label: medium, type: "medium" }).maxTimeMS(10000).exec()
+        : null,
+      substance
+        ? Tag.findOne({ label: substance, type: "substance" })
+            .maxTimeMS(10000)
+            .exec()
+        : null,
     ]);
 
+    // Assign new data to existing artwork document
     Object.assign(artwork, {
       ...restData,
       ...(categoryTag && { category: categoryTag._id }),
       ...(sizeTag && { size: sizeTag._id }),
       ...(mediumTag && { medium: mediumTag._id }),
+      ...(substanceTag && { substance: substanceTag._id }),
     });
 
     // if (category && !categoryTag) throw new Error("Invalid category name");
 
+    // If the name has changed then we need to update the s3
     if (newArtworkData.name !== currentArtworkData.name) {
       const s3UpdateResult = await updateS3({
         newName: newArtworkData.name,
@@ -213,18 +240,20 @@ export async function PATCH(
         currentThumbSrc: currentArtworkData.thumbSrc,
       });
 
-      // Update artwork with the S3 update results
+      // Update artwork document with the S3 update results
       artwork.src = s3UpdateResult.src;
       artwork.thumbSrc = s3UpdateResult.thumbSrc;
       artwork.name = s3UpdateResult.name;
     }
 
-    const updatedArtwork = await artwork.save();
-    const populatedArtwork = await updatedArtwork.populate(
-      "category medium size"
+    // Save and return updated artwork document
+    const savedDoc = await artwork.save();
+    const updatedArtwork = await savedDoc.populate(
+      "category medium size substance"
     );
 
-    return NextResponse.json(populatedArtwork, {
+    console.log(updatedArtwork);
+    return NextResponse.json(updatedArtwork, {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });

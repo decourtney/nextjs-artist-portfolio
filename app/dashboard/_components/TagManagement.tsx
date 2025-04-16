@@ -9,6 +9,7 @@ interface TagManagementProps {
     categories: TagDocument[];
     mediums: TagDocument[];
     sizes: TagDocument[];
+    substances: TagDocument[];
   };
 }
 
@@ -122,6 +123,7 @@ export default function TagManagement({ tags }: TagManagementProps) {
               <option value="category">Category</option>
               <option value="medium">Medium</option>
               <option value="size">Size</option>
+              <option value="substance">Substance</option>
             </select>
           </div>
           <button
@@ -148,6 +150,7 @@ export default function TagManagement({ tags }: TagManagementProps) {
         {renderTagList(tags.categories, "categories")}
         {renderTagList(tags.mediums, "mediums")}
         {renderTagList(tags.sizes, "sizes")}
+        {renderTagList(tags.substances, "substances")}
       </div>
     </section>
   );

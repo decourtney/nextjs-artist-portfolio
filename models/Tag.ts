@@ -19,7 +19,7 @@ const TagSchema = new Schema<TagDocument>(
       type: String,
       required: true,
       trim: true,
-      enum: [TagType.CATEGORY, TagType.MEDIUM, TagType.SIZE],
+      enum: [TagType.CATEGORY, TagType.MEDIUM, TagType.SIZE, TagType.SUBSTANCE],
     },
   },
   { timestamps: true }

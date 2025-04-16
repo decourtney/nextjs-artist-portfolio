@@ -22,6 +22,7 @@ import FileItem from "./FileItem";
 export interface EditableArtwork {
   name: string;
   description: string;
+  substance: string;
   medium: string;
   size: string;
   category: string;
@@ -33,9 +34,10 @@ export interface EditableArtwork {
 }
 
 interface AllTags {
-  categories: TagDocument[];
+  substances: TagDocument[];
   mediums: TagDocument[];
   sizes: TagDocument[];
+  categories: TagDocument[];
 }
 
 export default function FileManagement({
@@ -50,7 +52,8 @@ export default function FileManagement({
   totalPages: number;
 }) {
   const router = useRouter();
-  const [filesState, setFilesState] = useState<PopulatedArtworkDocument[]>(files)
+  const [filesState, setFilesState] =
+    useState<PopulatedArtworkDocument[]>(files);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [editingDoc, setEditingDoc] = useState<PopulatedArtworkDocument | null>(
     null
@@ -85,10 +88,10 @@ export default function FileManagement({
 
   // Global Select All
   const handleSelectAll = (isSelected: boolean) => {
-    setSelectedIds(isSelected ? filesState.map((file) => file._id) : []);
+    setSelectedIds(isSelected ? files.map((file) => file._id) : []);
   };
 
-  // Delete selected items (calls your API DELETE route)
+  // Delete selected items
   const handleDelete = async () => {
     try {
       const res = await fetch(`/api/artwork/batch-delete`, {
@@ -97,15 +100,8 @@ export default function FileManagement({
         body: JSON.stringify({ ids: selectedIds }),
       });
 
-      if (res.ok) {
-        setSelectedIds([]); // Clear selected IDs after deletion
-      }
-
-      if (!res.ok) {
-        console.error("Batch delete failed", await res.json());
-      } else {
-        // router.refresh();
-      }
+      setSelectedIds([]);
+      router.refresh();
     } catch (error) {
       console.error("Error deleting files", error);
     }
@@ -116,6 +112,7 @@ export default function FileManagement({
     setEditForm({
       name: file.name,
       description: file.description ?? undefined,
+      substance: file.substance?.label ?? undefined,
       medium: file.medium?.label ?? undefined,
       size: file.size?.label ?? undefined,
       category: file.category?.label ?? undefined,
@@ -147,15 +144,16 @@ export default function FileManagement({
         throw new Error(data.message || "Failed to update artwork");
       }
 
-      const updatedFile = await response.json();
+      // const updatedFile = await response.json();
 
-      // Update the filesState by replacing the old file with the updated one
-      setFilesState((prevFiles) =>
-        prevFiles.map((file) =>
-          file._id === updatedFile._id ? updatedFile : file
-        )
-      );
+      // // Update the files by replacing the old file with the updated one
+      // setfiles((prevFiles) =>
+      //   prevFiles.map((file) =>
+      //     file._id === updatedFile._id ? updatedFile : file
+      //   )
+      // );
 
+      router.refresh();
       closeEditModal();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -226,6 +224,26 @@ export default function FileManagement({
 
             {/* Tags */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Substance
+                  <select
+                    id="artwork-medium"
+                    value={editForm.substance}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, substance: e.target.value })
+                    }
+                    className="w-full p-2 border rounded-md"
+                  >
+                    <option value="">Select Substance</option>
+                    {tags.substances.map((tag) => (
+                      <option key={tag._id} value={tag.label}>
+                        {tag.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Medium
@@ -511,7 +529,7 @@ export default function FileManagement({
           type="checkbox"
           className="mr-2"
           checked={
-            selectedIds.length === filesState.length && filesState.length > 0
+            selectedIds.length === files.length && files.length > 0
           }
           onChange={(e) => handleSelectAll(e.target.checked)}
         />
@@ -519,7 +537,7 @@ export default function FileManagement({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        {filesState.map((file) => (
+        {files.map((file) => (
           <FileItem
             key={file._id}
             file={file}
