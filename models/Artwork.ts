@@ -92,6 +92,7 @@ const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
 // Pre-save middleware to enforce constraints
 ArtworkSchema.pre("save", async function (next) {
   const model = this.constructor as mongoose.Model<ArtworkDocument>;
+  const Tag = mongoose.models.Tag; // Import the Tag model
 
   // Ensure only one home main image
   if (this.isMainImage) {
@@ -113,19 +114,16 @@ ArtworkSchema.pre("save", async function (next) {
     }
   }
 
-  if (this.isCategoryImage) {
-    // Count the number of category tags dynamically
-    const categoryTagCount = await Tag.countDocuments({
-      type: TagType.CATEGORY,
-    });
-
-    const categoryCount = await model.countDocuments({
-      _id: { $ne: this._id },
+  if (this.isCategoryImage && this.category) {
+    // Check if another artwork is already a category image for this specific category
+    const existingCategoryImage = await model.findOne({
+      _id: { $ne: this._id }, // Exclude the current artwork
       isCategoryImage: true,
+      category: this.category, // Match the specific category tag
     });
 
-    if (categoryCount >= categoryTagCount) {
-      throw new Error(`Maximum of ${categoryTagCount} category images allowed`);
+    if (existingCategoryImage) {
+      throw new Error(`A category image already exists for this category`);
     }
   }
 
