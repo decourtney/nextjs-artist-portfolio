@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <main className="min-h-screen relative">
+    <div className="min-h-screen relative">
       {/* Hero Section */}
       <section className="hidden py-20 px-4 relative">
         <div className="container mx-auto px-4">
@@ -183,7 +183,7 @@ export default function ContactPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 px-4 relative">
+      {/* <section className="py-20 px-4 relative">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-charm text-center mb-12 text-[#1e293b]">
@@ -235,9 +235,8 @@ export default function ContactPage() {
             </div>
           </div>
         </div>
-      </section>
-      {/* Add gradient separators to each section */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#94a3b8] to-transparent"></div>
-    </main>
+        <SectionSeparator />
+      </section> */}
+    </div>
   );
 }

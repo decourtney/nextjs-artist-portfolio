@@ -52,8 +52,6 @@ export default function FileManagement({
   totalPages: number;
 }) {
   const router = useRouter();
-  const [filesState, setFilesState] =
-    useState<PopulatedArtworkDocument[]>(files);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [editingDoc, setEditingDoc] = useState<PopulatedArtworkDocument | null>(
     null
@@ -143,15 +141,6 @@ export default function FileManagement({
         const data = await response.json();
         throw new Error(data.message || "Failed to update artwork");
       }
-
-      // const updatedFile = await response.json();
-
-      // // Update the files by replacing the old file with the updated one
-      // setfiles((prevFiles) =>
-      //   prevFiles.map((file) =>
-      //     file._id === updatedFile._id ? updatedFile : file
-      //   )
-      // );
 
       router.refresh();
       closeEditModal();

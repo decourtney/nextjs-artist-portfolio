@@ -72,10 +72,7 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
       <div className="flex flex-col mb-8 px-4">
         <h1 className="text-3xl font-bold">{categoryDoc.label}</h1>
         <p className="text-sm text-gray-600 mt-2">
-          ipsom Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut,
-          nam enim modi, dignissimos maxime voluptatem ipsa magnam repellendus
-          delectus neque quibusdam pariatur quia beatae deleniti, sunt aliquid
-          laboriosam distinctio aperiam.
+          {categoryDoc.description}
         </p>
       </div>
 

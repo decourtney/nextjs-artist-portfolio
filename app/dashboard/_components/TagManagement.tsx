@@ -6,16 +6,20 @@ import { useRouter } from "next/navigation";
 
 interface TagManagementProps {
   tags: {
-    categories: TagDocument[];
+    substances: TagDocument[];
     mediums: TagDocument[];
     sizes: TagDocument[];
-    substances: TagDocument[];
+    categories: TagDocument[];
   };
 }
 
 export default function TagManagement({ tags }: TagManagementProps) {
   const router = useRouter();
-  const [newTag, setNewTag] = useState({ label: "", type: "category" });
+  const [newTag, setNewTag] = useState({
+    label: "",
+    type: "category",
+    description: "",
+  });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -39,7 +43,7 @@ export default function TagManagement({ tags }: TagManagementProps) {
       }
 
       setSuccess("Tag added successfully");
-      setNewTag({ ...newTag, label: "" });
+      setNewTag({ label: "", type: "category", description: "" });
       router.refresh();
     } catch (error) {
       setError("An error occurred while adding the tag");
@@ -71,9 +75,9 @@ export default function TagManagement({ tags }: TagManagementProps) {
     }
   };
 
-  const renderTagList = (tagList: TagDocument[], type: string) => (
-    <div className="space-y-2">
-      <h3 className="text-lg font-semibold capitalize">{type}</h3>
+  const renderTagList = (tagList: TagDocument[]) => (
+    <div key={tagList[0].type} className="space-y-2">
+      <h3 className="text-lg font-semibold capitalize">{tagList[0].type}</h3>
       <div className="flex flex-wrap gap-2">
         {tagList.map((tag) => (
           <div
@@ -103,7 +107,7 @@ export default function TagManagement({ tags }: TagManagementProps) {
       {/* Add new tag form */}
       <form onSubmit={handleAddTag} className="space-y-4">
         <div className="flex gap-4">
-          <div className="flex-1">
+          <div className="flex-1 space-y-2">
             <input
               id="tag-label"
               type="text"
@@ -111,6 +115,19 @@ export default function TagManagement({ tags }: TagManagementProps) {
               onChange={(e) => setNewTag({ ...newTag, label: e.target.value })}
               placeholder="Enter tag name"
               className="w-full px-3 py-2 border rounded-md"
+            />
+
+            <textarea
+              disabled={newTag.type !== "category"}
+              id="category-description"
+              onChange={(e) =>
+                setNewTag({ ...newTag, description: e.target.value })
+              }
+              placeholder={
+                newTag.type === "category" ? "Category Description" : ""
+              }
+              rows={3}
+              className="w-full p-2 border rounded-md"
             />
           </div>
           <div>
@@ -128,7 +145,7 @@ export default function TagManagement({ tags }: TagManagementProps) {
           </div>
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            className="h-fit px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
           >
             Add Tag
           </button>
@@ -147,10 +164,7 @@ export default function TagManagement({ tags }: TagManagementProps) {
 
       {/* Tag lists */}
       <div className="space-y-6">
-        {renderTagList(tags.categories, "categories")}
-        {renderTagList(tags.mediums, "mediums")}
-        {renderTagList(tags.sizes, "sizes")}
-        {renderTagList(tags.substances, "substances")}
+        {Object.values(tags).map((tagList) => renderTagList(tagList))}
       </div>
     </section>
   );

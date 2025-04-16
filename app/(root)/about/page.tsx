@@ -5,7 +5,7 @@ import SectionSeparator from "../_components/SectionSeparator";
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen relative">
+    <div className="min-h-screen relative">
       {/* Page-wide texture overlay */}
       {/* <TextureOverlay type="canvas" opacity={0.5} /> */}
 
@@ -224,6 +224,6 @@ export default function AboutPage() {
       <GetInTouchSection />
       {/* Add gradient separators to each section */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#94a3b8] to-transparent"></div>
-    </main>
+    </div>
   );
 }
