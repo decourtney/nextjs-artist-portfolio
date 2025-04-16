@@ -41,17 +41,21 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
   const artworks = rawArtworkDocs.map((artwork) => ({
     ...artwork,
     _id: artwork._id.toString(),
+    substance: {
+      ...artwork.substance,
+      _id: artwork.substance?._id.toString(),
+    },
     category: {
       ...artwork.category,
-      _id: artwork.category._id.toString(),
+      _id: artwork.category?._id.toString(),
     },
     medium: {
       ...artwork.medium,
-      _id: artwork.medium._id.toString(),
+      _id: artwork.medium?._id.toString(),
     },
     size: {
       ...artwork.size,
-      _id: artwork.size._id.toString(),
+      _id: artwork.size?._id.toString(),
     },
   })) as unknown as PopulatedArtworkDocument[];
 
