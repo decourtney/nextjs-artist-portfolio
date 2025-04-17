@@ -34,6 +34,8 @@ export default async function DashboardPage({
       Tag.find({}).lean().maxTimeMS(10000),
     ]);
 
+    const totalPages = Math.ceil(totalCount / 10)
+
     const artworkDocuments: PopulatedArtworkDocument[] = JSON.parse(
       JSON.stringify(artworkResponse)
     );
@@ -59,7 +61,7 @@ export default async function DashboardPage({
             files={artworkDocuments}
             tags={allTags}
             currentPage={page}
-            totalPages={totalCount}
+            totalPages={totalPages}
           />
 
           <TagManagement tags={allTags} />
