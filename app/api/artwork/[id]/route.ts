@@ -10,11 +10,11 @@ import Artwork, {
   PopulatedArtworkDocument,
 } from "@/models/Artwork";
 import { Tag } from "@/models";
-import { EditableArtwork } from "@/app/dashboard/_components/FileManagement";
 import { SanitizeAndShortenString } from "@/utils/sanitizeAndShortenString";
 import { getServerSession } from "next-auth";
 import { _nextAuthOptions } from "@/auth";
 import { TagDocument } from "@/models/Tag";
+import { EditFormData } from "@/types/editFormData";
 
 // Create S3 client
 const s3Client = new S3Client({
@@ -151,7 +151,7 @@ export async function PATCH(
 
     // Parse the incoming JSON payload containing the updated artwork fields.
     // Expected keys: name, description, size, medium, categories (array of category names), etc.
-    const newArtworkData: EditableArtwork = await request.json();
+    const newArtworkData: EditFormData = await request.json();
     if (!newArtworkData) {
       return NextResponse.json(
         { message: "No updated fields provided" },

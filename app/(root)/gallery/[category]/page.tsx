@@ -1,8 +1,7 @@
+import ArtworkCard from "@/app/(root)/_components/ArtworkCard";
 import dbConnect from "@/lib/dbConnect";
 import { Artwork, Tag } from "@/models";
-import ArtworkCard from "@/app/(root)/_components/ArtworkCard";
-import React, { useEffect, useState } from "react";
-import { ArtworkDocument, PopulatedArtworkDocument } from "@/models/Artwork";
+import { PopulatedArtworkDocument } from "@/models/Artwork";
 import { TagDocument } from "@/models/Tag";
 
 interface CategoryPageProps {
@@ -71,9 +70,7 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_600px_1fr] min-h-screen mx-auto py-8 lg:gap-y-8">
       <div className="flex flex-col mb-8 px-4">
         <h1 className="text-3xl font-bold">{categoryDoc.label}</h1>
-        <p className="text-sm text-gray-600 mt-2">
-          {categoryDoc.description}
-        </p>
+        <p className="text-sm text-gray-600 mt-2">{categoryDoc.description}</p>
       </div>
 
       {artworks.map((artwork) => (

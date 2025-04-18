@@ -1,5 +1,3 @@
-import Link from "next/link";
-import Navbar from "./_components/Navbar";
 import Header from "./_components/Header";
 
 export default function RootLayout({

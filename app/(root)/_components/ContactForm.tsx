@@ -13,7 +13,6 @@ const ContactForm = () => {
     e.preventDefault();
 
     if (!formRef.current) return;
-    console.log(formRef.current);
     const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "";
     const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || "";
     const userId = process.env.NEXT_PUBLIC_EMAILJS_USER_ID || "";

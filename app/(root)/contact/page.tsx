@@ -10,8 +10,6 @@ export const metadata: Metadata = {
 };
 
 export default function ContactPage() {
-
-
   return (
     <div className=" relative">
       {/* Hero Section */}

@@ -1,13 +1,10 @@
 import Image from "next/image";
-import TextureOverlay from "../../components/TextureOverlay";
 import GetInTouchSection from "../_components/GetInTouchSection";
 import SectionSeparator from "../_components/SectionSeparator";
 
 export default function AboutPage() {
   return (
     <div className="min-h-screen relative">
-      {/* Page-wide texture overlay */}
-      {/* <TextureOverlay type="canvas" opacity={0.5} /> */}
 
       {/* Hero Section */}
       <section className="hidden relative py-20 px-4">
