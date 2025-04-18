@@ -110,7 +110,6 @@ const FileUpload = () => {
       }
 
       router.refresh();
-      alert("Upload completed. See highlights for success/fail status.");
     } catch (error) {
       console.error(error);
       alert("Error uploading files");

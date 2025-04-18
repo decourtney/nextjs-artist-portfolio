@@ -75,7 +75,7 @@ const pastEvents = [
 
 export default function EventsPage() {
   return (
-    <main className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-neutral-50">
       {/* Hero Section */}
       <section className="relative py-24 bg-white">
         <div className="container mx-auto px-4">
@@ -192,6 +192,6 @@ export default function EventsPage() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

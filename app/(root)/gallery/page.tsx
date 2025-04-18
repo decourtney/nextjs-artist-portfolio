@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Book3D from "@/app/(root)/_components/Book3D";
 import dbConnect from "@/lib/dbConnect";
-import { Tag } from "@/models";
+import { Artwork, Tag } from "@/models";
 import { TagDocument } from "@/models/Tag";
 import GetInTouchSection from "../_components/GetInTouchSection";
 import SectionSeparator from "../_components/SectionSeparator";
@@ -10,36 +10,15 @@ import SectionSeparator from "../_components/SectionSeparator";
 const GalleryPage = async () => {
   await dbConnect();
   const categories = (await Tag.find({ type: "category" })) as TagDocument[];
-
-  // Hard coded categories
-  // const categories = [
-  //   {
-  //     name: "Landscapes",
-  //     description: "Explore the beauty of natural landscapes captured in art.",
-  //     color: "bg-emerald-100",
-  //     link: "/gallery/landscapes",
-  //   },
-  //   {
-  //     name: "Seascapes",
-  //     description: "Discover the serene and powerful scenes of the sea.",
-  //     color: "bg-blue-100",
-  //     link: "/gallery/seascapes",
-  //   },
-  //   {
-  //     name: "Still Lifes",
-  //     description:
-  //       "Appreciate the intricate details of still life compositions.",
-  //     color: "bg-amber-100",
-  //     link: "/gallery/still-lifes",
-  //   },
-  //   {
-  //     name: "Portraits",
-  //     description:
-  //       "See the expressive and detailed portraits of various subjects.",
-  //     color: "bg-rose-100",
-  //     link: "/gallery/portraits",
-  //   },
-  // ];
+  const categoryImages = await Promise.all(
+    categories.map(async (category) => {
+      const categoryImage = await Artwork.findOne({
+        category: category._id,
+        isCategoryImage: true,
+      }).populate("category");
+      return categoryImage;
+    })
+  );
 
   return (
     <>
@@ -54,17 +33,26 @@ const GalleryPage = async () => {
                 href={`/gallery/${category.label.replace(" ", "-")}`}
                 className="block border-2 border-black hover:border-blue-500 transition-colors duration-300"
               >
-                <div
-                  className={`w-full aspect-square flex items-center justify-center`}
-                >
-                  <span className="text-2xl font-charm text-gray-700">
-                    {category.label}
-                  </span>
-                </div>
+                {categoryImages.find(
+                  (img) => img?.category.label === category.label
+                ) ? (
+                  <img
+                    src={
+                      categoryImages.find(
+                        (img) => img?.category.label === category.label
+                      )?.src
+                    }
+                    alt={category.label}
+                    className="w-full aspect-square object-cover"
+                  />
+                ) : (
+                  <div className="w-full aspect-square flex items-center justify-center">
+                    <span className="text-2xl font-charm text-gray-700">
+                      {category.label}
+                    </span>
+                  </div>
+                )}
               </Link>
-              {/* <p className="text-gray-500 text-sm italic text-center mt-3">
-                {category.description}
-              </p> */}
             </div>
           ))}
 

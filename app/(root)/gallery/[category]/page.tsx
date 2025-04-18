@@ -1,8 +1,7 @@
+import ArtworkCard from "@/app/(root)/_components/ArtworkCard";
 import dbConnect from "@/lib/dbConnect";
 import { Artwork, Tag } from "@/models";
-import ArtworkCard from "@/app/(root)/_components/ArtworkCard";
-import React, { useEffect, useState } from "react";
-import { ArtworkDocument, PopulatedArtworkDocument } from "@/models/Artwork";
+import { PopulatedArtworkDocument } from "@/models/Artwork";
 import { TagDocument } from "@/models/Tag";
 
 interface CategoryPageProps {
@@ -30,9 +29,10 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
   const rawArtworkDocs = (await Artwork.find({
     category: categoryDoc._id,
   })
-    .populate("category")
+    .populate("substance")
     .populate("medium")
     .populate("size")
+    .populate("category")
     .lean()
     .exec()) as unknown as PopulatedArtworkDocument[];
 
@@ -40,17 +40,21 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
   const artworks = rawArtworkDocs.map((artwork) => ({
     ...artwork,
     _id: artwork._id.toString(),
+    substance: {
+      ...artwork.substance,
+      _id: artwork.substance?._id.toString(),
+    },
     category: {
       ...artwork.category,
-      _id: artwork.category._id.toString(),
+      _id: artwork.category?._id.toString(),
     },
     medium: {
       ...artwork.medium,
-      _id: artwork.medium._id.toString(),
+      _id: artwork.medium?._id.toString(),
     },
     size: {
       ...artwork.size,
-      _id: artwork.size._id.toString(),
+      _id: artwork.size?._id.toString(),
     },
   })) as unknown as PopulatedArtworkDocument[];
 
@@ -64,15 +68,9 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_600px_1fr] min-h-screen mx-auto py-8 lg:gap-y-8">
-      
       <div className="flex flex-col mb-8 px-4">
         <h1 className="text-3xl font-bold">{categoryDoc.label}</h1>
-        <p className="text-sm text-gray-600 mt-2">
-          ipsom Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut,
-          nam enim modi, dignissimos maxime voluptatem ipsa magnam repellendus
-          delectus neque quibusdam pariatur quia beatae deleniti, sunt aliquid
-          laboriosam distinctio aperiam.
-        </p>
+        <p className="text-sm text-gray-600 mt-2">{categoryDoc.description}</p>
       </div>
 
       {artworks.map((artwork) => (

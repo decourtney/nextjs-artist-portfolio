@@ -1,5 +1,6 @@
 export enum TagType {
-  CATEGORY = "category",
+  SUBSTANCE = "substance",
   MEDIUM = "medium",
   SIZE = "size",
+  CATEGORY = "category",
 }

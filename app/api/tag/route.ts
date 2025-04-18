@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     await dbConnect();
-    const { label, type } = await request.json();
+    const { label, type, description } = await request.json();
 
     // Validate required fields
     if (!label || !type) {
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create new tag
-    const newTag = await Tag.create({ label, type });
+    const newTag = await Tag.create({ label, type, description });
     return NextResponse.json({ tag: newTag }, { status: 201 });
   } catch (error) {
     console.error("Error creating tag:", error);
@@ -79,10 +79,7 @@ export async function DELETE(request: NextRequest) {
     // Check if tag is in use by any artwork
     const tag = await Tag.findById(id);
     if (!tag) {
-      return NextResponse.json(
-        { message: "Tag not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: "Tag not found" }, { status: 404 });
     }
 
     await tag.deleteOne();

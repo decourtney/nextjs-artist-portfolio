@@ -1,13 +1,10 @@
 import Image from "next/image";
-import TextureOverlay from "../../components/TextureOverlay";
 import GetInTouchSection from "../_components/GetInTouchSection";
 import SectionSeparator from "../_components/SectionSeparator";
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen relative">
-      {/* Page-wide texture overlay */}
-      {/* <TextureOverlay type="canvas" opacity={0.5} /> */}
+    <div className="min-h-screen relative">
 
       {/* Hero Section */}
       <section className="hidden relative py-20 px-4">
@@ -224,6 +221,6 @@ export default function AboutPage() {
       <GetInTouchSection />
       {/* Add gradient separators to each section */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#94a3b8] to-transparent"></div>
-    </main>
+    </div>
   );
 }

@@ -72,6 +72,16 @@ const FileItem = ({ file, handleSelectItem, handleEdit }: FileItemParams) => {
 
         {/* Metadata Tags */}
         <div className="flex flex-wrap gap-2 mb-2">
+          {file.size ? (
+            <span className="px-2 py-1 bg-gray-100 text-xs rounded-full">
+              {file.size.label || "Unknown Size"}
+            </span>
+          ) : (
+            <div className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full flex items-center">
+              <IoIosWarning className="mr-1" />
+              Unknown Size
+            </div>
+          )}
           {file.category ? (
             <span className="px-2 py-1 bg-gray-100 text-xs rounded-full">
               {file.category.label || "Uncategorized"}
@@ -82,6 +92,16 @@ const FileItem = ({ file, handleSelectItem, handleEdit }: FileItemParams) => {
               Uncategorized
             </div>
           )}
+          {file.substance ? (
+            <span className="px-2 py-1 bg-gray-100 text-xs rounded-full">
+              {file.substance.label || "Unknown Substance"}
+            </span>
+          ) : (
+            <div className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full flex items-center">
+              <IoIosWarning className="mr-1" />
+              Unknown Substance
+            </div>
+          )}
           {file.medium ? (
             <span className="px-2 py-1 bg-gray-100 text-xs rounded-full">
               {file.medium.label || "Unknown Medium"}
@@ -90,16 +110,6 @@ const FileItem = ({ file, handleSelectItem, handleEdit }: FileItemParams) => {
             <div className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full flex items-center">
               <IoIosWarning className="mr-1" />
               Unknown Medium
-            </div>
-          )}
-          {file.size ? (
-            <span className="px-2 py-1 bg-gray-100 text-xs rounded-full">
-              {file.size.label || "Unknown Size"}
-            </span>
-          ) : (
-            <div className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full flex items-center">
-              <IoIosWarning className="mr-1" />
-              Unknown Size
             </div>
           )}
         </div>
@@ -148,27 +158,45 @@ const FileItem = ({ file, handleSelectItem, handleEdit }: FileItemParams) => {
           )}
 
           {/* Main Page Image Icon */}
-          {file.isMainImage && (
+          {file.isMainImage ? (
             <IoIosHome
               className="text-blue-500"
+              title="Home Page Image"
+              size={20}
+            />
+          ) : (
+            <IoIosHome
+              className="text-gray-300"
               title="Home Page Image"
               size={20}
             />
           )}
 
           {/* Featured Icon */}
-          {file.isFeatured && (
+          {file.isFeatured ? (
             <IoIosStar
               className="text-yellow-500 fill-current"
+              title="Featured"
+              size={20}
+            />
+          ) : (
+            <IoIosStar
+              className="text-gray-300 fill-current"
               title="Featured"
               size={20}
             />
           )}
 
           {/* Category Image Icon */}
-          {file.isCategoryImage && (
+          {file.isCategoryImage ? (
             <IoIosImages
               className="text-purple-500"
+              title="Category Image"
+              size={20}
+            />
+          ) : (
+            <IoIosImages
+              className="text-gray-300"
               title="Category Image"
               size={20}
             />

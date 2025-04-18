@@ -23,9 +23,10 @@ export default async function DashboardPage({
     const [totalCount, artworkResponse, tagsResponse] = await Promise.all([
       Artwork.countDocuments({}).maxTimeMS(10000),
       Artwork.find({})
-        .populate("category")
+        .populate("substance")
         .populate("medium")
         .populate("size")
+        .populate("category")
         .skip(skip)
         .limit(limit)
         .lean()
@@ -33,18 +34,24 @@ export default async function DashboardPage({
       Tag.find({}).lean().maxTimeMS(10000),
     ]);
 
+    const totalPages = Math.ceil(totalCount / 10)
+
     const artworkDocuments: PopulatedArtworkDocument[] = JSON.parse(
       JSON.stringify(artworkResponse)
     );
     const tags: TagDocument[] = JSON.parse(JSON.stringify(tagsResponse));
 
     // Split tags by type
-    const categories = tags.filter(
-      (tag: TagDocument) => tag.type === "category"
+    const substances = tags.filter(
+      (tag: TagDocument) => tag.type === "substance"
     );
     const mediums = tags.filter((tag: TagDocument) => tag.type === "medium");
     const sizes = tags.filter((tag: TagDocument) => tag.type === "size");
-    const allTags = { categories, mediums, sizes };
+    const categories = tags.filter(
+      (tag: TagDocument) => tag.type === "category"
+    );
+
+    const allTags = { substances, mediums, sizes, categories };
 
     return (
       <main className="w-full mx-auto">
@@ -54,7 +61,7 @@ export default async function DashboardPage({
             files={artworkDocuments}
             tags={allTags}
             currentPage={page}
-            totalPages={totalCount}
+            totalPages={totalPages}
           />
 
           <TagManagement tags={allTags} />

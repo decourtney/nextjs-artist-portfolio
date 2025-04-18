@@ -12,16 +12,17 @@ export default async function Home() {
     .lean()
     .maxTimeMS(10000)
     .exec() as unknown as ArtworkDocument;
-  const featuredArtworks = await Artwork.find({
+  const featuredArtworks = (await Artwork.find({
     isFeatured: true,
   })
     .limit(3)
-    .populate("category")
+    .populate("substance")
     .populate("medium")
     .populate("size")
+    .populate("category")
     .lean()
     .maxTimeMS(10000)
-    .exec() as unknown as PopulatedArtworkDocument[];
+    .exec()) as unknown as PopulatedArtworkDocument[];
 
   return (
     <div className="min-h-screen">

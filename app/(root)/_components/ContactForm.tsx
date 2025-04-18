@@ -1,150 +1,103 @@
 "use client";
 
+import React, { useRef, useState, FormEvent } from "react";
 import emailjs from "@emailjs/browser";
-import { useTheme } from "next-themes";
-import React, { ChangeEvent, FormEvent, useState } from "react";
-import SocialMediaButtons from "./SocialMediaButtons";
 
 const ContactForm = () => {
-  const { theme } = useTheme();
-  const [name, setName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [isSending, setIsSending] = useState<boolean>(false);
-  const [successMessage, setSuccessMessage] = useState<string>("");
+  const formRef = useRef<HTMLFormElement>(null);
+  const [status, setStatus] = useState<
+    "idle" | "sending" | "success" | "error"
+  >("idle");
 
-  const validateForm = (): { [key: string]: string } => {
-    const newErrors: { [key: string]: string } = {};
-    if (!name) newErrors.name = "Name is required";
-    if (!email) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = "Email is invalid";
-    if (!message) newErrors.message = "Message is required";
-    return newErrors;
-  };
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleOnSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const validationErrors = validateForm();
 
-    const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
-    const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
-    const userId = process.env.NEXT_PUBLIC_EMAILJS_USER_ID;
+    if (!formRef.current) return;
+    const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "";
+    const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || "";
+    const userId = process.env.NEXT_PUBLIC_EMAILJS_USER_ID || "";
 
-    if (!serviceId || !templateId || !userId) {
-      return;
-    }
+    setStatus("sending");
 
-    if (Object.keys(validationErrors).length === 0) {
-      setIsSending(true);
-      try {
-        await emailjs.send(
-          serviceId,
-          templateId,
-          { user_name: name, user_email: email, user_message: message },
-          userId
-        );
-        setSuccessMessage(
-          `${
-            theme === "dark"
-              ? "Be vigilant and stick to the shadows!"
-              : "Thank You! That really brightened my day!"
-          }`
-        );
-        setName("");
-        setEmail("");
-        setMessage("");
-      } catch (error) {
-        if (error instanceof Error) {
-          console.error("Failed to send email: ", error.message);
-        } else {
-          console.error("An error occurred while sending the email.");
+    emailjs
+      .sendForm(serviceId, templateId, formRef.current, { publicKey: userId })
+      .then(
+        () => {
+          setStatus("success");
+          formRef.current?.reset();
+        },
+        (error) => {
+          setStatus("error");
+          console.error("Email send failed:", error);
         }
-      } finally {
-        setIsSending(false);
-      }
-    } else {
-      setErrors(validationErrors);
-    }
+      );
   };
-
-  const handleInputChange =
-    (setter: React.Dispatch<React.SetStateAction<string>>) =>
-    (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
-      setter(e.target.value);
-      setErrors((prevErrors) => ({ ...prevErrors, [e.target.name]: "" }));
-    };
-
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full"
-    >
-      <div className="col-span-1">
-        <input
-          type="text"
-          placeholder="Name"
-          name="name"
-          value={name}
-          onChange={handleInputChange(setName)}
-          className={`w-full p-3 rounded-medium bg-background-100 border border-divider-200 focus:border-primary-500 focus:outline-none transition-colors ${
-            errors.name ? "border-red-500" : ""
-          }`}
-        />
-        {errors.name && (
-          <p className="text-red-500 text-small mt-1">{errors.name}</p>
-        )}
-      </div>
-
-      <div className="col-span-1">
-        <input
-          type="email"
-          placeholder="Email"
-          name="email"
-          value={email}
-          onChange={handleInputChange(setEmail)}
-          className={`w-full p-3 rounded-medium bg-background-100 border border-divider-200 focus:border-primary-500 focus:outline-none transition-colors ${
-            errors.email ? "border-red-500" : ""
-          }`}
-        />
-        {errors.email && (
-          <p className="text-red-500 text-small mt-1">{errors.email}</p>
-        )}
-      </div>
-
-      <div className="col-span-2">
-        <textarea
-          placeholder="Message"
-          name="message"
-          value={message}
-          onChange={handleInputChange(setMessage)}
-          rows={4}
-          className={`w-full p-3 rounded-medium bg-background-100 border border-divider-200 focus:border-primary-500 focus:outline-none transition-colors ${
-            errors.message ? "border-red-500" : ""
-          }`}
-        />
-        {errors.message && (
-          <p className="text-red-500 text-small mt-1">{errors.message}</p>
-        )}
-      </div>
-
-      <div className="col-span-2 flex justify-between items-center">
-        <SocialMediaButtons />
-        <button
-          type="submit"
-          disabled={isSending}
-          className="px-6 py-3 rounded-medium bg-primary-500 text-white hover:bg-primary-600 transition-colors disabled:opacity-50"
-        >
-          {isSending ? "Sending..." : "Send Message"}
-        </button>
-      </div>
-
-      {successMessage && (
-        <div className="col-span-2 text-center text-green-500">
-          {successMessage}
+    <div>
+      <h2 className="text-3xl font-charm mb-8 text-[#1e293b]">
+        Send a Message
+      </h2>
+      <form ref={formRef} className="space-y-6" onSubmit={handleOnSubmit}>
+        <div>
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-[#475569] mb-1"
+          >
+            Name
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            className="w-full px-4 py-2 border border-[#1e293b] rounded-md focus:outline-none focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent"
+            required
+          />
         </div>
-      )}
-    </form>
+        <div>
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-[#475569] mb-1"
+          >
+            Email
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            className="w-full px-4 py-2 border border-[#1e293b] rounded-md focus:outline-none focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent"
+            required
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="message"
+            className="block text-sm font-medium text-[#475569] mb-1"
+          >
+            Message
+          </label>
+          <textarea
+            id="message"
+            name="message"
+            rows={5}
+            className="w-full px-4 py-2 border border-[#1e293b] rounded-md focus:outline-none focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent"
+            required
+          ></textarea>
+        </div>
+        <div>
+          <button
+            type="submit"
+            className="group relative inline-block px-8 py-4 text-lg font-medium text-[#1e293b] hover:text-white transition-colors duration-300"
+            disabled={status === "sending"}
+          >
+            <span className="relative z-10">
+              {status === "sending" ? "Sending..." : "Send Message"}
+            </span>
+            <span className="absolute inset-0 w-full h-full bg-[#3b82f6] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <span className="absolute inset-0 w-full h-full border-2 border-[#1e293b] group-hover:border-[#3b82f6] transition-colors duration-300" />
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };
 

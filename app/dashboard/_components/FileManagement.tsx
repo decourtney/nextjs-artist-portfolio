@@ -1,42 +1,12 @@
 "use client";
 
 import { PopulatedArtworkDocument } from "@/models/Artwork";
-import { TagDocument } from "@/models/Tag";
 import { useRouter } from "next/navigation";
-import React, { Fragment, useState } from "react";
-import {
-  IoIosArrowBack,
-  IoIosArrowForward,
-  IoIosClose,
-  IoIosWarning,
-  IoIosCheckmarkCircle,
-  IoIosCloseCircle,
-  IoIosHome,
-  IoIosStar,
-  IoIosImages,
-} from "react-icons/io";
-import Image from "next/image";
+import { useState } from "react";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import EditModal from "./EditModal";
 import FileItem from "./FileItem";
-
-// Define a type for the editable fields.
-export interface EditableArtwork {
-  name: string;
-  description: string;
-  medium: string;
-  size: string;
-  category: string;
-  price: number;
-  isAvailable: boolean;
-  isMainImage: boolean;
-  isFeatured: boolean;
-  isCategoryImage: boolean;
-}
-
-interface AllTags {
-  categories: TagDocument[];
-  mediums: TagDocument[];
-  sizes: TagDocument[];
-}
+import { AllTags } from "@/types/allTags";
 
 export default function FileManagement({
   files,
@@ -50,15 +20,11 @@ export default function FileManagement({
   totalPages: number;
 }) {
   const router = useRouter();
-  const [filesState, setFilesState] = useState<PopulatedArtworkDocument[]>(files)
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [editingDoc, setEditingDoc] = useState<PopulatedArtworkDocument | null>(
+  const [fileToEdit, setFileToEdit] = useState<PopulatedArtworkDocument | null>(
     null
   );
-  const [editForm, setEditForm] = useState<EditableArtwork | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handlePrevious = () => {
     if (currentPage > 1) {
@@ -85,10 +51,10 @@ export default function FileManagement({
 
   // Global Select All
   const handleSelectAll = (isSelected: boolean) => {
-    setSelectedIds(isSelected ? filesState.map((file) => file._id) : []);
+    setSelectedIds(isSelected ? files.map((file) => file._id) : []);
   };
 
-  // Delete selected items (calls your API DELETE route)
+  // Delete selected items
   const handleDelete = async () => {
     try {
       const res = await fetch(`/api/artwork/batch-delete`, {
@@ -97,394 +63,16 @@ export default function FileManagement({
         body: JSON.stringify({ ids: selectedIds }),
       });
 
-      if (res.ok) {
-        setSelectedIds([]); // Clear selected IDs after deletion
-      }
-
-      if (!res.ok) {
-        console.error("Batch delete failed", await res.json());
-      } else {
-        // router.refresh();
-      }
+      setSelectedIds([]);
+      router.refresh();
     } catch (error) {
       console.error("Error deleting files", error);
     }
   };
 
   const handleEdit = (file: PopulatedArtworkDocument) => {
-    setEditingDoc(file);
-    setEditForm({
-      name: file.name,
-      description: file.description ?? undefined,
-      medium: file.medium?.label ?? undefined,
-      size: file.size?.label ?? undefined,
-      category: file.category?.label ?? undefined,
-      price: file.price ?? undefined,
-      isAvailable: file.isAvailable ?? true,
-      isMainImage: file.isMainImage ?? false,
-      isFeatured: file.isFeatured ?? false,
-      isCategoryImage: file.isCategoryImage ?? false,
-    });
+    setFileToEdit(file);
     setIsModalOpen(true);
-  };
-
-  const handleSubmitEdit = async () => {
-    if (!editingDoc || !editForm) return;
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      const response = await fetch(`/api/artwork/${editingDoc._id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(editForm),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || "Failed to update artwork");
-      }
-
-      const updatedFile = await response.json();
-
-      // Update the filesState by replacing the old file with the updated one
-      setFilesState((prevFiles) =>
-        prevFiles.map((file) =>
-          file._id === updatedFile._id ? updatedFile : file
-        )
-      );
-
-      closeEditModal();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const closeEditModal = () => {
-    setIsModalOpen(false);
-    setEditingDoc(null);
-    setEditForm(null);
-    setError(null);
-  };
-
-  const renderEditModal = () => {
-    if (!isModalOpen || !editForm) return null;
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Edit Artwork</h2>
-            <button
-              onClick={closeEditModal}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <IoIosClose size={24} />
-            </button>
-          </div>
-
-          {error && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
-              {error}
-            </div>
-          )}
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Name
-                <input
-                  id="artwork-name"
-                  type="text"
-                  value={editForm.name}
-                  onChange={(e) =>
-                    setEditForm({ ...editForm, name: e.target.value })
-                  }
-                  className="w-full p-2 border rounded-md"
-                />
-              </label>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-                <textarea
-                  id="artwork-description"
-                  value={editForm.description}
-                  onChange={(e) =>
-                    setEditForm({ ...editForm, description: e.target.value })
-                  }
-                  rows={3}
-                  className="w-full p-2 border rounded-md"
-                />
-              </label>
-            </div>
-
-            {/* Tags */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Medium
-                  <select
-                    id="artwork-medium"
-                    value={editForm.medium}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, medium: e.target.value })
-                    }
-                    className="w-full p-2 border rounded-md"
-                  >
-                    <option value="">Select Medium</option>
-                    {tags.mediums.map((tag) => (
-                      <option key={tag._id} value={tag.label}>
-                        {tag.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Size
-                  <select
-                    id="artwork-size"
-                    value={editForm.size}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, size: e.target.value })
-                    }
-                    className="w-full p-2 border rounded-md"
-                  >
-                    <option value="">Select Size</option>
-                    {tags.sizes.map((tag) => (
-                      <option key={tag._id} value={tag.label}>
-                        {tag.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Category
-                  <select
-                    id="artwork-category"
-                    value={editForm.category}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, category: e.target.value })
-                    }
-                    className="w-full p-2 border rounded-md"
-                  >
-                    <option value="">Select Category</option>
-                    {tags.categories.map((tag) => (
-                      <option key={tag._id} value={tag.label}>
-                        {tag.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-            </div>
-
-            {/* Price and Availability */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Price
-                  <input
-                    id="artwork-price"
-                    type="number"
-                    placeholder={editForm.price.toString()}
-                    onChange={(e) =>
-                      setEditForm({
-                        ...editForm,
-                        price: parseFloat(e.target.value) || 0,
-                      })
-                    }
-                    min="0"
-                    step="0.01"
-                    className="w-full p-2 border rounded-md"
-                  />
-                </label>
-                <div
-                  className={`ml-2 cursor-pointer ${
-                    editForm.isAvailable ? "text-blue-500" : "text-gray-300"
-                  }`}
-                  onClick={(e) =>
-                    setEditForm({
-                      ...editForm,
-                      isAvailable: !editForm.isAvailable,
-                    })
-                  }
-                >
-                  {editForm.isAvailable ? (
-                    <div className="flex flex-row items-center space-x-2">
-                      <IoIosCheckmarkCircle
-                        className="text-green-500"
-                        title="Available"
-                        size={20}
-                      />
-                      <span className="text-sm font-medium text-gray-700">
-                        Available
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="flex flex-row items-center space-x-2">
-                      <IoIosCloseCircle
-                        className="text-red-500"
-                        title="Unavailable"
-                        size={20}
-                      />
-                      <span className="text-sm font-medium text-gray-700">
-                        Unavailable
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Radio buttons for Home page, featured, and category images */}
-              <div className="flex flex-col justify-between">
-                <div
-                  className={`cursor-pointer ${
-                    editForm.isMainImage ? "text-blue-500" : "text-gray-300"
-                  }`}
-                  onClick={(e) =>
-                    setEditForm({
-                      ...editForm,
-                      isMainImage: !editForm.isMainImage,
-                    })
-                  }
-                >
-                  {editForm.isMainImage ? (
-                    <div className="flex flex-row items-center space-x-2">
-                      <IoIosHome
-                        className="text-blue-500"
-                        title="Home Page Image"
-                        size={20}
-                      />
-                      <span className="text-sm font-medium text-gray-700">
-                        Home Page Image
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="group flex flex-row items-center space-x-2">
-                      <IoIosHome
-                        className="text-gray-300 group-hover:text-blue-300"
-                        title="Home Page Image"
-                        size={20}
-                      />
-                      <span className="text-sm font-medium text-gray-300 group-hover:text-blue-300">
-                        Home Page Image
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                <div
-                  className={`cursor-pointer ${
-                    editForm.isFeatured ? "text-blue-500" : "text-gray-300"
-                  }`}
-                  onClick={(e) =>
-                    setEditForm({
-                      ...editForm,
-                      isFeatured: !editForm.isFeatured,
-                    })
-                  }
-                >
-                  {editForm.isFeatured ? (
-                    <div className="flex flex-row items-center space-x-2">
-                      <IoIosStar
-                        className="text-yellow-500 fill-current"
-                        title="Featured"
-                        size={20}
-                      />
-                      <span className="text-sm font-medium text-gray-700">
-                        Featured Image
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="group flex flex-row items-center space-x-2">
-                      <IoIosStar
-                        className="text-gray-300 group-hover:text-blue-300 fill-current"
-                        title="Featured"
-                        size={20}
-                      />
-                      <span className="text-sm font-medium text-gray-300 group-hover:text-blue-300">
-                        Featured Image
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                <div
-                  className={`cursor-pointer ${
-                    editForm.isCategoryImage ? "text-blue-500" : "text-gray-300"
-                  }`}
-                  onClick={(e) =>
-                    setEditForm({
-                      ...editForm,
-                      isCategoryImage: !editForm.isCategoryImage,
-                    })
-                  }
-                >
-                  {editForm.isCategoryImage ? (
-                    <div className="flex flex-row items-center space-x-2">
-                      <IoIosImages
-                        className="text-purple-500"
-                        title="Category Image"
-                        size={20}
-                      />
-                      <span className="text-sm font-medium text-gray-700">
-                        Category Image
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="group flex flex-row items-center space-x-2">
-                      <IoIosImages
-                        className="text-gray-300 group-hover:text-blue-300"
-                        title="Category Image"
-                        size={20}
-                      />
-                      <span className="text-sm font-medium text-gray-300 group-hover:text-blue-300">
-                        Category Image
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-6 flex justify-end space-x-3">
-            <button
-              onClick={closeEditModal}
-              className="px-4 py-2 text-gray-600 hover:text-gray-800"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSubmitEdit}
-              disabled={isSubmitting}
-              className={`
-                px-4 py-2 bg-blue-500 text-white rounded-md
-                ${
-                  isSubmitting
-                    ? "opacity-50 cursor-not-allowed"
-                    : "hover:bg-blue-600"
-                }
-              `}
-            >
-              {isSubmitting ? "Saving..." : "Save Changes"}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
   };
 
   return (
@@ -510,16 +98,14 @@ export default function FileManagement({
           id="select-all"
           type="checkbox"
           className="mr-2"
-          checked={
-            selectedIds.length === filesState.length && filesState.length > 0
-          }
+          checked={selectedIds.length === files.length && files.length > 0}
           onChange={(e) => handleSelectAll(e.target.checked)}
         />
         <span>Select All</span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        {filesState.map((file) => (
+        {files.map((file) => (
           <FileItem
             key={file._id}
             file={file}
@@ -556,7 +142,15 @@ export default function FileManagement({
           <IoIosArrowForward />
         </button>
       </div>
-      {renderEditModal()}
+
+      {/* Editing Modal */}
+      {isModalOpen && fileToEdit && (
+        <EditModal
+          fileToEdit={fileToEdit}
+          tags={tags}
+          setIsModalOpen={setIsModalOpen}
+        />
+      )}
     </section>
   );
 }

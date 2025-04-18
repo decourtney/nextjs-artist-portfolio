@@ -5,6 +5,7 @@ export interface TagDocument extends Document {
   _id: string;
   label: string;
   type: TagType;
+  description: string
 }
 
 const TagSchema = new Schema<TagDocument>(
@@ -19,7 +20,11 @@ const TagSchema = new Schema<TagDocument>(
       type: String,
       required: true,
       trim: true,
-      enum: [TagType.CATEGORY, TagType.MEDIUM, TagType.SIZE],
+      enum: [TagType.CATEGORY, TagType.MEDIUM, TagType.SIZE, TagType.SUBSTANCE],
+    },
+    description: {
+      type: String,
+      maxlength: [255, "Description cannot be more than 255 characters long"],
     },
   },
   { timestamps: true }
