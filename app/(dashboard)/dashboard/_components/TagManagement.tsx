@@ -1,7 +1,7 @@
 "use client";
 
 import { TagDocument } from "@/models/Tag";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface TagManagementProps {
@@ -22,6 +22,7 @@ export default function TagManagement({ tags }: TagManagementProps) {
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleAddTag = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,6 +43,7 @@ export default function TagManagement({ tags }: TagManagementProps) {
         return;
       }
 
+      formRef.current?.reset()
       setSuccess("Tag added successfully");
       setNewTag({ label: "", type: "category", description: "" });
       router.refresh();
@@ -105,7 +107,7 @@ export default function TagManagement({ tags }: TagManagementProps) {
       <h2 className="text-2xl font-bold text-foreground-500">Tag Management</h2>
 
       {/* Add new tag form */}
-      <form onSubmit={handleAddTag} className="space-y-4">
+      <form ref={formRef} onSubmit={handleAddTag} className="space-y-4">
         <div className="flex gap-4">
           <div className="flex-1 space-y-2">
             <input

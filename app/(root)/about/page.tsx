@@ -5,7 +5,6 @@ import SectionSeparator from "../_components/SectionSeparator";
 export default function AboutPage() {
   return (
     <div className="min-h-screen relative">
-
       {/* Hero Section */}
       <section className="hidden relative py-20 px-4">
         <div className="container mx-auto px-4">

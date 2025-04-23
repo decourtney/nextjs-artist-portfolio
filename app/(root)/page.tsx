@@ -6,12 +6,12 @@ import dbConnect from "@/lib/dbConnect";
 import { Artwork } from "@/models";
 import { ArtworkDocument, PopulatedArtworkDocument } from "@/models/Artwork";
 
-export default async function Home() {
+const Home = async () => {
   await dbConnect();
-  const mainImageArtwork = await Artwork.findOne({ isMainImage: true })
+  const mainImageArtwork = (await Artwork.findOne({ isMainImage: true })
     .lean()
     .maxTimeMS(10000)
-    .exec() as unknown as ArtworkDocument;
+    .exec()) as unknown as ArtworkDocument;
   const featuredArtworks = (await Artwork.find({
     isFeatured: true,
   })
@@ -108,4 +108,6 @@ export default async function Home() {
       <GetInTouchSection />
     </div>
   );
-}
+};
+
+export default Home;

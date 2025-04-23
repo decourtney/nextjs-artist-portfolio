@@ -1,8 +1,8 @@
 import Artwork, { PopulatedArtworkDocument } from "@/models/Artwork";
 import Tag, { TagDocument } from "@/models/Tag";
-import FileManagement from "@/app/dashboard/_components/FileManagement";
-import FileUpload from "@/app/dashboard/_components/FileUpload";
-import TagManagement from "@/app/dashboard/_components/TagManagement";
+import FileManagement from "@/app/(dashboard)/dashboard/_components/FileManagement";
+import FileUpload from "@/app/(dashboard)/dashboard/_components/FileUpload";
+import TagManagement from "@/app/(dashboard)/dashboard/_components/TagManagement";
 import dbConnect from "@/lib/dbConnect";
 import { notFound } from "next/navigation";
 import ProfileManagement from "./_components/ProfileManagement";
