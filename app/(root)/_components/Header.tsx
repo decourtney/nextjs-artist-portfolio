@@ -8,7 +8,10 @@ import { useEffect } from "react";
 
 const Header = () => {
   const pathname = usePathname();
-  const previousRoute = sessionStorage.getItem("previousRoute");
+  const previousRoute =
+    typeof window !== "undefined"
+      ? sessionStorage.getItem("previousRoute")
+      : null;
   const isSmallHeader = pathname.startsWith("/gallery");
 
   // Check if the previous route is "/gallery/* to determine if motions initial value needs to be set to the same value as the animate value

@@ -74,11 +74,12 @@ const Home = async () => {
           <h2 className="text-3xl font-bold text-center mb-12 text-[#1e293b] font-charm">
             Featured Works
           </h2>
-          <div className="flex justify-around items-center">
+          <div className="flex flex-col md:flex-row gap-1">
+          {/* <div className="grid grid-cols-3"> */}
             {featuredArtworks &&
               featuredArtworks.map((artwork) => (
-                <div key={artwork.name} className="group">
-                  <div className="relative aspect-square mb-4 h-[350px]">
+                <div key={artwork.name} className="group flex w-full">
+                  <div className="relative aspect-square mb-4 w-full">
                     <Image
                       src={artwork.thumbSrc}
                       alt={artwork.name}
@@ -102,6 +103,7 @@ const Home = async () => {
             </Link>
           </div>
         </div>
+
         <SectionSeparator />
       </section>
 
