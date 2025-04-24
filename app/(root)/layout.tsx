@@ -1,14 +1,16 @@
 import Footer from "./_components/Footer";
 import Header from "./_components/Header";
+import PageWrapper from "./_components/PageWrapper";
 
 const RootLayoutLarge = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
-      {/* Header */}
       <Header />
-      {/* Main */}
-      <main className="max-w-[1200px] mx-auto">{children}</main>
-      {/* Footer */}
+
+      <main className="max-w-[1200px] mx-auto">
+        <PageWrapper>{children}</PageWrapper>
+      </main>
+
       <Footer />
     </>
   );

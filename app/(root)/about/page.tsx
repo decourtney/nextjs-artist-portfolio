@@ -186,22 +186,22 @@ export default function AboutPage() {
             </h2>
             <div className="grid md:grid-cols-2 gap-8">
               <div className="relative aspect-[4/3]">
-                <Image
+                {/* <Image
                   src="https://general-purpose-chumbucket-001.s3.us-east-2.amazonaws.com/genacourtney/images/viking-longship-rigging-oil-on-copper-10-x-12.webp"
                   alt="Studio workspace"
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 50vw"
-                />
+                /> */}
               </div>
               <div className="relative aspect-[4/3]">
-                <Image
+                {/* <Image
                   src="https://general-purpose-chumbucket-001.s3.us-east-2.amazonaws.com/genacourtney/images/weary-travelers-oil-on-copper-11-x-10.webp"
                   alt="Art supplies and tools"
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 50vw"
-                />
+                /> */}
               </div>
             </div>
             <div className="mt-8 text-center">

@@ -26,7 +26,7 @@ const Home = async () => {
 
   return (
     <div className="min-h-screen">
-      {/* About Section */}
+      {/* Hero Section */}
       <section className="py-20 px-4 relative">
         <div className="max-w-4xl mx-auto">
           <div className="flex flex-col gap-12">

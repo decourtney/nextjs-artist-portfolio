@@ -1,10 +1,8 @@
-"use client";
-
 import Link from "next/link";
 
 const Navbar = () => {
   return (
-    <nav className="relative mt-8 pb-4 w-full h-[64px] content-end">
+    <nav className="relative pb-4 w-full h-[64px] content-end">
       <ul className="flex justify-center gap-12">
         <li>
           <Link

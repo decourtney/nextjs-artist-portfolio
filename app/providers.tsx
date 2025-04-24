@@ -1,10 +1,9 @@
 "use client";
 
-import { ThemeProvider as NextThemesProvider } from "next-themes";
-import { SessionProvider } from "next-auth/react";
 import type { Session } from "next-auth";
-import React, { ReactNode, Suspense } from "react";
-import { FilteredArtworkProvider } from "./context/FilteredArtworkContext";
+import { SessionProvider } from "next-auth/react";
+import { usePathname } from "next/navigation";
+import { ReactNode } from "react";
 
 export function Providers({
   children,
@@ -13,11 +12,11 @@ export function Providers({
   children: ReactNode;
   session: Session | null;
 }) {
+  const pathname = usePathname();
+
   return (
     <SessionProvider session={session}>
-      {/* <FilteredArtworkProvider> */}
-        {children}
-        {/* </FilteredArtworkProvider> */}
+      <div key={pathname}>{children}</div>
     </SessionProvider>
   );
 }
