@@ -4,6 +4,7 @@ import type { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
+import { PreviousPathnameProvider } from "./context/PreviousPathnameContext";
 
 export function Providers({
   children,
@@ -16,7 +17,9 @@ export function Providers({
 
   return (
     <SessionProvider session={session}>
-      <div key={pathname}>{children}</div>
+      <PreviousPathnameProvider>
+        <div key={pathname}>{children}</div>
+      </PreviousPathnameProvider>
     </SessionProvider>
   );
 }
