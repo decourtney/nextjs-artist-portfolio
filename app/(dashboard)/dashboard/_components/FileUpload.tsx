@@ -59,8 +59,8 @@ const FileUpload = () => {
     setSelectedFiles([]);
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
     if (selectedFiles.length === 0) {
       alert("Please select at least one file first.");

@@ -42,8 +42,10 @@ const s3Client = new S3Client({
 });
 
 // Utility: Convert a Next.js ReadableStream to Node.js Readable
-function streamToNodeReadable(stream: ReadableStream<Uint8Array>): Readable {
-  const reader = stream.getReader();
+function webStreamToNodeReadable(
+  webStream: ReadableStream<Uint8Array>
+): Readable {
+  const reader = webStream.getReader();
   return new Readable({
     async read() {
       const { done, value } = await reader.read();
@@ -114,6 +116,8 @@ export async function POST(request: NextRequest) {
     const pendingImages: PendingImageData[] = [];
 
     // We'll store the UUIDs in an array in the order they appear
+    // Don't jumble them up by using an object or map
+    // This way, we can match them to the files in the order they are uploaded
     const uuids: string[] = [];
     let fileIndex = 0;
 
@@ -331,20 +335,7 @@ export async function POST(request: NextRequest) {
         return;
       }
 
-      // Stream the request body into Busboy
-      const reader = request.body.getReader();
-      const stream = new ReadableStream({
-        async pull(controller) {
-          const { done, value } = await reader.read();
-          if (done) {
-            controller.close();
-          } else {
-            controller.enqueue(value);
-          }
-        },
-      });
-
-      const nodeStream = streamToNodeReadable(stream);
+      const nodeStream = webStreamToNodeReadable(request.body);
       nodeStream.pipe(busboy);
     });
   } catch (error) {
