@@ -4,6 +4,8 @@ import React, { useState, ChangeEvent, useRef, FormEvent } from "react";
 import { MdClose } from "react-icons/md";
 import { IoIosWarning } from "react-icons/io";
 import { useRouter } from "next/navigation";
+import { overlay, secondary } from "@/ColorTheme";
+import LoadingSpinner from "./LoadingSpinner";
 
 interface FileItem {
   id: string;
@@ -22,6 +24,7 @@ const FileUpload = () => {
   const router = useRouter();
   const [selectedFiles, setSelectedFiles] = useState<FileItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleOpenFileDialog = () => {
     fileInputRef.current?.click();
@@ -67,6 +70,8 @@ const FileUpload = () => {
       return;
     }
 
+    setIsLoading(true);
+
     const formData = new FormData();
     selectedFiles.forEach((item) => {
       formData.append("files", item.file);
@@ -109,6 +114,7 @@ const FileUpload = () => {
         );
       }
 
+      setIsLoading(false);
       router.refresh();
     } catch (error) {
       console.error(error);
@@ -120,7 +126,7 @@ const FileUpload = () => {
     <form
       id="file-upload"
       onSubmit={handleSubmit}
-      className="p-6 shadow-md rounded-lg bg-background-50 text-gray-900"
+      className="relative p-6 shadow-md rounded-lg bg-background-50 text-gray-900"
     >
       <div className="relative flex justify-between mb-4 border-b">
         <h1 className="text-2xl font-bold text-foreground-500 mb-4">
@@ -143,7 +149,9 @@ const FileUpload = () => {
         onChange={handleFileChange}
       />
 
-      <div className="min-h-[200px] max-h-[500px] overflow-y-auto rounded-lg bg-white shadow-sm">
+      {isLoading && <LoadingSpinner />}
+
+      <div className="relative min-h-[200px] max-h-[500px] overflow-y-auto rounded-lg bg-white shadow-sm">
         {selectedFiles.length > 0 ? (
           <>
             <ul className="[&>*:nth-child(even)]:bg-gray-50 text-gray-900">
@@ -185,6 +193,7 @@ const FileUpload = () => {
       <div className="flex justify-between mt-4">
         <button
           type="button"
+          disabled={isLoading}
           className="px-4 py-2 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors"
           onClick={handleOpenFileDialog}
         >
@@ -194,14 +203,24 @@ const FileUpload = () => {
         <div className="space-x-4">
           <button
             type="button"
-            className="px-4 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors"
+            disabled={selectedFiles.length === 0 || isLoading}
+            className="px-4 py-2 text-sm bg-secondary-700 hover:bg-secondary-900 text-white rounded-md transition-colors"
+            style={{
+              backgroundColor:
+                selectedFiles.length === 0 ? overlay[100] : undefined,
+            }}
             onClick={handleCancel}
           >
             Cancel
           </button>
           <button
             type="submit"
+            disabled={selectedFiles.length === 0 || isLoading}
             className="px-4 py-2 text-sm bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors"
+            style={{
+              backgroundColor:
+                selectedFiles.length === 0 ? overlay[100] : undefined,
+            }}
           >
             Upload
           </button>

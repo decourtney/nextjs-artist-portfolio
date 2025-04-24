@@ -335,6 +335,7 @@ export async function POST(request: NextRequest) {
         return;
       }
 
+      // Need to convert to Node.js Readable stream
       const nodeStream = webStreamToNodeReadable(request.body);
       nodeStream.pipe(busboy);
     });
