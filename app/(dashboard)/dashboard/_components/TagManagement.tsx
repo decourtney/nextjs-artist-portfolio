@@ -110,7 +110,7 @@ export default function TagManagement({ tags }: TagManagementProps) {
       id="tag-management"
       className="space-y-6 bg-background-50 p-6 rounded-lg shadow-md"
     >
-      <div className="flex items-center">
+      <div className="flex items-center border-b pb-4">
         <h2 className="mr-6 text-2xl font-bold text-foreground-500">
           Tag Management
         </h2>
@@ -172,7 +172,7 @@ export default function TagManagement({ tags }: TagManagementProps) {
             type="submit"
             disabled={isLoading}
             className="relative h-fit px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-            style={{backgroundColor: isLoading ? overlay[100] : undefined}}
+            style={{ backgroundColor: isLoading ? overlay[100] : undefined }}
           >
             Add Tag
             {isLoading && <LoadingSpinner />}

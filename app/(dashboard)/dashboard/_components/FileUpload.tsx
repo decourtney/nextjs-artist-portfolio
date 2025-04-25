@@ -135,8 +135,8 @@ const FileUpload = () => {
       onSubmit={handleSubmit}
       className="relative p-6 shadow-md rounded-lg bg-background-50 text-gray-900"
     >
-      <div className="flex mb-4 border-b">
-        <h1 className="mr-6 text-2xl font-bold text-foreground-500 mb-4">
+      <div className="flex mb-4 pb-4 border-b">
+        <h1 className="mr-6 text-2xl font-bold text-foreground-500">
           Upload Image
         </h1>
 
