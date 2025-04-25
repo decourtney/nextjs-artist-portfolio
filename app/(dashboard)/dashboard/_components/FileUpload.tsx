@@ -6,6 +6,7 @@ import { IoIosWarning } from "react-icons/io";
 import { useRouter } from "next/navigation";
 import { overlay, secondary } from "@/ColorTheme";
 import LoadingSpinner from "./LoadingSpinner";
+import { set } from "mongoose";
 
 interface FileItem {
   id: string;
@@ -25,6 +26,8 @@ const FileUpload = () => {
   const [selectedFiles, setSelectedFiles] = useState<FileItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [numberOfSuccesses, setNumberOfSuccesses] = useState<number | null>();
+  const [numberOfFailures, setNumberOfFailures] = useState<number | null>();
 
   const handleOpenFileDialog = () => {
     fileInputRef.current?.click();
@@ -64,6 +67,8 @@ const FileUpload = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setNumberOfSuccesses(null);
+    setNumberOfFailures(null);
 
     if (selectedFiles.length === 0) {
       alert("Please select at least one file first.");
@@ -90,7 +95,8 @@ const FileUpload = () => {
 
       const data = (await response.json()) as ArtworkApiResponse;
 
-      if (data.successes) {
+      if (data.successes && data.successes.length > 0) {
+        setNumberOfSuccesses(data.successes.length);
         setSelectedFiles((prev) =>
           prev.filter(
             (fileItem) => !data.successes!.some((s) => s.id === fileItem.id)
@@ -98,7 +104,8 @@ const FileUpload = () => {
         );
       }
 
-      if (data.failures) {
+      if (data.failures && data.failures.length > 0) {
+        setNumberOfFailures(data.failures.length);
         setSelectedFiles((prev) =>
           prev.map((fileItem) => {
             const failure = data.failures!.find((f) => f.id === fileItem.id);
@@ -128,10 +135,25 @@ const FileUpload = () => {
       onSubmit={handleSubmit}
       className="relative p-6 shadow-md rounded-lg bg-background-50 text-gray-900"
     >
-      <div className="relative flex justify-between mb-4 border-b">
-        <h1 className="text-2xl font-bold text-foreground-500 mb-4">
+      <div className="flex mb-4 border-b">
+        <h1 className="mr-6 text-2xl font-bold text-foreground-500 mb-4">
           Upload Image
         </h1>
+
+        <div className="flex flex-grow h-full">
+          {numberOfFailures && (
+            <div className="w-full p-1 text-center bg-red-100 text-red-700 rounded-md">
+              {numberOfFailures > 1 ? `${numberOfFailures} files failed to upload.` : "File failed to upload."}
+            </div>
+          )}
+
+          {numberOfSuccesses && (
+            <div className="w-full p-1 text-center bg-green-100 text-green-700 rounded-md">
+              {numberOfSuccesses > 1 ? `${numberOfSuccesses} files` : "File"} uploaded successfully.
+            </div>
+          )}
+        </div>
+
         {selectedFiles.length > 0 ? (
           <h3 className="px-4 py-2 text-center text-sm font-semibold text-gray-700">
             <span>{selectedFiles.length} </span>File
