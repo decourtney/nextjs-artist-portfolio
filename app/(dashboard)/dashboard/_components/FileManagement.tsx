@@ -7,6 +7,7 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import EditModal from "./EditModal";
 import FileItem from "./FileItem";
 import { AllTags } from "@/types/allTags";
+import { overlay } from "@/ColorTheme";
 
 export default function FileManagement({
   files,
@@ -80,31 +81,38 @@ export default function FileManagement({
       id="file-management"
       className="bg-background-50 p-6 rounded-lg shadow-md"
     >
-      <div className="flex justify-between mb-4 border-b ">
-        <h1 className="text-2xl font-bold text-foreground-500 mb-4">
+      <div className="flex justify-between mb-4 pb-4 border-b">
+        <h1 className="text-2xl font-bold text-foreground-500">
           File Management
         </h1>
+      </div>
+
+      <div className="flex justify-between items-center mb-4">
+        <div className="ml-4">
+          <input
+            id="select-all"
+            type="checkbox"
+            className="mr-2"
+            checked={selectedIds.length === files.length && files.length > 0}
+            onChange={(e) => handleSelectAll(e.target.checked)}
+          />
+          <span>Select All</span>
+        </div>
+
         <button
+          disabled={selectedIds.length === 0}
+          className="h-fit px-4 py-2 text-sm text-white bg-red-500 hover:bg-red-600 rounded-md"
+          style={{
+            backgroundColor:
+              selectedIds.length === 0 ? overlay[100] : undefined,
+          }}
           onClick={handleDelete}
-          className="h-fit px-4 py-2  text-sm text-white bg-red-500 hover:bg-red-600 rounded-md"
-          style={{ display: selectedIds.length > 0 ? "block" : "none" }}
         >
           Delete Selected
         </button>
       </div>
 
-      <div className="flex items-center mb-4">
-        <input
-          id="select-all"
-          type="checkbox"
-          className="mr-2"
-          checked={selectedIds.length === files.length && files.length > 0}
-          onChange={(e) => handleSelectAll(e.target.checked)}
-        />
-        <span>Select All</span>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {files.map((file) => (
           <FileItem
             key={file._id}

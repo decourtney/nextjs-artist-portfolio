@@ -28,7 +28,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
     return {
       id: fileToEdit._id,
       name: fileToEdit.name,
-      description: fileToEdit.description,
+      description: fileToEdit.description ?? undefined,
       substance: fileToEdit.substance?.label,
       medium: fileToEdit.medium?.label,
       size: fileToEdit.size?.label,
@@ -41,15 +41,18 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
     };
   });
 
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
   const handleOnSubmit = async (e: FormEvent) => {
-    if (!editFormData) return;
     e.preventDefault();
 
     setIsSubmitting(true);
     setError(null);
 
     try {
-      const response = await fetch(`/api/artwork/${editFormData.id}`, {
+      const response = await fetch(`/api/artwork/${editFormData!.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -62,8 +65,8 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
         throw new Error(data.message || "Failed to update artwork");
       }
 
-      router.refresh();
       setIsModalOpen(false);
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -83,7 +86,8 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Edit Artwork</h2>
           <button
-            onClick={() => setIsModalOpen(false)}
+            type={"button"}
+            onClick={handleModalClose}
             className="text-gray-500 hover:text-gray-700"
           >
             <IoIosClose size={24} />
@@ -136,7 +140,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Substance
                 <select
-                  id="artwork-medium"
+                  id="artwork-substance"
                   value={editFormData.substance}
                   onChange={(e) =>
                     setEditFormData({
@@ -396,11 +400,13 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
 
         <div className="mt-6 flex justify-end space-x-3">
           <button
-            onClick={() => setIsModalOpen(false)}
+            type={"button"}
+            onClick={handleModalClose}
             className="px-4 py-2 text-gray-600 hover:text-gray-800"
           >
             Cancel
           </button>
+
           <button
             type={"submit"}
             disabled={isSubmitting}

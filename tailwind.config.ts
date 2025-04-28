@@ -10,7 +10,6 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        beasties: ["Beasties", "serif"],
         charm: ["Charm", "var(--font-charm)"],
         openSans: ["Open_Sans", "var(--font-openSans)"],
       },

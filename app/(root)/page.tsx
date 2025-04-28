@@ -6,12 +6,12 @@ import dbConnect from "@/lib/dbConnect";
 import { Artwork } from "@/models";
 import { ArtworkDocument, PopulatedArtworkDocument } from "@/models/Artwork";
 
-export default async function Home() {
+const Home = async () => {
   await dbConnect();
-  const mainImageArtwork = await Artwork.findOne({ isMainImage: true })
+  const mainImageArtwork = (await Artwork.findOne({ isMainImage: true })
     .lean()
     .maxTimeMS(10000)
-    .exec() as unknown as ArtworkDocument;
+    .exec()) as unknown as ArtworkDocument;
   const featuredArtworks = (await Artwork.find({
     isFeatured: true,
   })
@@ -26,11 +26,11 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen">
-      {/* About Section */}
+      {/* Hero Section */}
       <section className="py-20 px-4 relative">
         <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col gap-12">
-            <div className="relative aspect-square max-w-2xl mx-auto w-full">
+          <div className="flex flex-col gap-12 max-w-2xl mx-auto">
+            <div className="relative aspect-square w-full inset-0 border-2 border-[#1e293b]">
               {mainImageArtwork ? (
                 <Image
                   src={mainImageArtwork.src}
@@ -43,24 +43,20 @@ export default async function Home() {
                   Image not found
                 </div>
               )}
-
-              <div className="absolute inset-0 border-2 border-[#1e293b]" />
             </div>
             <div className="text-center">
               <h2 className="text-3xl font-bold mb-6 text-[#1e293b] font-charm">
                 About the Artist
               </h2>
-              <p className="text-[#475569] mb-4">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                nisi ut aliquip ex ea commodo consequat.
-              </p>
-              <p className="text-[#475569]">
-                Duis aute irure dolor in reprehenderit in voluptate velit esse
-                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-                cupidatat non proident, sunt in culpa qui officia deserunt
-                mollit anim id est laborum.
+              <p className="text-left text-lg text-[#475569] mb-4">
+                <span className="float-start font-charm text-6xl leading-10">
+                  G
+                </span>
+                ena Courtney is an award-winning painter and illustrator from
+                Macon, Georgia, working in pastels, oils, and acrylics. Inspired
+                by nature, travel, and atmosphere, she captures the spirit of
+                people and places through vibrant, expressive art and shares her
+                passion through teaching and workshops.
               </p>
             </div>
           </div>
@@ -74,11 +70,12 @@ export default async function Home() {
           <h2 className="text-3xl font-bold text-center mb-12 text-[#1e293b] font-charm">
             Featured Works
           </h2>
-          <div className="flex justify-around items-center">
+          <div className="flex flex-col md:flex-row gap-1">
+            {/* <div className="grid grid-cols-3"> */}
             {featuredArtworks &&
               featuredArtworks.map((artwork) => (
-                <div key={artwork.name} className="group">
-                  <div className="relative aspect-square mb-4 h-[350px]">
+                <div key={artwork.name} className="group flex w-full">
+                  <div className="relative aspect-square mb-4 w-full">
                     <Image
                       src={artwork.thumbSrc}
                       alt={artwork.name}
@@ -102,10 +99,13 @@ export default async function Home() {
             </Link>
           </div>
         </div>
+
         <SectionSeparator />
       </section>
 
       <GetInTouchSection />
     </div>
   );
-}
+};
+
+export default Home;

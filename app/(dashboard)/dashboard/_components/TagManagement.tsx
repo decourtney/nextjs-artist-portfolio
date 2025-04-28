@@ -1,8 +1,11 @@
 "use client";
 
 import { TagDocument } from "@/models/Tag";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { set } from "mongoose";
+import LoadingSpinner from "./LoadingSpinner";
+import { overlay } from "@/ColorTheme";
 
 interface TagManagementProps {
   tags: {
@@ -22,11 +25,14 @@ export default function TagManagement({ tags }: TagManagementProps) {
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleAddTag = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setIsLoading
 
     try {
       const res = await fetch("/api/tag", {
@@ -42,8 +48,10 @@ export default function TagManagement({ tags }: TagManagementProps) {
         return;
       }
 
+      formRef.current?.reset()
       setSuccess("Tag added successfully");
       setNewTag({ label: "", type: "category", description: "" });
+      setIsLoading(false);
       router.refresh();
     } catch (error) {
       setError("An error occurred while adding the tag");
@@ -102,10 +110,27 @@ export default function TagManagement({ tags }: TagManagementProps) {
       id="tag-management"
       className="space-y-6 bg-background-50 p-6 rounded-lg shadow-md"
     >
-      <h2 className="text-2xl font-bold text-foreground-500">Tag Management</h2>
+      <div className="flex items-center border-b pb-4">
+        <h2 className="mr-6 text-2xl font-bold text-foreground-500">
+          Tag Management
+        </h2>
+
+        <div className="flex-1 h-full">
+          {error && (
+            <div className="p-1 text-center bg-red-100 text-red-700 rounded-md">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="p-1 text-center bg-green-100 text-green-700 rounded-md">
+              {success}
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Add new tag form */}
-      <form onSubmit={handleAddTag} className="space-y-4">
+      <form ref={formRef} onSubmit={handleAddTag} className="space-y-4">
         <div className="flex gap-4">
           <div className="flex-1 space-y-2">
             <input
@@ -145,22 +170,15 @@ export default function TagManagement({ tags }: TagManagementProps) {
           </div>
           <button
             type="submit"
-            className="h-fit px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            disabled={isLoading}
+            className="relative h-fit px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            style={{ backgroundColor: isLoading ? overlay[100] : undefined }}
           >
             Add Tag
+            {isLoading && <LoadingSpinner />}
           </button>
         </div>
       </form>
-
-      {/* Error and success messages */}
-      {error && (
-        <div className="p-3 bg-red-100 text-red-700 rounded-md">{error}</div>
-      )}
-      {success && (
-        <div className="p-3 bg-green-100 text-green-700 rounded-md">
-          {success}
-        </div>
-      )}
 
       {/* Tag lists */}
       <div className="space-y-6">

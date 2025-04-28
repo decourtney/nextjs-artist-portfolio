@@ -4,6 +4,9 @@ import React, { useState, ChangeEvent, useRef, FormEvent } from "react";
 import { MdClose } from "react-icons/md";
 import { IoIosWarning } from "react-icons/io";
 import { useRouter } from "next/navigation";
+import { overlay, secondary } from "@/ColorTheme";
+import LoadingSpinner from "./LoadingSpinner";
+import { set } from "mongoose";
 
 interface FileItem {
   id: string;
@@ -22,6 +25,9 @@ const FileUpload = () => {
   const router = useRouter();
   const [selectedFiles, setSelectedFiles] = useState<FileItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [numberOfSuccesses, setNumberOfSuccesses] = useState<number | null>();
+  const [numberOfFailures, setNumberOfFailures] = useState<number | null>();
 
   const handleOpenFileDialog = () => {
     fileInputRef.current?.click();
@@ -59,13 +65,17 @@ const FileUpload = () => {
     setSelectedFiles([]);
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setNumberOfSuccesses(null);
+    setNumberOfFailures(null);
 
     if (selectedFiles.length === 0) {
       alert("Please select at least one file first.");
       return;
     }
+
+    setIsLoading(true);
 
     const formData = new FormData();
     selectedFiles.forEach((item) => {
@@ -85,7 +95,8 @@ const FileUpload = () => {
 
       const data = (await response.json()) as ArtworkApiResponse;
 
-      if (data.successes) {
+      if (data.successes && data.successes.length > 0) {
+        setNumberOfSuccesses(data.successes.length);
         setSelectedFiles((prev) =>
           prev.filter(
             (fileItem) => !data.successes!.some((s) => s.id === fileItem.id)
@@ -93,7 +104,8 @@ const FileUpload = () => {
         );
       }
 
-      if (data.failures) {
+      if (data.failures && data.failures.length > 0) {
+        setNumberOfFailures(data.failures.length);
         setSelectedFiles((prev) =>
           prev.map((fileItem) => {
             const failure = data.failures!.find((f) => f.id === fileItem.id);
@@ -109,6 +121,7 @@ const FileUpload = () => {
         );
       }
 
+      setIsLoading(false);
       router.refresh();
     } catch (error) {
       console.error(error);
@@ -120,12 +133,27 @@ const FileUpload = () => {
     <form
       id="file-upload"
       onSubmit={handleSubmit}
-      className="p-6 shadow-md rounded-lg bg-background-50 text-gray-900"
+      className="relative p-6 shadow-md rounded-lg bg-background-50 text-gray-900"
     >
-      <div className="relative flex justify-between mb-4 border-b">
-        <h1 className="text-2xl font-bold text-foreground-500 mb-4">
+      <div className="flex mb-4 pb-4 border-b">
+        <h1 className="mr-6 text-2xl font-bold text-foreground-500">
           Upload Image
         </h1>
+
+        <div className="flex flex-grow h-full">
+          {numberOfFailures && (
+            <div className="w-full p-1 text-center bg-red-100 text-red-700 rounded-md">
+              {numberOfFailures > 1 ? `${numberOfFailures} files failed to upload.` : "File failed to upload."}
+            </div>
+          )}
+
+          {numberOfSuccesses && (
+            <div className="w-full p-1 text-center bg-green-100 text-green-700 rounded-md">
+              {numberOfSuccesses > 1 ? `${numberOfSuccesses} files` : "File"} uploaded successfully.
+            </div>
+          )}
+        </div>
+
         {selectedFiles.length > 0 ? (
           <h3 className="px-4 py-2 text-center text-sm font-semibold text-gray-700">
             <span>{selectedFiles.length} </span>File
@@ -143,7 +171,9 @@ const FileUpload = () => {
         onChange={handleFileChange}
       />
 
-      <div className="min-h-[200px] max-h-[500px] overflow-y-auto rounded-lg bg-white shadow-sm">
+      {isLoading && <LoadingSpinner />}
+
+      <div className="relative min-h-[200px] max-h-[500px] overflow-y-auto rounded-lg bg-white shadow-sm">
         {selectedFiles.length > 0 ? (
           <>
             <ul className="[&>*:nth-child(even)]:bg-gray-50 text-gray-900">
@@ -185,6 +215,7 @@ const FileUpload = () => {
       <div className="flex justify-between mt-4">
         <button
           type="button"
+          disabled={isLoading}
           className="px-4 py-2 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors"
           onClick={handleOpenFileDialog}
         >
@@ -194,14 +225,24 @@ const FileUpload = () => {
         <div className="space-x-4">
           <button
             type="button"
-            className="px-4 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors"
+            disabled={selectedFiles.length === 0 || isLoading}
+            className="px-4 py-2 text-sm bg-secondary-700 hover:bg-secondary-900 text-white rounded-md transition-colors"
+            style={{
+              backgroundColor:
+                selectedFiles.length === 0 ? overlay[100] : undefined,
+            }}
             onClick={handleCancel}
           >
             Cancel
           </button>
           <button
             type="submit"
+            disabled={selectedFiles.length === 0 || isLoading}
             className="px-4 py-2 text-sm bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors"
+            style={{
+              backgroundColor:
+                selectedFiles.length === 0 ? overlay[100] : undefined,
+            }}
           >
             Upload
           </button>

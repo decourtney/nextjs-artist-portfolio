@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <div className=" relative">
+    <div className="min-h-[calc(100dvh-482px)] relative">
       {/* Hero Section */}
       <section className="hidden py-20 px-4 relative">
         <div className="container mx-auto px-4">
@@ -99,7 +99,6 @@ export default function ContactPage() {
             </div>
           </div>
         </div>
-        <SectionSeparator />
       </section>
     </div>
   );
