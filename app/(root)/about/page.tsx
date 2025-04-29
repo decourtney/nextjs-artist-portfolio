@@ -11,7 +11,14 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen relative">
+    <div className="relative min-h-screen">
+      <Image
+        src="/images/goldstarbanner.png"
+        alt="Gold Star Mothers"
+        fill
+        className="object-cover opacity-5"
+      />
+
       {/* Hero Section */}
       <section className="py-10 px-4">
         <div className="container max-w-[700px] mx-auto px-4">
@@ -186,8 +193,6 @@ export default function AboutPage() {
       </section>
 
       <GetInTouchSection />
-      {/* Add gradient separators to each section */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#94a3b8] to-transparent"></div>
     </div>
   );
 }
