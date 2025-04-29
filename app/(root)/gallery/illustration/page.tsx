@@ -1,4 +1,11 @@
 import React from "react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Illustration Book | Gena Courtney",
+  description:
+    "A curated collection of illustrations will be available here soon. Stay tuned for an interactive experience.",
+};
 
 const IllustrationPage = () => {
   return (

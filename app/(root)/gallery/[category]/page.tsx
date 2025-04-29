@@ -3,6 +3,12 @@ import dbConnect from "@/lib/dbConnect";
 import { Artwork, Tag } from "@/models";
 import { PopulatedArtworkDocument } from "@/models/Artwork";
 import { TagDocument } from "@/models/Tag";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Gallery | Gena Courtney",
+  
+};
 
 interface CategoryPageProps {
   params: {

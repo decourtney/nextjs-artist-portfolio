@@ -7,6 +7,12 @@ import { TagDocument } from "@/models/Tag";
 import GetInTouchSection from "../_components/GetInTouchSection";
 import SectionSeparator from "../_components/SectionSeparator";
 import Image from "next/image";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Gallery | Gena Courtney",
+  description: `Explore Gena Courtney's diverse art gallery. Discover a range of artistic styles and the captivating 'Midnight at Kyrie Eleison Castle' illustration series.`,
+};
 
 const GalleryPage = async () => {
   await dbConnect();
