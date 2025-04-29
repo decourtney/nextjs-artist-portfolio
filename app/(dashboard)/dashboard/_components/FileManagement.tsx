@@ -8,6 +8,7 @@ import EditModal from "./EditModal";
 import FileItem from "./FileItem";
 import { AllTags } from "@/types/allTags";
 import { overlay } from "@/ColorTheme";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function FileManagement({
   files,
@@ -26,6 +27,7 @@ export default function FileManagement({
     null
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handlePrevious = () => {
     if (currentPage > 1) {
@@ -57,6 +59,8 @@ export default function FileManagement({
 
   // Delete selected items
   const handleDelete = async () => {
+    setIsLoading(true);
+
     try {
       const res = await fetch(`/api/artwork/batch-delete`, {
         method: "DELETE",
@@ -65,6 +69,7 @@ export default function FileManagement({
       });
 
       setSelectedIds([]);
+      setIsLoading(false);
       router.refresh();
     } catch (error) {
       console.error("Error deleting files", error);
@@ -79,8 +84,10 @@ export default function FileManagement({
   return (
     <section
       id="file-management"
-      className="bg-background-50 p-6 rounded-lg shadow-md"
+      className="relative bg-background-50 p-6 rounded-lg shadow-md"
     >
+      {isLoading && <LoadingSpinner />}
+
       <div className="flex justify-between mb-4 pb-4 border-b">
         <h1 className="text-2xl font-bold text-foreground-500">
           File Management
@@ -117,6 +124,7 @@ export default function FileManagement({
           <FileItem
             key={file._id}
             file={file}
+            isSelected={selectedIds.includes(file._id)}
             handleSelectItem={handleSelectItem}
             handleEdit={handleEdit}
           />
