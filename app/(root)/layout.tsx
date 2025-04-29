@@ -1,6 +1,6 @@
 import Footer from "./_components/Footer";
 import Header from "./_components/Header";
-import PageWrapper from "./_components/PageWrapper";
+import PageFadein from "./_components/PageFadein";
 
 const RootLayoutLarge = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -8,7 +8,7 @@ const RootLayoutLarge = ({ children }: { children: React.ReactNode }) => {
       <Header />
 
       <main className="max-w-[1200px] mx-auto">
-        <PageWrapper>{children}</PageWrapper>
+        <PageFadein>{children}</PageFadein>
       </main>
 
       <Footer />

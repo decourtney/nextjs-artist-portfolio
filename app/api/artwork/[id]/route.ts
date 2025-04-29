@@ -5,15 +5,11 @@ import {
   CopyObjectCommand,
 } from "@aws-sdk/client-s3";
 import dbConnect from "@/lib/dbConnect";
-import Artwork, {
-  ArtworkDocument,
-  PopulatedArtworkDocument,
-} from "@/models/Artwork";
+import Artwork, { ArtworkDocument } from "@/models/Artwork";
 import { Tag } from "@/models";
 import { SanitizeAndShortenString } from "@/utils/sanitizeAndShortenString";
 import { getServerSession } from "next-auth";
 import { _nextAuthOptions } from "@/auth";
-import { TagDocument } from "@/models/Tag";
 import { EditFormData } from "@/types/editFormData";
 
 // Create S3 client

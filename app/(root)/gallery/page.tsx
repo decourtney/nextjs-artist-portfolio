@@ -6,6 +6,7 @@ import { Artwork, Tag } from "@/models";
 import { TagDocument } from "@/models/Tag";
 import GetInTouchSection from "../_components/GetInTouchSection";
 import SectionSeparator from "../_components/SectionSeparator";
+import Image from "next/image";
 
 const GalleryPage = async () => {
   await dbConnect();
@@ -36,7 +37,7 @@ const GalleryPage = async () => {
                 {categoryImages.find(
                   (img) => img?.category.label === category.label
                 ) ? (
-                  <img
+                  <Image
                     src={
                       categoryImages.find(
                         (img) => img?.category.label === category.label
@@ -76,14 +77,14 @@ const GalleryPage = async () => {
                 Each illustration is paired with its story, creating an
                 immersive experience.
               </p>
-              <a
+              <Link
                 href="/gallery/illustration"
                 className="group relative inline-block px-8 py-4 text-lg font-medium text-[#1e293b] hover:text-white transition-colors duration-300"
               >
                 <span className="relative z-10">Read the Story</span>
                 <span className="absolute inset-0 w-full h-full bg-[#3b82f6] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <span className="absolute inset-0 w-full h-full border-2 border-[#1e293b] group-hover:border-[#3b82f6] transition-colors duration-300" />
-              </a>
+              </Link>
             </div>
             <div className="w-full md:w-1/2">
               <Book3D title="Midnight at\nKyrie Eleison Castle" />

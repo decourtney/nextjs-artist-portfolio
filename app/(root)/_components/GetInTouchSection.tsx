@@ -10,7 +10,7 @@ const GetInTouchSection = () => {
         </h2>
         <p className="text-[#475569] mb-8 max-w-2xl mx-auto">
           Interested in commissioning a piece or learning more about my work?
-          I'd love to hear from you.
+          I&apos;d love to hear from you.
         </p>
         <Link
           href="/contact"

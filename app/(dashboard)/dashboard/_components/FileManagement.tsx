@@ -68,6 +68,10 @@ export default function FileManagement({
         body: JSON.stringify({ ids: selectedIds }),
       });
 
+      if (!res.ok) {
+        throw new Error("Failed to delete files");
+      }
+
       setSelectedIds([]);
       setIsLoading(false);
       router.refresh();

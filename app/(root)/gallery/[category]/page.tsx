@@ -60,7 +60,7 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
 
   if (artworks.length === 0) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center">
+      <div className="min-h-[calc(100dvh-196px)] w-full flex items-center justify-center">
         No artworks found in this category.
       </div>
     );

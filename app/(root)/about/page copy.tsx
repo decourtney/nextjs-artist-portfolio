@@ -148,7 +148,7 @@ export default function AboutPage() {
                   </p>
                   <p>
                     I also draw inspiration from the Pre-Raphaelite
-                    Brotherhood's attention to detail and their use of
+                    Brotherhood&apos;s attention to detail and their use of
                     mythological and literary themes.
                   </p>
                 </div>
@@ -207,9 +207,9 @@ export default function AboutPage() {
             <div className="mt-8 text-center">
               <p className="text-[#475569] max-w-2xl mx-auto">
                 Located in the heart of Nashville, my studio is a space where
-                tradition meets innovation. It's here that I create each piece,
-                surrounded by the tools and inspiration that fuel my artistic
-                journey.
+                tradition meets innovation. It&apos;s here that I create each
+                piece, surrounded by the tools and inspiration that fuel my
+                artistic journey.
               </p>
             </div>
           </div>

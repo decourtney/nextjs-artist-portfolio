@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
 import SectionSeparator from "./SectionSeparator";
 import { useEffect } from "react";
@@ -61,7 +61,7 @@ const Header = () => {
           transition={{ duration: 0.5, ease: "easeInOut" }}
         >
           <h1 className="text-6xl md:text-8xl font-bold text-[#1e293b] font-charm mb-6 text-center">
-            BOLD NAME
+            Gena Courtney
           </h1>
           <div className="relative flex justify-center items-center mb-8">
             <p className="text-md bg-inherit text-[#64748b]">Artist</p>
