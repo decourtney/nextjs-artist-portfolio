@@ -1,6 +1,6 @@
 import { PopulatedArtworkDocument } from "@/models/Artwork";
 import Image from "next/image";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   IoIosCheckmarkCircle,
   IoIosCloseCircle,
@@ -12,12 +12,22 @@ import {
 
 interface FileItemParams {
   file: PopulatedArtworkDocument;
+  isSelected: boolean;
   handleSelectItem: (id: string, isSelected: boolean) => void;
   handleEdit: (file: PopulatedArtworkDocument) => void;
 }
 
-const FileItem = ({ file, handleSelectItem, handleEdit }: FileItemParams) => {
+const FileItem = ({
+  file,
+  isSelected,
+  handleSelectItem,
+  handleEdit,
+}: FileItemParams) => {
   const [isChecked, setIsChecked] = React.useState(false);
+
+  useEffect(() => {
+    setIsChecked(isSelected);
+  }, [isSelected]);
 
   const handleChange = (id: string, isSelected: boolean) => {
     setIsChecked(isSelected);
