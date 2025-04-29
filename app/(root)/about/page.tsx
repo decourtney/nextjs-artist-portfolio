@@ -1,6 +1,13 @@
 import Image from "next/image";
 import GetInTouchSection from "../_components/GetInTouchSection";
 import SectionSeparator from "../_components/SectionSeparator";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About | Gena Courtney",
+  description:
+    "Gena Courtney is an award-winning painter and illustrator based in Macon, Georgia, specializing in pastels, oil, and acrylic paintings that explore nature, atmosphere, and personal memories.",
+};
 
 export default function AboutPage() {
   return (
@@ -48,7 +55,7 @@ export default function AboutPage() {
                   </p>
                   <p>
                     <span className="italic font-medium">
-                      &quot;My paintings serve as a diary of my life,&quot;
+                      &quot;My paintings serve as a diary of my life,&quot;{" "}
                     </span>
                     Gena says. &quot;Re-imagining the people, places, and
                     experiences I have encountered and transcribing them through

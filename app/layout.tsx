@@ -22,20 +22,22 @@ const openSans = Open_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Gena Courtney",
-  description: "Southern Art",
+  title: "Gena Courtney – Award-Winning Painter & Illustrator",
+  description:
+    "Original landscapes, seascapes, still life, and portraits by Gena Courtney. Inspired by nature, travel, and emotion. Based in Macon, Georgia.",
   openGraph: {
-    title: "Gena Courtney",
-    description: "Southern Art",
+    title: "Gena Courtney – Award-Winning Painter & Illustrator",
+    description:
+      "Original landscapes, seascapes, still life, and portraits by Gena Courtney. Inspired by nature, travel, and emotion. Based in Macon, Georgia.",
     url: "https://genacourtney.com",
     siteName: "Next.js",
     images: [
       {
-        secureUrl: "https://genacourtney.com/images/largeIcon.png",
-        url: "https://genacourtney.com/images/largeIcon.png",
+        secureUrl: "https://genacourtney.com/images/metaimage.jpg",
+        url: "https://genacourtney.com/images/metaimage.jpg",
         width: 512,
         height: 512,
-        alt: "Gena Courtney",
+        alt: "Gena Courtney – Painter & Illustrator",
       },
     ],
     locale: "en_US",
@@ -44,9 +46,10 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     site: "https://genacourtney.com",
-    title: "Gena Courtney",
-    description: "Southern Art",
-    images: ["https://genacourtney.com/images/largeIcon.png"],
+    title: "Gena Courtney – Award-Winning Painter & Illustrator",
+    description:
+      "Original landscapes, seascapes, still life, and portraits by Gena Courtney. Inspired by nature, travel, and emotion. Based in Macon, Georgia.",
+    images: ["https://genacourtney.com/images/metaimage.jpg"],
   },
 };
 
