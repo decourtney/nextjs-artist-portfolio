@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Gena Courtney – Artist Portfolio Website
+
+This is the source code for the portfolio website of Gena Courtney, an award-winning painter and illustrator based in Macon, Georgia. The site showcases her artwork across four main categories: Landscapes, Seascapes, Still Life, and Portraits. It also includes a biography page and a contact form for commissions and event inquiries.
+
+## Features
+
+- Built with Next.js and React  
+- Dynamic gallery organized by subject  
+- Responsive layout using Tailwind CSS  
+- Email contact form powered by EmailJS  
+- Optimized image handling with Sharp  
+- Artwork upload support via S3 integration  
+- Fully TypeScript-based project  
+- 3D and animation effects via Framer Motion, Three.js, and React Three Fiber
+
+## Tech Stack
+
+- **Framework**: Next.js (v14)
+- **Language**: TypeScript
+- **UI**: React, Tailwind CSS, Headless UI
+- **Media**: Sharp, Three.js
+- **Animation**: React Three Fiber, Drei, Framer
+- **Backend/Storage**: MongoDB, Mongoose, AWS S3
+- **Auth**: NextAuth.js with MongoDB adapter
+- **Utilities**: EmailJS
 
 ## Getting Started
 
-First, run the development server:
+Clone the repo:
+
+```bash
+git clone https://github.com/yourusername/gena-courtney-portfolio.git
+cd gena-courtney-portfolio
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Build for production:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Start the production server:
 
-## Learn More
+```bash
+npm run start
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This project can be deployed to Vercel, Netlify, or any platform supporting Node.js and static file hosting.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Example with Vercel:
 
-## Deploy on Vercel
+```bash
+npm run build
+vercel deploy
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed under the MIT License.
+
+## Contact
+
+This site was created to showcase the work of Gena Courtney.  
+For web-related inquiries, contact donovan.courtney@gmaill.com.  
+To view or commission work, visit the [Contact](https://genacourtney.com/contact) page on the site.
