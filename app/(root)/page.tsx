@@ -75,15 +75,13 @@ const Home = async () => {
             {featuredArtworks &&
               featuredArtworks.map((artwork) => (
                 <div key={artwork.name} className="group flex w-full">
-                  <div className="relative aspect-square mb-4 w-full">
+                  <div className="relative aspect-square mb-4 w-full inset-0 border-2 border-[#1e293b]">
                     <Image
                       src={artwork.thumbSrc}
                       alt={artwork.name}
                       fill
                       className="object-cover"
                     />
-                    <div className="absolute inset-0 border-2 border-[#1e293b] group-hover:border-[#3b82f6] transition-colors duration-300" />
-                    <div className="absolute inset-0 bg-[#1e293b] opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
                   </div>
                 </div>
               ))}

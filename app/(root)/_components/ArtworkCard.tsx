@@ -19,11 +19,12 @@ const ArtworkCard = ({ artwork }: ArtworkCardProps) => {
 
         <div className="md:hidden"></div>
         <Image
-          src={artwork.thumbSrc}
+          src={artwork.src}
           alt={artwork.name}
           width={600}
           height={450}
           className="w-full h-auto object-cover"
+          loading="lazy"
           priority={false}
         />
         <div className="flex justify-between mb-2 px-4 py-1 text-sm">
