@@ -2,6 +2,7 @@ import { Decal, useGLTF, useTexture } from "@react-three/drei";
 import { GroupProps } from "@react-three/fiber";
 import { Mesh, MeshStandardMaterial } from "three";
 import { GLTF } from "three-stdlib";
+
 type GLTFResult = GLTF & {
   nodes: {
     Mesh: Mesh;
