@@ -31,16 +31,11 @@ export const metadata: Metadata = {
     siteName: "Next.js",
     images: [
       {
-        secureUrl: "/icon.ico",
-        url: "/icon.ico",
-        width: 800,
-        height: 600,
-      },
-      {
-        secureUrl: "/icon.ico",
-        url: "/icon.ico",
-        width: 1800,
-        height: 1600,
+        secureUrl: "https://genacourtney.com/images/largeIcon.png",
+        url: "https://genacourtney.com/images/largeIcon.png",
+        width: 512,
+        height: 512,
+        alt: "Gena Courtney",
       },
     ],
     locale: "en_US",
@@ -48,10 +43,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    site: "https://genacourtney.com",
     title: "Gena Courtney",
     description: "Southern Art",
-    creator: "Donovan Courtney",
-    images: ["/icon.ico"],
+    images: ["https://genacourtney.com/images/largeIcon.png"],
   },
 };
 
