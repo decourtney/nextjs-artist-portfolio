@@ -4,9 +4,8 @@ import React, { useState, ChangeEvent, useRef, FormEvent } from "react";
 import { MdClose } from "react-icons/md";
 import { IoIosWarning } from "react-icons/io";
 import { useRouter } from "next/navigation";
-import { overlay, secondary } from "@/ColorTheme";
+import { overlay } from "@/ColorTheme";
 import LoadingSpinner from "./LoadingSpinner";
-import { set } from "mongoose";
 
 interface FileItem {
   id: string;

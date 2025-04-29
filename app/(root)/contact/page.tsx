@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import ContactForm from "../_components/ContactForm";
-import SectionSeparator from "../_components/SectionSeparator";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -66,28 +65,12 @@ export default function ContactPage() {
                     </h3>
                     <div className="flex space-x-4">
                       <Link
-                        href="https://instagram.com"
+                        href="https://www.instagram.com/genacourtney/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="group relative inline-block text-[#475569] hover:text-[#3b82f6] transition-colors duration-300"
                       >
                         <span className="relative z-10">Instagram</span>
-                      </Link>
-                      <Link
-                        href="https://facebook.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group relative inline-block text-[#475569] hover:text-[#3b82f6] transition-colors duration-300"
-                      >
-                        <span className="relative z-10">Facebook</span>
-                      </Link>
-                      <Link
-                        href="https://twitter.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group relative inline-block text-[#475569] hover:text-[#3b82f6] transition-colors duration-300"
-                      >
-                        <span className="relative z-10">Twitter</span>
                       </Link>
                     </div>
                   </div>

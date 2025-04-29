@@ -1,6 +1,6 @@
 import { PopulatedArtworkDocument } from "@/models/Artwork";
 import Image from "next/image";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import {
   IoIosCheckmarkCircle,
   IoIosCloseCircle,

@@ -47,13 +47,15 @@ export default function AboutPage() {
                     deep connection to nature, atmosphere, and memory.
                   </p>
                   <p>
-                    <span className="italic font-medium">"My paintings serve as a diary of my life,"</span>{" "}
-                    Gena says. "Re-imagining the people, places, and experiences
-                    I have encountered and transcribing them through eye, hand,
-                    and medium creates a cognitive and emotional connection to
-                    meaningful moments. Dreams and spiritual nuances also
-                    influence my creative process. Painting and writing are ways
-                    I express emotion."
+                    <span className="italic font-medium">
+                      &quot;My paintings serve as a diary of my life,&quot;
+                    </span>
+                    Gena says. &quot;Re-imagining the people, places, and
+                    experiences I have encountered and transcribing them through
+                    eye, hand, and medium creates a cognitive and emotional
+                    connection to meaningful moments. Dreams and spiritual
+                    nuances also influence my creative process. Painting and
+                    writing are ways I express emotion.&quot;
                   </p>
                 </div>
               </div>
@@ -86,10 +88,10 @@ export default function AboutPage() {
                   </p>
                   <p>
                     Beyond the local scene, Gena has organized and taught plein
-                    air painting events on Georgia's Cumberland and Jekyll
+                    air painting events on Georgia&apos;s Cumberland and Jekyll
                     Islands, and most recently on Monhegan Island in Maine,
-                    sharing her passion for capturing nature's ever-changing
-                    beauty.
+                    sharing her passion for capturing nature&apos;s
+                    ever-changing beauty.
                   </p>
                 </div>
               </div>

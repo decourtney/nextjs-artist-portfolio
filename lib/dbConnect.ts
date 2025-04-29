@@ -5,7 +5,7 @@ interface MongooseCache {
   promise: Promise<mongoose.Connection> | null;
 }
 
-let cached: MongooseCache = { conn: null, promise: null };
+const cached: MongooseCache = { conn: null, promise: null };
 
 async function dbConnect(retries = 3, delay = 1000) {
   const MONGODB_URI = process.env.MONGODB_URI!;

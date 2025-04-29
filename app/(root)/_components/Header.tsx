@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
 import SectionSeparator from "./SectionSeparator";
 import { useEffect } from "react";

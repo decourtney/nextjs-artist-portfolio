@@ -250,7 +250,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
                 className={`ml-2 cursor-pointer ${
                   editFormData.isAvailable ? "text-blue-500" : "text-gray-300"
                 }`}
-                onClick={(e) =>
+                onClick={() =>
                   setEditFormData({
                     ...editFormData,
                     isAvailable: !editFormData.isAvailable,
@@ -289,7 +289,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
                 className={`cursor-pointer ${
                   editFormData.isMainImage ? "text-blue-500" : "text-gray-300"
                 }`}
-                onClick={(e) =>
+                onClick={() =>
                   setEditFormData({
                     ...editFormData,
                     isMainImage: !editFormData.isMainImage,
@@ -325,7 +325,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
                 className={`cursor-pointer ${
                   editFormData.isFeatured ? "text-blue-500" : "text-gray-300"
                 }`}
-                onClick={(e) =>
+                onClick={() =>
                   setEditFormData({
                     ...editFormData,
                     isFeatured: !editFormData.isFeatured,
@@ -363,7 +363,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
                     ? "text-blue-500"
                     : "text-gray-300"
                 }`}
-                onClick={(e) =>
+                onClick={() =>
                   setEditFormData({
                     ...editFormData,
                     isCategoryImage: !editFormData.isCategoryImage,

@@ -6,6 +6,7 @@ import { Artwork, Tag } from "@/models";
 import { TagDocument } from "@/models/Tag";
 import GetInTouchSection from "../_components/GetInTouchSection";
 import SectionSeparator from "../_components/SectionSeparator";
+import Image from "next/image";
 
 const GalleryPage = async () => {
   await dbConnect();
@@ -36,7 +37,7 @@ const GalleryPage = async () => {
                 {categoryImages.find(
                   (img) => img?.category.label === category.label
                 ) ? (
-                  <img
+                  <Image
                     src={
                       categoryImages.find(
                         (img) => img?.category.label === category.label

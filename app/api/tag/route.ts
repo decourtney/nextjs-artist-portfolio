@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { _nextAuthOptions } from "@/auth";
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     await dbConnect();
     const tags = await Tag.find();
