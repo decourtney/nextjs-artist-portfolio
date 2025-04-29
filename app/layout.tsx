@@ -31,14 +31,14 @@ export const metadata: Metadata = {
     siteName: "Next.js",
     images: [
       {
-        secureUrl: "https://genacourtney.com/images/INSERT_IMAGE",
-        url: "https://nextjs.org/og.png",
+        secureUrl: "/icon.ico",
+        url: "/icon.ico",
         width: 800,
         height: 600,
       },
       {
-        secureUrl: "https://genacourtney.com/images/INSERT_IMAGE",
-        url: "https://nextjs.org/og-alt.png",
+        secureUrl: "/icon.ico",
+        url: "/icon.ico",
         width: 1800,
         height: 1600,
       },
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     title: "Gena Courtney",
     description: "Southern Art",
     creator: "Donovan Courtney",
-    images: ["https://genacourtney.com/images/INSERT_IMAGE"],
+    images: ["/icon.ico"],
   },
 };
 
