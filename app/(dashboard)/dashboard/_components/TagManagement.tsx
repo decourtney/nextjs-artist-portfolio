@@ -31,7 +31,7 @@ export default function TagManagement({ tags }: TagManagementProps) {
     e.preventDefault();
     setError("");
     setSuccess("");
-    setIsLoading
+    setIsLoading;
 
     try {
       const res = await fetch("/api/tag", {
@@ -47,7 +47,7 @@ export default function TagManagement({ tags }: TagManagementProps) {
         return;
       }
 
-      formRef.current?.reset()
+      formRef.current?.reset();
       setSuccess("Tag added successfully");
       setNewTag({ label: "", type: "category", description: "" });
       setIsLoading(false);
@@ -83,12 +83,12 @@ export default function TagManagement({ tags }: TagManagementProps) {
   };
 
   const renderTagList = (tagList: TagDocument[]) => (
-    <div key={tagList[0].type} className="space-y-2">
-      <h3 className="text-lg font-semibold capitalize">{tagList[0].type}</h3>
+    <>
+      <h3 className="text-lg font-semibold capitalize">{tagList[0]?.type}</h3>
       <div className="flex flex-wrap gap-2">
         {tagList.map((tag) => (
           <div
-            key={tag._id}
+            key={tag.label}
             className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full"
           >
             <span>{tag.label}</span>
@@ -101,7 +101,7 @@ export default function TagManagement({ tags }: TagManagementProps) {
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 
   return (
@@ -181,7 +181,11 @@ export default function TagManagement({ tags }: TagManagementProps) {
 
       {/* Tag lists */}
       <div className="space-y-6">
-        {Object.values(tags).map((tagList) => renderTagList(tagList))}
+        {Object.values(tags).map((tagList, index) => (
+          <div key={index} className="space-y-2">
+            {renderTagList(tagList)}
+          </div>
+        ))}
       </div>
     </section>
   );

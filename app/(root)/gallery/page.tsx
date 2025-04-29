@@ -30,24 +30,24 @@ const GalleryPage = async () => {
           {categories.map((category) => (
             <div key={category.label} className="flex flex-col">
               <h2 className="text-2xl font-charm mb-4">{category.label}</h2>
-              <Link
-                href={`/gallery/${category.label.replace(" ", "-")}`}
-                className="block border-2 border-black hover:border-blue-500 transition-colors duration-300"
-              >
+              <Link href={`/gallery/${category.label.replace(" ", "-")}`}>
                 {categoryImages.find(
                   (img) => img?.category.label === category.label
                 ) ? (
-                  <Image
-                    src={
-                      categoryImages.find(
-                        (img) => img?.category.label === category.label
-                      )?.src
-                    }
-                    alt={category.label}
-                    className="w-full aspect-square object-cover"
-                  />
+                  <div className="relative aspect-square mb-4 w-full inset-0 border-2 border-[#1e293b] hover:border-blue-500 transition-colors duration-300">
+                    <Image
+                      src={
+                        categoryImages.find(
+                          (img) => img?.category.label === category.label
+                        )?.thumbSrc
+                      }
+                      fill
+                      alt={category.label}
+                      className="w-full object-cover"
+                    />
+                  </div>
                 ) : (
-                  <div className="w-full aspect-square flex items-center justify-center">
+                  <div className="flex items-center justify-center w-full aspect-square">
                     <span className="text-2xl font-charm text-gray-700">
                       {category.label}
                     </span>

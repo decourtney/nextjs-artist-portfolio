@@ -20,24 +20,93 @@ export default async function DashboardPage({
     const limit = parseInt(awaitedSearchParams.limit || "10");
     const skip = (page - 1) * limit;
 
-    const [totalCount, artworkResponse, tagsResponse] = await Promise.all([
-      Artwork.countDocuments({}).maxTimeMS(10000),
-      Artwork.find({})
-        .populate("substance")
-        .populate("medium")
-        .populate("size")
-        .populate("category")
-        .skip(skip)
-        .limit(limit)
-        .lean()
-        .maxTimeMS(10000),
-      Tag.find({}).lean().maxTimeMS(10000),
+    // const [totalCount, artworkResponse, tagsResponse] = await Promise.all([
+    //   Artwork.countDocuments({}).maxTimeMS(10000),
+    //   Artwork.find({})
+    //     .sort({
+    //       isMainImage: -1,
+    //       isFeatured: -1,
+    //       isCategoryImage: -1,
+    //     })
+    //     .populate("substance")
+    //     .populate("medium")
+    //     .populate("size")
+    //     .populate("category")
+    //     .skip(skip)
+    //     .limit(limit)
+    //     .lean()
+    //     .maxTimeMS(10000),
+    //   Tag.find({}).lean().maxTimeMS(10000),
+    // ]);
+
+    const tagsResponse = await Tag.find({}).lean().maxTimeMS(10000);
+    const aggregateQueryResult = await Artwork.aggregate([
+      {
+        $lookup: {
+          from: "tags",
+          localField: "category",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $unwind: { path: "$category", preserveNullAndEmptyArrays: true },
+      },
+      {
+        $lookup: {
+          from: "tags",
+          localField: "substance",
+          foreignField: "_id",
+          as: "substance",
+        },
+      },
+      {
+        $unwind: { path: "$substance", preserveNullAndEmptyArrays: true },
+      },
+      {
+        $lookup: {
+          from: "tags",
+          localField: "medium",
+          foreignField: "_id",
+          as: "medium",
+        },
+      },
+      {
+        $unwind: { path: "$medium", preserveNullAndEmptyArrays: true },
+      },
+      {
+        $lookup: {
+          from: "tags",
+          localField: "size",
+          foreignField: "_id",
+          as: "size",
+        },
+      },
+      {
+        $unwind: { path: "$size", preserveNullAndEmptyArrays: true },
+      },
+      {
+        $sort: {
+          isMainImage: -1,
+          isFeatured: -1,
+          isCategoryImage: -1,
+        },
+      },
+      {
+        $facet: {
+          metadata: [{ $count: "totalCount" }],
+          data: [{ $skip: skip }, { $limit: limit }],
+        },
+      },
     ]);
 
-    const totalPages = Math.ceil(totalCount / 10)
+    const { metadata, data } = aggregateQueryResult[0];
+    console.log("Metadata:", metadata[0].totalCount);
+
+    const totalPages = Math.ceil(metadata[0].totalCount / 10);
 
     const artworkDocuments: PopulatedArtworkDocument[] = JSON.parse(
-      JSON.stringify(artworkResponse)
+      JSON.stringify(data)
     );
     const tags: TagDocument[] = JSON.parse(JSON.stringify(tagsResponse));
 
