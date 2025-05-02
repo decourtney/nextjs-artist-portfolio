@@ -8,6 +8,7 @@ import {
   IoIosImages,
   IoIosStar,
   IoIosWarning,
+  IoIosBook,
 } from "react-icons/io";
 
 interface FileItemParams {
@@ -208,6 +209,21 @@ const FileItem = ({
             <IoIosImages
               className="text-gray-300"
               title="Category Image"
+              size={20}
+            />
+          )}
+
+          {/* Illustration Icon */}
+          {file.isIllustration ? (
+            <IoIosBook
+              className="text-orange-500"
+              title="Illustration"
+              size={20}
+            />
+          ) : (
+            <IoIosBook
+              className="text-gray-300"
+              title="Illustration"
               size={20}
             />
           )}

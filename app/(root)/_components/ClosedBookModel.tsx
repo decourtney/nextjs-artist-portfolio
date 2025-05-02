@@ -16,7 +16,7 @@ type GLTFResult = GLTF & {
   };
 };
 
-export function BookModel({
+const ClosedBookModel = ({
   rotation = [0, 0, 0],
   position = [0, 0, 0],
   title,
@@ -24,8 +24,10 @@ export function BookModel({
 }: GroupProps & {
   rotation?: [number, number, number];
   title?: string;
-}): JSX.Element {
-  const { nodes, materials } = useGLTF("/book1.glb") as unknown as GLTFResult;
+}) => {
+  const { nodes, materials } = useGLTF(
+    "/assets/book1.glb"
+  ) as unknown as GLTFResult;
   const coverDecal = useTexture("/images/bookcover.jpg");
 
   return (
@@ -49,7 +51,7 @@ export function BookModel({
           material={materials.bookcover}
         >
           <Decal
-            // debug
+            debug
             map={coverDecal}
             position={[-0.08, 0.2, 0]}
             rotation={[Math.PI / -2, 0, 0]}
@@ -71,6 +73,8 @@ export function BookModel({
       </group>
     </group>
   );
-}
+};
 
-useGLTF.preload("/book1.glb");
+useGLTF.preload("/assets/book1.glb");
+
+export default ClosedBookModel;

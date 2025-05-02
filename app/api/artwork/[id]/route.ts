@@ -123,6 +123,7 @@ type CurrentArtworkData = {
   isMainImage: boolean;
   isFeatured: boolean;
   isCategoryImage: boolean;
+  isIllustration: boolean;
   src: string;
   thumbSrc: string;
 };
@@ -186,6 +187,7 @@ export async function PATCH(
       isMainImage: artwork.isMainImage,
       isFeatured: artwork.isFeatured,
       isCategoryImage: artwork.isCategoryImage,
+      isIllustration: artwork.isIllustration,
       src: artwork.src,
       thumbSrc: artwork.thumbSrc,
     };

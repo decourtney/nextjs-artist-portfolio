@@ -20,6 +20,7 @@ export interface ArtworkDocument extends mongoose.Document {
   isMainImage: boolean;
   isFeatured: boolean;
   isCategoryImage: boolean;
+  isIllustration: boolean;
 }
 
 const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
@@ -84,6 +85,10 @@ const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
     default: false,
   },
   isCategoryImage: {
+    type: Boolean,
+    default: false,
+  },
+  isIllustration: {
     type: Boolean,
     default: false,
   },

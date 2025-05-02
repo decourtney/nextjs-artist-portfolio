@@ -3,7 +3,7 @@
 import { Plane, SoftShadows } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { useEffect, useState } from "react";
-import { BookModel } from "./BookModel";
+import ClosedBookModel from "./ClosedBookModel";
 
 function Backdrop() {
   return (
@@ -22,7 +22,7 @@ function Backdrop() {
 }
 
 // Main component
-export default function Book3D({ title }: { title: string }) {
+const ClosedBookCanvas = ({ title }: { title: string }) => {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export default function Book3D({ title }: { title: string }) {
           />
         </directionalLight>
         <Backdrop />
-        <BookModel
+        <ClosedBookModel
           rotation={[0, Math.PI / 6, 0]}
           position={[0, 0, 0]}
           title={`
@@ -71,4 +71,6 @@ export default function Book3D({ title }: { title: string }) {
       </Canvas>
     </div>
   );
-}
+};
+
+export default ClosedBookCanvas;

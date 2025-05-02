@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import Book3D from "@/app/(root)/_components/Book3D";
+import Book3D from "@/app/(root)/_components/ClosedBookCanvas";
 import dbConnect from "@/lib/dbConnect";
 import { Artwork, Tag } from "@/models";
 import { TagDocument } from "@/models/Tag";

@@ -38,6 +38,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
       isMainImage: fileToEdit.isMainImage,
       isFeatured: fileToEdit.isFeatured,
       isCategoryImage: fileToEdit.isCategoryImage,
+      isIllustration: fileToEdit.isIllustration,
     };
   });
 
@@ -284,7 +285,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
             </div>
 
             {/* Radio buttons for Home page, featured, and category images */}
-            <div className="flex flex-col justify-between">
+            <div className="grid grid-cols-2 gap-2">
               <div
                 className={`cursor-pointer ${
                   editFormData.isMainImage ? "text-blue-500" : "text-gray-300"
@@ -304,7 +305,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
                       size={20}
                     />
                     <span className="text-sm font-medium text-gray-700">
-                      Home Page Image
+                      Home Page
                     </span>
                   </div>
                 ) : (
@@ -315,7 +316,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
                       size={20}
                     />
                     <span className="text-sm font-medium text-gray-300 group-hover:text-blue-300">
-                      Home Page Image
+                      Home Page
                     </span>
                   </div>
                 )}
@@ -340,7 +341,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
                       size={20}
                     />
                     <span className="text-sm font-medium text-gray-700">
-                      Featured Image
+                      Featured
                     </span>
                   </div>
                 ) : (
@@ -351,7 +352,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
                       size={20}
                     />
                     <span className="text-sm font-medium text-gray-300 group-hover:text-blue-300">
-                      Featured Image
+                      Featured
                     </span>
                   </div>
                 )}
@@ -378,7 +379,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
                       size={20}
                     />
                     <span className="text-sm font-medium text-gray-700">
-                      Category Image
+                      Category
                     </span>
                   </div>
                 ) : (
@@ -389,7 +390,45 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
                       size={20}
                     />
                     <span className="text-sm font-medium text-gray-300 group-hover:text-blue-300">
-                      Category Image
+                      Category
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div
+                className={`cursor-pointer ${
+                  editFormData.isIllustration
+                    ? "text-blue-500"
+                    : "text-gray-300"
+                }`}
+                onClick={() =>
+                  setEditFormData({
+                    ...editFormData,
+                    isIllustration: !editFormData.isIllustration,
+                  })
+                }
+              >
+                {editFormData.isIllustration ? (
+                  <div className="flex flex-row items-center space-x-2">
+                    <IoIosImages
+                      className="text-orange-500"
+                      title="Illustration"
+                      size={20}
+                    />
+                    <span className="text-sm font-medium text-gray-700">
+                      Illustration
+                    </span>
+                  </div>
+                ) : (
+                  <div className="group flex flex-row items-center space-x-2">
+                    <IoIosImages
+                      className="text-gray-300 group-hover:text-blue-300"
+                      title="Illustration"
+                      size={20}
+                    />
+                    <span className="text-sm font-medium text-gray-300 group-hover:text-blue-300">
+                      Illustration
                     </span>
                   </div>
                 )}

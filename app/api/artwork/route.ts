@@ -77,7 +77,7 @@ export async function GET(request: Request) {
     }
 
     const artworks = await Artwork.find(query)
-      .populate("categories")
+      .populate("category")
       .populate("medium")
       .populate("size");
 

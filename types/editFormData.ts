@@ -11,4 +11,5 @@ export type EditFormData = {
   isMainImage: boolean;
   isFeatured: boolean;
   isCategoryImage: boolean;
+  isIllustration: boolean;
 };
