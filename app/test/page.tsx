@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import OpenBookCanvas from "./OpenBookCanvas";
 import { Artwork } from "@/models";
 import { ArtworkDocument } from "@/models/Artwork";
+import dbConnect from "@/lib/dbConnect";
 
 export const metadata: Metadata = {
   title: "Interactive Art Book | Gena Courtney",
@@ -11,19 +12,18 @@ export const metadata: Metadata = {
 };
 
 const TestPage = async () => {
+  await dbConnect();
+
   const data = (await Artwork.find({
     isIllustration: true,
   }).lean()) as unknown as ArtworkDocument[];
-    const artworks = JSON.parse(JSON.stringify(data));
-
+  const artworks = JSON.parse(JSON.stringify(data));
 
   // console.log("artworks", artworks);
 
   return (
     <div className="flex justify-center items-center min-h-[calc(100dvh-196px)] p-4">
-      <div className="w-full">
-        <OpenBookCanvas artworks={artworks}/>
-      </div>
+      <OpenBookCanvas artworks={artworks} />
     </div>
   );
 };

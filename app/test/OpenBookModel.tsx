@@ -38,8 +38,6 @@ const OpenBookModel = ({ currentArtwork }: OpenBookModelProps) => {
   const { nodes, materials } = useGLTF("/assets/open_book.glb") as GLTFResult;
   const artworkTexture = useTexture(currentArtwork.src);
 
-
-
   return (
     <group
       dispose={null}
@@ -78,7 +76,7 @@ const OpenBookModel = ({ currentArtwork }: OpenBookModelProps) => {
           // debug
           position={[-0.29, 0, 0]}
           rotation={[MathUtils.degToRad(-90), 0, 0]}
-          scale={0.55}
+          scale={.50}
         >
           <meshStandardMaterial
             map={artworkTexture}
@@ -99,7 +97,11 @@ const OpenBookModel = ({ currentArtwork }: OpenBookModelProps) => {
         <Decal
           // debug
           position={[0.29, 0, 0]}
-          rotation={[MathUtils.degToRad(-90), 0, 0]}
+          rotation={[
+            MathUtils.degToRad(-90),
+            MathUtils.degToRad(0),
+            MathUtils.degToRad(0),
+          ]}
           scale={1}
         >
           <meshStandardMaterial
@@ -111,33 +113,16 @@ const OpenBookModel = ({ currentArtwork }: OpenBookModelProps) => {
               <Text
                 color={"black"}
                 fontSize={0.2}
-                font=""
                 rotation={[0, 0, 0]}
                 characters="abcdefghijklmnopqrstuvwxyz0123456789!"
               >
                 {wrapText(
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla sed gravida nisi. Cras ultricies nulla elit, ac venenatis lacus condimentum ut. Etiam accumsan in tellus vel efficitur. In vulputate tristique risus id sagittis. Nam rhoncus, eros at viverra porta, est justo efficitur augue, in pretium elit ipsum in turpis. Praesent ut consectetur dui. Cras ultrices dignissim risus, ut feugiat nisi ornare nec. Praesent placerat dapibus massa. Vestibulum vel felis tincidunt metus finibus tristique id at ante. In ultrices suscipit augue a gravida. Aliquam a ornare lectus."
+                  currentArtwork.description || "No description available."
                 )}
               </Text>
             </RenderTexture>
           </meshStandardMaterial>
         </Decal>
-
-
-        {/* <Html position={[0.55, 0, 0.4]}>
-          <div
-            style={{
-              // transform: "scale(0.5)",
-              cursor: "pointer",
-            }}
-          >
-            <IoArrowRedo
-              size={32}
-              color="blue"
-              onClick={() => alert("Book details")}
-            />
-          </div>
-        </Html> */}
       </mesh>
     </group>
   );
