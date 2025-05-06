@@ -33,17 +33,6 @@ const ClosedBookModel = ({
   return (
     <group {...props} rotation={rotation} dispose={null}>
       <group position={position}>
-        {title && (
-          <group
-            position={[0, 0.08, 0.2]}
-            rotation={[Math.PI / -2, 0, 0]}
-            scale={0.07}
-          >
-            {/* <Text color={"white"} anchorX={"center"} anchorY={"middle"}>
-              {title}
-            </Text> */}
-          </group>
-        )}
         <mesh
           castShadow
           receiveShadow
@@ -51,7 +40,6 @@ const ClosedBookModel = ({
           material={materials.bookcover}
         >
           <Decal
-            debug
             map={coverDecal}
             position={[-0.08, 0.2, 0]}
             rotation={[Math.PI / -2, 0, 0]}
