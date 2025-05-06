@@ -1,14 +1,7 @@
 import { ArtworkDocument } from "@/models/Artwork";
-import {
-  Decal,
-  RenderTexture,
-  Svg,
-  Text,
-  useGLTF,
-  useTexture,
-} from "@react-three/drei";
+import { Decal, RenderTexture, Text, useGLTF } from "@react-three/drei";
 import { useLoader } from "@react-three/fiber";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import { useState } from "react";
 import { MathUtils, Mesh, MeshStandardMaterial, TextureLoader } from "three";
 import { GLTF } from "three-stdlib";
 
@@ -123,7 +116,7 @@ const OpenBookModel = ({ artworks }: OpenBookModelProps) => {
               polygonOffsetFactor={-1}
               transparent
             >
-              {/* <RenderTexture attach="map">
+              <RenderTexture attach="map">
                 <Text
                   color={"black"}
                   fontSize={0.2}
@@ -131,10 +124,11 @@ const OpenBookModel = ({ artworks }: OpenBookModelProps) => {
                   characters="abcdefghijklmnopqrstuvwxyz0123456789!"
                 >
                   {wrapText(
-                    currentArtwork.description || "No description available."
+                    artworks[currentIndex].description ||
+                      "No description available."
                   )}
                 </Text>
-              </RenderTexture> */}
+              </RenderTexture>
             </meshStandardMaterial>
           </Decal>
         </mesh>
@@ -147,6 +141,8 @@ const OpenBookModel = ({ artworks }: OpenBookModelProps) => {
 
 export default OpenBookModel;
 
+// Function to wrap text into multiple lines based on a maximum character limit
+// Currently this was the only way I could get the text to wrap correctly in the texture
 function wrapText(str: string, maxChars = 60) {
   const words = str.split(" ");
   let lines = [];

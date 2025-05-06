@@ -51,34 +51,9 @@ const AnimatedPointLight = () => {
 };
 
 const OpenBookCanvas = ({ artworks }: { artworks: ArtworkDocument[] }) => {
-  const { width } = useScreenSize();
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const nextImage = () => {
-    setCurrentIndex((prev) => (prev + 1) % artworks.length);
-  };
-
-  const prevImage = () => {
-    setCurrentIndex((prev) => (prev - 1 + artworks.length) % artworks.length);
-  };
-
   return (
     <>
       <div className="w-full h-full">
-        {/* Temporary Navigation Buttons */}
-        {/* <button
-          onClick={prevImage}
-          className="bg-black/50 text-white px-4 py-2 rounded"
-        >
-          Previous
-        </button>
-        <button
-          onClick={nextImage}
-          className="bg-black/50 text-white px-4 py-2 rounded"
-        >
-          Next
-        </button> */}
-
         <Canvas className={`w-full h-full aspect-video }`} shadows>
           <ambientLight intensity={0.1} />
           <directionalLight
@@ -89,12 +64,9 @@ const OpenBookCanvas = ({ artworks }: { artworks: ArtworkDocument[] }) => {
           />
           <AnimatedPointLight />
           <SoftShadows size={20} samples={10} focus={1} />
-          {/* <BakeShadows /> */}
 
           <Suspense fallback={null}>
-            {/* <AnimatedCamera artworks={artworks} currentIndex={currentIndex} /> */}
             <PerspectiveCamera
-              // ref={cameraRef}
               position={[0, 1.85, 0.43]}
               rotation={[MathUtils.degToRad(-75), 0, 0]}
               makeDefault
