@@ -2,7 +2,7 @@ import React from "react";
 import { Metadata } from "next";
 import OpenBookCanvas from "./OpenBookCanvas";
 import { Artwork } from "@/models";
-import { ArtworkDocument } from "@/models/Artwork";
+import { ArtworkDocument, PopulatedArtworkDocument } from "@/models/Artwork";
 import dbConnect from "@/lib/dbConnect";
 
 export const metadata: Metadata = {
@@ -14,12 +14,17 @@ export const metadata: Metadata = {
 const TestPage = async () => {
   await dbConnect();
 
-  const data = (await Artwork.find({
+  const data = await Artwork.find({
     isIllustration: true,
-  }).lean()) as unknown as ArtworkDocument[];
-  const artworks = JSON.parse(JSON.stringify(data));
-
-  // console.log("artworks", artworks);
+  })
+    .populate("substance")
+    .populate("medium")
+    .populate("size")
+    .populate("category")
+    .lean()
+    .maxTimeMS(10000)
+    .exec() as unknown as PopulatedArtworkDocument[];
+  const artworks: PopulatedArtworkDocument[] = JSON.parse(JSON.stringify(data));
 
   return (
     <div className="flex justify-center items-center min-h-[calc(100dvh-196px)] p-4">

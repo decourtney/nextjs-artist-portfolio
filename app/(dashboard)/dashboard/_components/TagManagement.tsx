@@ -3,7 +3,7 @@
 import { TagDocument } from "@/models/Tag";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import LoadingSpinner from "./LoadingSpinner";
+import LoadingSpinner from "@/app/(dashboard)/dashboard/_components/LoadingSpinner";
 import { overlay } from "@/ColorTheme";
 
 interface TagManagementProps {

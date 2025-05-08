@@ -4,8 +4,8 @@ import Book3D from "@/app/(root)/_components/ClosedBookCanvas";
 import dbConnect from "@/lib/dbConnect";
 import { Artwork, Tag } from "@/models";
 import { TagDocument } from "@/models/Tag";
-import GetInTouchSection from "../_components/GetInTouchSection";
-import SectionSeparator from "../_components/SectionSeparator";
+import GetInTouchSection from "@/app/(root)/_components/GetInTouchSection";
+import SectionSeparator from "@/app/(root)/_components/SectionSeparator";
 import Image from "next/image";
 import { Metadata } from "next";
 

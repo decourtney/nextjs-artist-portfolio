@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import DashNav from "./_components/DashNav";
+import DashNav from "@/app/(dashboard)/dashboard/_components/DashNav";
 
 const DashboardLayout = ({ children }: { children: ReactNode }) => {
   return (

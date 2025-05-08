@@ -4,11 +4,11 @@ import { PopulatedArtworkDocument } from "@/models/Artwork";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import EditModal from "./EditModal";
-import FileItem from "./FileItem";
+import EditModal from "@/app/(dashboard)/dashboard/_components/EditModal";
+import FileItem from "@/app/(dashboard)/dashboard/_components/FileItem";
 import { AllTags } from "@/types/allTags";
 import { overlay } from "@/ColorTheme";
-import LoadingSpinner from "./LoadingSpinner";
+import LoadingSpinner from "@/app/(dashboard)/dashboard/_components/LoadingSpinner";
 
 export default function FileManagement({
   files,

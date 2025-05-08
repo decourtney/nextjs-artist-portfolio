@@ -5,7 +5,7 @@ import { MdClose } from "react-icons/md";
 import { IoIosWarning } from "react-icons/io";
 import { useRouter } from "next/navigation";
 import { overlay } from "@/ColorTheme";
-import LoadingSpinner from "./LoadingSpinner";
+import LoadingSpinner from "@/app/(dashboard)/dashboard/_components/LoadingSpinner";
 
 interface FileItem {
   id: string;

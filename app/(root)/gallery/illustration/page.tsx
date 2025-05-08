@@ -1,23 +1,29 @@
-import React from "react";
-import { Metadata } from "next";
-import OpenBookCanvas from "../../_components/OpenBookCanvas";
 import dbConnect from "@/lib/dbConnect";
 import { Artwork } from "@/models";
-import { ArtworkDocument } from "@/models/Artwork";
+import { PopulatedArtworkDocument } from "@/models/Artwork";
+import { Metadata } from "next";
+import OpenBookCanvas from "@/app/(root)/_components/OpenBookCanvas";
 
 export const metadata: Metadata = {
-  title: "Illustration Book | Gena Courtney",
+  title: "Interactive Art Book | Gena Courtney",
   description:
-    "A curated collection of illustrations will be available here soon. Stay tuned for an interactive experience.",
+    "Browse through a collection of artwork in an interactive 3D book format.",
 };
 
-const IllustrationPage = async () => {
+const TestPage = async () => {
   await dbConnect();
 
   const data = (await Artwork.find({
     isIllustration: true,
-  }).lean()) as unknown as ArtworkDocument[];
-  const artworks = JSON.parse(JSON.stringify(data));
+  })
+    .populate("substance")
+    .populate("medium")
+    .populate("size")
+    .populate("category")
+    .lean()
+    .maxTimeMS(10000)
+    .exec()) as unknown as PopulatedArtworkDocument[];
+  const artworks: PopulatedArtworkDocument[] = JSON.parse(JSON.stringify(data));
 
   return (
     <div className="flex flex-col justify-center items-center min-h-[calc(100dvh-128px)]">
@@ -32,9 +38,10 @@ const IllustrationPage = async () => {
         <span className="text-2xl font-semibold">at</span>
         <span className="text-6xl font-bold">Kyrie Eleison Castle</span>
       </h1>
+
       <OpenBookCanvas artworks={artworks} />
     </div>
   );
 };
 
-export default IllustrationPage;
+export default TestPage;

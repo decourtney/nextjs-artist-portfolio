@@ -5,7 +5,7 @@ import FileUpload from "@/app/(dashboard)/dashboard/_components/FileUpload";
 import TagManagement from "@/app/(dashboard)/dashboard/_components/TagManagement";
 import dbConnect from "@/lib/dbConnect";
 import { notFound } from "next/navigation";
-import ProfileManagement from "./_components/ProfileManagement";
+import ProfileManagement from "@/app/(dashboard)/dashboard/_components/ProfileManagement";
 
 export default async function DashboardPage({
   searchParams,

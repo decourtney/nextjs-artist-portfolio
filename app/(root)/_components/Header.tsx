@@ -2,8 +2,8 @@
 
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
-import Navbar from "./Navbar";
-import SectionSeparator from "./SectionSeparator";
+import Navbar from "@/app/(root)/_components/Navbar";
+import SectionSeparator from "@/app/(root)/_components/SectionSeparator";
 import { useEffect } from "react";
 import { usePreviousPathname } from "@/app/context/PreviousPathnameContext";
 

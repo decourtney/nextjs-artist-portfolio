@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import GetInTouchSection from "./_components/GetInTouchSection";
-import SectionSeparator from "./_components/SectionSeparator";
+import GetInTouchSection from "@/app/(root)/_components/GetInTouchSection";
+import SectionSeparator from "@/app/(root)/_components/SectionSeparator";
 import dbConnect from "@/lib/dbConnect";
 import { Artwork } from "@/models";
 import { ArtworkDocument, PopulatedArtworkDocument } from "@/models/Artwork";

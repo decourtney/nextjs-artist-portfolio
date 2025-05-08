@@ -1,6 +1,6 @@
-import Footer from "./_components/Footer";
-import Header from "./_components/Header";
-import PageFadein from "./_components/PageFadein";
+import Footer from "@/app/(root)/_components/Footer";
+import Header from "@/app/(root)/_components/Header";
+import PageFadein from "@/app/(root)/_components/PageFadein";
 
 const RootLayoutLarge = ({ children }: { children: React.ReactNode }) => {
   return (

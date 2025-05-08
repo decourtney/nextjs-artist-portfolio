@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
-import HashNavButton from "./HashNavButton";
-import SignoutButton from "./SignoutButton";
+import HashNavButton from "@/app/(dashboard)/dashboard/_components/HashNavButton";
+import SignoutButton from "@/app/(dashboard)/dashboard/_components/SignoutButton";
 
 const DashNav = () => {
   const hashPaths = [

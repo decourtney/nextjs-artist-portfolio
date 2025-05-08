@@ -3,7 +3,7 @@
 import { Plane, SoftShadows } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { useEffect, useState } from "react";
-import ClosedBookModel from "./ClosedBookModel";
+import ClosedBookModel from "@/app/(root)/_components/ClosedBookModel";
 
 function Backdrop() {
   return (

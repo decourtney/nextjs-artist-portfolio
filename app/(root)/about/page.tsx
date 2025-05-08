@@ -1,6 +1,6 @@
 import Image from "next/image";
-import GetInTouchSection from "../_components/GetInTouchSection";
-import SectionSeparator from "../_components/SectionSeparator";
+import GetInTouchSection from "@/app/(root)/_components/GetInTouchSection";
+import SectionSeparator from "@/app/(root)/_components/SectionSeparator";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
