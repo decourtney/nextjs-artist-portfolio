@@ -13,9 +13,10 @@ import {
   TextureLoader,
 } from "three";
 import { GLTF } from "three-stdlib";
+import { BookPage, SpecialPage } from "@/types/global";
 
 interface OpenBookModelProps {
-  artworks: PopulatedArtworkDocument[];
+  pagesWithSpecials: BookPage[];
 }
 
 type GLTFResult = GLTF & {
@@ -39,11 +40,14 @@ type GLTFResult = GLTF & {
   animations: AnimationClip[];
 };
 
-const OpenBookModel = ({ artworks }: OpenBookModelProps) => {
+const OpenBookModel = ({ pagesWithSpecials }: OpenBookModelProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [textureScales, setTextureScales] = useState<
     { x: number; y: number }[]
   >([{ x: 0, y: 0 }]);
+  const isSpecialPage = (page: BookPage): page is SpecialPage => {
+    return "type" in page;
+  };
 
   const { nodes, materials, animations } = useGLTF(
     "/assets/open_book.glb"
@@ -52,12 +56,12 @@ const OpenBookModel = ({ artworks }: OpenBookModelProps) => {
   // Preload textures to prevent flickering
   const textures = useLoader(
     TextureLoader,
-    artworks.map((artwork) => artwork.src)
+    pagesWithSpecials.map((artwork) => artwork.src)
   );
 
   // Calculate dynamic scales to preserve aspect ratio
   useEffect(() => {
-    const scales = artworks.map((artwork) => {
+    const scales = pagesWithSpecials.map((artwork) => {
       const { metaWidth, metaHeight } = artwork;
 
       const pageWidth = 0.4;
@@ -81,17 +85,16 @@ const OpenBookModel = ({ artworks }: OpenBookModelProps) => {
       return { x: scaleX, y: scaleY };
     });
     setTextureScales(scales);
-  }, [artworks, textures]);
-
-  const currentTexture = textures[currentIndex];
-  const currentScale = textureScales[currentIndex] || { x: 1, y: 1 };
+  }, [pagesWithSpecials, textures]);
 
   // Navigation Controls
   const nextImage = () => {
-    setCurrentIndex((currentIndex + 1) % artworks.length);
+    setCurrentIndex((currentIndex + 1) % pagesWithSpecials.length);
   };
   const prevImage = () => {
-    setCurrentIndex((currentIndex - 1 + artworks.length) % artworks.length);
+    setCurrentIndex(
+      (currentIndex - 1 + pagesWithSpecials.length) % pagesWithSpecials.length
+    );
   };
 
   return (
@@ -133,10 +136,14 @@ const OpenBookModel = ({ artworks }: OpenBookModelProps) => {
             // debug
             position={[-0.28, 0, 0]}
             rotation={[MathUtils.degToRad(-90), 0, 0]}
-            scale={[currentScale.x, currentScale.y, 1]}
+            scale={[
+              textureScales[currentIndex].x,
+              textureScales[currentIndex].y,
+              1,
+            ]}
           >
             <meshStandardMaterial
-              map={currentTexture}
+              map={textures[currentIndex]}
               polygonOffset
               polygonOffsetFactor={-1}
             />
@@ -146,19 +153,19 @@ const OpenBookModel = ({ artworks }: OpenBookModelProps) => {
           {createTextDecal(
             -0.35,
             0.38,
-            artworks[currentIndex].size?.label,
+            pagesWithSpecials[currentIndex].size?.label,
             0.16
           )}
           {createTextDecal(
             -0.3,
             0.38,
-            artworks[currentIndex].substance?.label,
+            pagesWithSpecials[currentIndex].substance?.label,
             0.16
           )}
           {createTextDecal(
             -0.25,
             0.38,
-            artworks[currentIndex].medium?.label,
+            pagesWithSpecials[currentIndex].medium?.label,
             0.16
           )}
         </mesh>
@@ -175,7 +182,8 @@ const OpenBookModel = ({ artworks }: OpenBookModelProps) => {
           {createTextDecal(
             0.3,
             0,
-            artworks[currentIndex].description || "No description available.",
+            pagesWithSpecials[currentIndex].description ||
+              "No description available.",
             0.2
           )}
         </mesh>

@@ -143,8 +143,8 @@ export type PopulatedArtworkDocument = Omit<
   ArtworkDocument,
   "substance" | "medium" | "size" | "category"
 > & {
-  substance: TagDocument;
-  medium: TagDocument;
-  size: TagDocument;
-  category: TagDocument;
+  substance?: TagDocument;
+  medium?: TagDocument;
+  size?: TagDocument;
+  category?: TagDocument;
 };

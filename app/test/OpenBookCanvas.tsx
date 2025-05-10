@@ -14,12 +14,13 @@ import { MathUtils } from "three";
 import { ArtworkDocument, PopulatedArtworkDocument } from "@/models/Artwork";
 import useScreenSize from "@/utils/useScreenSize";
 import { Clock } from "three";
+import { BookPage, SpecialPage } from "@/types/global";
 
 interface OpenBookCanvasProps {
-  artworks: PopulatedArtworkDocument[]; // or use undefined instead of null if preferred
+  pagesWithSpecials: BookPage[]; // or use undefined instead of null if preferred
 }
 
-const OpenBookCanvas = ({ artworks }: OpenBookCanvasProps) => {
+const OpenBookCanvas = ({ pagesWithSpecials }: OpenBookCanvasProps) => {
   return (
     <>
       <div className="w-full h-full">
@@ -41,7 +42,7 @@ const OpenBookCanvas = ({ artworks }: OpenBookCanvasProps) => {
               makeDefault
               fov={35}
             />
-            <OpenBookModel artworks={artworks} />
+            <OpenBookModel pagesWithSpecials={pagesWithSpecials} />
           </Suspense>
         </Canvas>
       </div>
