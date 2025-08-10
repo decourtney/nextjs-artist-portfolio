@@ -49,6 +49,12 @@ const OpenBookModel = ({ pagesWithSpecials }: OpenBookModelProps) => {
     return "type" in page;
   };
 
+  const isPopulatedArtworkDocument = (
+    page: BookPage
+  ): page is PopulatedArtworkDocument => {
+    return page.hasOwnProperty("substance") || page.hasOwnProperty("medium") || page.hasOwnProperty("size") || page.hasOwnProperty("description"); 
+  };
+
   const { nodes, materials, animations } = useGLTF(
     "/assets/open_book.glb"
   ) as GLTFResult;
@@ -150,6 +156,7 @@ const OpenBookModel = ({ pagesWithSpecials }: OpenBookModelProps) => {
           </Decal>
 
           {/* Artwork Info */}
+          
           {createTextDecal(
             -0.35,
             0.38,

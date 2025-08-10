@@ -25,7 +25,8 @@ const TestPage = async () => {
     .lean()
     .maxTimeMS(10000)
     .exec()) as unknown as PopulatedArtworkDocument[];
-  const artworks: PopulatedArtworkDocument[] = JSON.parse(JSON.stringify(data));
+    
+  const artworks: BookPage[] = JSON.parse(JSON.stringify(data));
 
   // Create special pages
   const specialPages: BookPage[] = [
