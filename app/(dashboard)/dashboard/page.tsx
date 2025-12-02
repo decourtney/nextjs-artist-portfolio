@@ -19,26 +19,6 @@ export default async function DashboardPage({
     const page = parseInt(awaitedSearchParams.page || "1");
     const limit = parseInt(awaitedSearchParams.limit || "10");
     const skip = (page - 1) * limit;
-
-    // const [totalCount, artworkResponse, tagsResponse] = await Promise.all([
-    //   Artwork.countDocuments({}).maxTimeMS(10000),
-    //   Artwork.find({})
-    //     .sort({
-    //       isMainImage: -1,
-    //       isFeatured: -1,
-    //       isCategoryImage: -1,
-    //     })
-    //     .populate("substance")
-    //     .populate("medium")
-    //     .populate("size")
-    //     .populate("category")
-    //     .skip(skip)
-    //     .limit(limit)
-    //     .lean()
-    //     .maxTimeMS(10000),
-    //   Tag.find({}).lean().maxTimeMS(10000),
-    // ]);
-
     const tagsResponse = await Tag.find({}).lean().maxTimeMS(10000);
     const aggregateQueryResult = await Artwork.aggregate([
       {
@@ -101,10 +81,7 @@ export default async function DashboardPage({
     ]);
 
     const { metadata, data } = aggregateQueryResult[0];
-    console.log("Metadata:", metadata[0].totalCount);
-
     const totalPages = Math.ceil(metadata[0].totalCount / 10);
-
     const artworkDocuments: PopulatedArtworkDocument[] = JSON.parse(
       JSON.stringify(data)
     );
