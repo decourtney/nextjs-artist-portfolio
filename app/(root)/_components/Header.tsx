@@ -46,33 +46,22 @@ const Header = () => {
   };
 
   return (
-    <motion.header
-      initial={isInitialSame ? "small" : "large"}
-      variants={headerVariants}
-      animate={isSmallHeader ? "small" : "large"}
-      className="relative flex flex-col items-center justify-end"
-    >
+    <header className="relative flex flex-col items-center justify-end mt-10 md:mt-20">
       <div className="max-w-4xl w-full px-4">
-        <motion.div
-          initial={isInitialSame ? { opacity: 0 } : { opacity: 1 }}
-          animate={{
-            opacity: isSmallHeader ? 0 : 1,
-          }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
-        >
+        <div>
           <h1 className="text-6xl md:text-8xl font-bold text-[#1e293b] font-charm mb-6 text-center">
             Gena Courtney
           </h1>
           <div className="relative flex justify-center items-center mb-8">
             <p className="text-md bg-inherit text-[#64748b]">Artist</p>
           </div>
-        </motion.div>
+        </div>
 
         <Navbar />
 
         <SectionSeparator />
       </div>
-    </motion.header>
+    </header>
   );
 };
 
