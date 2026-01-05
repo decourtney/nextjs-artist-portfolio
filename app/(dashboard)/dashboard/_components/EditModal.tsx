@@ -38,6 +38,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
       isMainImage: fileToEdit.isMainImage,
       isFeatured: fileToEdit.isFeatured,
       isCategoryImage: fileToEdit.isCategoryImage,
+      isIllustration: fileToEdit.isIllustration
     };
   });
 
@@ -153,6 +154,13 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Add a description for this artwork..."
                 />
+              </div>
+
+              <div className="space-x-2">
+                <input id="isIllustration" type="checkbox" value="True" />
+                <label className="text-md font-medium text-gray-700 mb-2">
+                  Part of an Illustration
+                </label>
               </div>
             </div>
 

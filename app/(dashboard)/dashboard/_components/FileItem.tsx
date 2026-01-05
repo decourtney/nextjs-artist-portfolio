@@ -46,26 +46,6 @@ const FileItem = ({
         }
       `}
     >
-      {/* Special Image Indicator */}
-      {/* {file.isMainImage && (
-        <div className="absolute top-2 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-2 px-2 py-1 bg-blue-500 text-white text-xs font-medium rounded-md flex items-center gap-1 shadow-md">
-          <IoIosHome size={14} />
-          Home
-        </div>
-      )}
-      {!file.isMainImage && file.isFeatured && (
-        <div className="absolute top-2 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-2 px-2 py-1 bg-orange-500 text-white text-xs font-medium rounded-md flex items-center gap-1 shadow-md">
-          <IoIosStar size={14} />
-          Featured
-        </div>
-      )}
-      {!file.isMainImage && !file.isFeatured && file.isCategoryImage && (
-        <div className="absolute top-2 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-2 px-2 py-1 bg-purple-500 text-white text-xs font-medium rounded-md flex items-center gap-1 shadow-md">
-          <IoIosImages size={14} />
-          Category
-        </div>
-      )} */}
-
       {/* Checkbox */}
       <div className="absolute top-4 left-4 z-10">
         <input
@@ -154,8 +134,35 @@ const FileItem = ({
           )}
         </div>
 
+        {/* Illustration */}
+        <div className="flex items-center mt-auto">
+          {file.isIllustration ? (
+            <>
+              <IoIosCheckmarkCircle
+                className="text-blue-500"
+                title="Part of an illustration"
+                size={16}
+              />
+              <span className="px-2 py-1 text-blue-700 text-xs font-medium">
+                Illustration
+              </span>
+            </>
+          ) : (
+            <>
+              <IoIosCloseCircle
+                className="text-gray-300"
+                title="Not part of an illustration"
+                size={16}
+              />
+              <span className="px-2 py-1 text-gray-300 text-xs font-medium">
+                Illustration
+              </span>
+            </>
+          )}
+        </div>
+
         {/* Bottom Row: Price, Status Icons, Edit Button */}
-        <div className="flex justify-between items-center mt-auto">
+        <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
             {/* Price */}
             <div className="text-sm font-semibold text-gray-800">

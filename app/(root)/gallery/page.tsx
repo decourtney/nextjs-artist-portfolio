@@ -16,7 +16,10 @@ export const metadata: Metadata = {
 
 const GalleryPage = async () => {
   await dbConnect();
-  const categories = (await Tag.find({ type: "category" })) as TagDocument[];
+  const categories = (await Tag.find({
+    type: "category",
+    label: { $ne: "Illustration" },
+  })) as TagDocument[];
   const categoryImages = await Promise.all(
     categories.map(async (category) => {
       const categoryImage = await Artwork.findOne({

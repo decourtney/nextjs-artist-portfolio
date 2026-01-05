@@ -6,6 +6,7 @@ import TagManagement from "@/app/(dashboard)/dashboard/_components/TagManagement
 import dbConnect from "@/lib/dbConnect";
 import { notFound } from "next/navigation";
 import ProfileManagement from "./_components/ProfileManagement";
+import IllustrationManagement from "./_components/IllustrationManagement";
 
 export default async function DashboardPage({
   searchParams,
@@ -94,8 +95,7 @@ export default async function DashboardPage({
     const mediums = tags.filter((tag: TagDocument) => tag.type === "medium");
     const sizes = tags.filter((tag: TagDocument) => tag.type === "size");
     const categories = tags.filter(
-      (tag: TagDocument) => tag.type === "category"
-    );
+      (tag: TagDocument) => tag.type === "category"    );
 
     const allTags = { substances, mediums, sizes, categories };
 
@@ -109,6 +109,7 @@ export default async function DashboardPage({
             currentPage={page}
             totalPages={totalPages}
           />
+          <IllustrationManagement />
 
           <TagManagement tags={allTags} />
 
