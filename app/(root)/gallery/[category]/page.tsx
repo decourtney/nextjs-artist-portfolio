@@ -2,12 +2,11 @@ import ArtworkCard from "@/app/(root)/_components/ArtworkCard";
 import dbConnect from "@/lib/dbConnect";
 import { Artwork, Tag } from "@/models";
 import { PopulatedArtworkDocument } from "@/models/Artwork";
-import { TagDocument } from "@/models/Tag";
+import { ITag } from "@/models/Tag";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Gallery | Gena Courtney",
-  
 };
 
 interface CategoryPageProps {
@@ -22,7 +21,7 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
 
   const categoryDoc = (await Tag.findOne({
     label: category.replace("-", " "),
-  })) as TagDocument;
+  })) as ITag;
 
   if (!categoryDoc) {
     return (

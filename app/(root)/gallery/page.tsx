@@ -3,7 +3,7 @@ import Link from "next/link";
 import Book3D from "@/app/(root)/_components/Book3D";
 import dbConnect from "@/lib/dbConnect";
 import { Artwork, Tag } from "@/models";
-import { TagDocument } from "@/models/Tag";
+import { ITag } from "@/models/Tag";
 import GetInTouchSection from "../_components/GetInTouchSection";
 import SectionSeparator from "../_components/SectionSeparator";
 import Image from "next/image";
@@ -19,7 +19,7 @@ const GalleryPage = async () => {
   const categories = (await Tag.find({
     type: "category",
     label: { $ne: "Illustration" },
-  })) as TagDocument[];
+  })) as ITag[];
   const categoryImages = await Promise.all(
     categories.map(async (category) => {
       const categoryImage = await Artwork.findOne({

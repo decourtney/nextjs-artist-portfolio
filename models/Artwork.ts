@@ -1,8 +1,7 @@
-import mongoose, { Schema } from "mongoose";
-import Tag, { TagDocument } from "./Tag";
-import { TagType } from "@/types/tagType";
+import mongoose, { Schema, Document, Types, ObjectId } from "mongoose";
+import { ITag } from "./Tag";
 
-export interface ArtworkDocument extends mongoose.Document {
+export interface IArtwork extends Document {
   _id: string;
   name: string;
   description: string;
@@ -11,10 +10,10 @@ export interface ArtworkDocument extends mongoose.Document {
   alt: string;
   metaWidth: number;
   metaHeight: number;
-  substance: mongoose.Types.ObjectId;
-  medium: mongoose.Types.ObjectId;
-  size: mongoose.Types.ObjectId;
-  category: mongoose.Types.ObjectId;
+  substance: ObjectId;
+  medium: ObjectId;
+  size: ObjectId;
+  category: ObjectId;
   price: number;
   isAvailable: boolean;
   isMainImage: boolean;
@@ -23,7 +22,7 @@ export interface ArtworkDocument extends mongoose.Document {
   isIllustration: boolean;
 }
 
-const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
+const ArtworkSchema = new Schema<IArtwork>({
   name: {
     type: String,
     unique: true,
@@ -52,19 +51,19 @@ const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
     type: Number,
   },
   substance: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "Tag",
   },
   medium: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "Tag",
   },
   size: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "Tag",
   },
   category: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "Tag",
   },
   price: {
@@ -88,15 +87,15 @@ const ArtworkSchema = new mongoose.Schema<ArtworkDocument>({
     type: Boolean,
     default: false,
   },
-  isIllustration:{
+  isIllustration: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 
 // Pre-save middleware to enforce constraints
 ArtworkSchema.pre("save", async function (next) {
-  const model = this.constructor as mongoose.Model<ArtworkDocument>;
+  const model = this.constructor as mongoose.Model<IArtwork>;
   const Tag = mongoose.models.Tag; // Import the Tag model
 
   // Ensure only one home main image
@@ -136,15 +135,15 @@ ArtworkSchema.pre("save", async function (next) {
 });
 
 export default mongoose.models.Artwork ||
-  mongoose.model<ArtworkDocument>("Artwork", ArtworkSchema);
+  mongoose.model<IArtwork>("Artwork", ArtworkSchema);
 
 // Extended type for populated categories:
 export type PopulatedArtworkDocument = Omit<
-  ArtworkDocument,
+  IArtwork,
   "substance" | "medium" | "size" | "category"
 > & {
-  substance: TagDocument;
-  medium: TagDocument;
-  size: TagDocument;
-  category: TagDocument;
+  substance: ITag;
+  medium: ITag;
+  size: ITag;
+  category: ITag;
 };

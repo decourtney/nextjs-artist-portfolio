@@ -5,7 +5,7 @@ import {
   CopyObjectCommand,
 } from "@aws-sdk/client-s3";
 import dbConnect from "@/lib/dbConnect";
-import Artwork, { ArtworkDocument } from "@/models/Artwork";
+import Artwork, { IArtwork } from "@/models/Artwork";
 import { Tag } from "@/models";
 import { SanitizeAndShortenString } from "@/utils/sanitizeAndShortenString";
 import { getServerSession } from "next-auth";
@@ -56,7 +56,7 @@ export async function DELETE(
     const { id } = await params;
 
     // Find the artwork document by ID
-    const artwork = (await Artwork.findById(id)) as ArtworkDocument;
+    const artwork = (await Artwork.findById(id)) as IArtwork;
     if (!artwork) {
       return NextResponse.json(
         { message: "Artwork not found" },
@@ -159,7 +159,7 @@ export async function PATCH(
     // Retrieve the artwork document by ID
     const artwork = (await Artwork.findById(id)
       .maxTimeMS(10000)
-      .exec()) as ArtworkDocument;
+      .exec()) as IArtwork;
 
     if (!artwork) {
       return NextResponse.json(

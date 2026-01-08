@@ -3,7 +3,7 @@ import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import Busboy from "busboy";
 import dbConnect from "@/lib/dbConnect";
-import Artwork, { ArtworkDocument } from "@/models/Artwork";
+import Artwork, { IArtwork } from "@/models/Artwork";
 import sharp from "sharp";
 import { Readable } from "stream";
 import {
@@ -257,7 +257,7 @@ export async function POST(request: NextRequest) {
             await thumbUpload.done();
 
             // Insert a document into MongoDB
-            const artworkDoc: ArtworkDocument = new Artwork({
+            const artworkDoc: IArtwork = new Artwork({
               name: baseName,
               src: mainUrl,
               alt: sanitizedFilename,

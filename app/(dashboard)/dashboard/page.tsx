@@ -1,5 +1,5 @@
 import Artwork, { PopulatedArtworkDocument } from "@/models/Artwork";
-import Tag, { TagDocument } from "@/models/Tag";
+import Tag, { ITag } from "@/models/Tag";
 import FileManagement from "@/app/(dashboard)/dashboard/_components/FileManagement";
 import FileUpload from "@/app/(dashboard)/dashboard/_components/FileUpload";
 import TagManagement from "@/app/(dashboard)/dashboard/_components/TagManagement";
@@ -86,16 +86,13 @@ export default async function DashboardPage({
     const artworkDocuments: PopulatedArtworkDocument[] = JSON.parse(
       JSON.stringify(data)
     );
-    const tags: TagDocument[] = JSON.parse(JSON.stringify(tagsResponse));
+    const tags: ITag[] = JSON.parse(JSON.stringify(tagsResponse));
 
     // Split tags by type
-    const substances = tags.filter(
-      (tag: TagDocument) => tag.type === "substance"
-    );
-    const mediums = tags.filter((tag: TagDocument) => tag.type === "medium");
-    const sizes = tags.filter((tag: TagDocument) => tag.type === "size");
-    const categories = tags.filter(
-      (tag: TagDocument) => tag.type === "category"    );
+    const substances = tags.filter((tag: ITag) => tag.type === "substance");
+    const mediums = tags.filter((tag: ITag) => tag.type === "medium");
+    const sizes = tags.filter((tag: ITag) => tag.type === "size");
+    const categories = tags.filter((tag: ITag) => tag.type === "category");
 
     const allTags = { substances, mediums, sizes, categories };
 

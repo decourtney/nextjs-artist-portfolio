@@ -1,14 +1,14 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { TagType } from "@/types/tagType";
 
-export interface TagDocument extends Document {
+export interface ITag extends Document {
   _id: string;
   label: string;
   type: TagType;
-  description: string
+  description: string;
 }
 
-const TagSchema = new Schema<TagDocument>(
+const TagSchema = new Schema<ITag>(
   {
     label: {
       type: String,
@@ -33,5 +33,4 @@ const TagSchema = new Schema<TagDocument>(
 // Adding a compound index for label and type to ensure uniqueness
 TagSchema.index({ label: 1, type: 1 }, { unique: true });
 
-export default mongoose.models.Tag ||
-  mongoose.model<TagDocument>("Tag", TagSchema);
+export default mongoose.models.Tag || mongoose.model<ITag>("Tag", TagSchema);

@@ -4,14 +4,14 @@ import GetInTouchSection from "./_components/GetInTouchSection";
 import SectionSeparator from "./_components/SectionSeparator";
 import dbConnect from "@/lib/dbConnect";
 import { Artwork } from "@/models";
-import { ArtworkDocument, PopulatedArtworkDocument } from "@/models/Artwork";
+import { IArtwork, PopulatedArtworkDocument } from "@/models/Artwork";
 
 const Home = async () => {
   await dbConnect();
   const mainImageArtwork = (await Artwork.findOne({ isMainImage: true })
     .lean()
     .maxTimeMS(10000)
-    .exec()) as unknown as ArtworkDocument;
+    .exec()) as unknown as IArtwork;
   const featuredArtworks = (await Artwork.find({
     isFeatured: true,
   })

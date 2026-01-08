@@ -1,8 +1,8 @@
-import { TagDocument } from "@/models/Tag";
+import { ITag } from "@/models/Tag";
 
 export function BuildQueryFromFilters(
   activeFilters: Record<string, string[]>,
-  tags: TagDocument[]
+  tags: ITag[]
 ): Record<string, any> {
   const query: Record<string, any> = {};
 

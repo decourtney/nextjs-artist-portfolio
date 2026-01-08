@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import dbConnect from "@/lib/dbConnect";
-import Artwork, { ArtworkDocument } from "@/models/Artwork";
+import Artwork, { IArtwork } from "@/models/Artwork";
 import { getServerSession } from "next-auth";
 import { _nextAuthOptions } from "@/auth";
 
@@ -34,7 +34,7 @@ export async function DELETE(request: NextRequest) {
     // Fetch artworks to retrieve their S3 URL details
     const artworks = (await Artwork.find({ _id: { $in: ids } })
       .maxTimeMS(10000)
-      .exec()) as unknown as ArtworkDocument[];
+      .exec()) as unknown as IArtwork[];
 
     const bucket = process.env.NEXT_PUBLIC_AWS_S3_BUCKET!;
     const region = process.env.NEXT_PUBLIC_AWS_REGION!;

@@ -1,6 +1,6 @@
 "use client";
 
-import { TagDocument } from "@/models/Tag";
+import { ITag } from "@/models/Tag";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -11,10 +11,10 @@ import {
 
 interface TagManagementProps {
   tags: {
-    substances: TagDocument[];
-    mediums: TagDocument[];
-    sizes: TagDocument[];
-    categories: TagDocument[];
+    substances: ITag[];
+    mediums: ITag[];
+    sizes: ITag[];
+    categories: ITag[];
   };
 }
 
@@ -106,7 +106,7 @@ export default function TagManagement({ tags }: TagManagementProps) {
     }
   };
 
-  const renderTagList = (tagList: TagDocument[], type: string) => {
+  const renderTagList = (tagList: ITag[], type: string) => {
     if (tagList.length === 0) {
       return (
         <div className="text-sm text-gray-500 italic">
