@@ -8,52 +8,19 @@ import {
   useDroppable,
   DragEndEvent,
   DragStartEvent,
+  closestCenter,
+  closestCorners,
 } from "@dnd-kit/core";
 import { PopulatedArtworkDocument } from "@/models/Artwork";
 import DraggableArtwork from "./DraggableArtwork";
 import DroppableArea from "./DroppableArea";
-
-// function DraggableArtwork({ id, children }) {
-//   const { attributes, listeners, setNodeRef, transform, isDragging } =
-//     useDraggable({
-//       id: id,
-//     });
-
-//   const style = {
-//     transform: transform
-//       ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
-//       : undefined,
-//     opacity: isDragging ? 0.5 : 1,
-//   };
-
-//   return (
-//     <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-//       {children}
-//     </div>
-//   );
-// }
-
-// function DroppableArea({ id, children }) {
-//   const { isOver, setNodeRef } = useDroppable({
-//     id: id,
-//   });
-
-//   const style = {
-//     backgroundColor: isOver ? "#e0f2fe" : "#f8fafc",
-//     borderColor: isOver ? "#3b82f6" : "#e5e7eb",
-//     transition: "all 0.2s",
-//   };
-
-//   return (
-//     <div
-//       ref={setNodeRef}
-//       style={style}
-//       className="flex flex-row flex-wrap gap-2 p-4 w-full min-h-32 rounded-xl border-2 border-dashed"
-//     >
-//       {children}
-//     </div>
-//   );
-// }
+import SortableItem from "./SortableItem";
+import {
+  SortableContext,
+  arrayMove,
+  horizontalListSortingStrategy,
+  rectSwappingStrategy,
+} from "@dnd-kit/sortable";
 
 const DragTest = ({ artwork }: { artwork: PopulatedArtworkDocument[] }) => {
   const [activeId, setActiveId] = useState(null);
@@ -68,6 +35,8 @@ const DragTest = ({ artwork }: { artwork: PopulatedArtworkDocument[] }) => {
 
   function handleDragEnd(event) {
     const { active, over } = event;
+    console.log("active:", active);
+    console.log("over:", over);
 
     if (!over) {
       setActiveId(null);
@@ -76,6 +45,15 @@ const DragTest = ({ artwork }: { artwork: PopulatedArtworkDocument[] }) => {
 
     const activeItemId = active.id;
     const overId = over.id;
+
+    if (active.id !== over.id) {
+      setUnassignedItems((items) => {
+        const oldIndex = items.indexOf(active.id);
+        const newIndex = items.indexOf(over.id);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
 
     // Moving from unassigned to collection
     if (overId === "collection" && unassignedItems.includes(activeItemId)) {
@@ -103,28 +81,30 @@ const DragTest = ({ artwork }: { artwork: PopulatedArtworkDocument[] }) => {
           <label className="text-sm font-medium text-gray-700 mb-2 block">
             Unassigned Artwork ({unassignedItems.length})
           </label>
-          <DroppableArea id="unassigned">
-            {unassignedItems.length === 0 ? (
-              <p className="text-gray-400 text-sm w-full text-center">
-                All artwork assigned
-              </p>
-            ) : (
-              unassignedItems.map((id) => {
-                const file = getArtworkById(id);
-                return (
-                  <DraggableArtwork key={id} id={id}>
-                    <div className="w-24 h-24 flex-shrink-0 relative rounded-md overflow-hidden bg-gray-100 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-shadow">
-                      <img
-                        src={file.thumbSrc}
-                        alt={file.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </DraggableArtwork>
-                );
-              })
-            )}
-          </DroppableArea>
+          <SortableContext items={unassignedItems}>
+            <DroppableArea id="unassigned">
+              {unassignedItems.length === 0 ? (
+                <p className="text-gray-400 text-sm w-full text-center">
+                  All artwork assigned
+                </p>
+              ) : (
+                unassignedItems.map((id) => {
+                  const file = getArtworkById(id);
+                  return (
+                    <SortableItem key={id} id={id}>
+                      <div className="w-24 h-24 flex-shrink-0 relative rounded-md overflow-hidden bg-gray-100 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-shadow">
+                        <img
+                          src={file.thumbSrc}
+                          alt={file.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </SortableItem>
+                  );
+                })
+              )}
+            </DroppableArea>
+          </SortableContext>
         </div>
 
         {/* Collection */}
@@ -132,28 +112,30 @@ const DragTest = ({ artwork }: { artwork: PopulatedArtworkDocument[] }) => {
           <h3 className="text-lg font-semibold text-gray-800 mb-2">
             Illustrations Collection ({collectionItems.length})
           </h3>
-          <DroppableArea id="collection">
-            {collectionItems.length === 0 ? (
-              <p className="text-gray-400 text-sm w-full text-center">
-                Drag artwork here to add to collection
-              </p>
-            ) : (
-              collectionItems.map((id) => {
-                const file = getArtworkById(id);
-                return (
-                  <DraggableArtwork key={id} id={id}>
-                    <div className="w-24 h-24 flex-shrink-0 relative rounded-md overflow-hidden bg-gray-100 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-shadow">
-                      <img
-                        src={file.thumbSrc}
-                        alt={file.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </DraggableArtwork>
-                );
-              })
-            )}
-          </DroppableArea>
+          <SortableContext items={collectionItems}>
+            <DroppableArea id="collection">
+              {collectionItems.length === 0 ? (
+                <p className="text-gray-400 text-sm w-full text-center">
+                  Drag artwork here to add to collection
+                </p>
+              ) : (
+                collectionItems.map((id) => {
+                  const file = getArtworkById(id);
+                  return (
+                    <SortableItem key={id} id={id}>
+                      <div className="w-24 h-24 flex-shrink-0 relative rounded-md overflow-hidden bg-gray-100 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-shadow">
+                        <img
+                          src={file.thumbSrc}
+                          alt={file.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </SortableItem>
+                  );
+                })
+              )}
+            </DroppableArea>
+          </SortableContext>
         </div>
 
         {/* Save Button */}

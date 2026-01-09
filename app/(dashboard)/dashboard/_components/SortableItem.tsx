@@ -1,18 +1,18 @@
 "use client";
 
 import { PopulatedArtworkDocument } from "@/models/Artwork";
-import { useDraggable } from "@dnd-kit/core";
+import { useSortable } from "@dnd-kit/sortable";
 import Image from "next/image";
 import { ReactNode } from "react";
 
-interface DraggleArtworkProps {
+interface SortableItemProps {
   id: string;
   children: ReactNode;
 }
 
-const DraggableArtwork = ({ id, children }: DraggleArtworkProps) => {
+const SortableItem = ({ id, children }: SortableItemProps) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
+    useSortable({
       id: id,
     });
 
@@ -29,4 +29,4 @@ const DraggableArtwork = ({ id, children }: DraggleArtworkProps) => {
   );
 };
 
-export default DraggableArtwork;
+export default SortableItem;
