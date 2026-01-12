@@ -2,13 +2,15 @@
 
 import React, { ReactNode } from "react";
 import { useDroppable } from "@dnd-kit/core";
+import { SortableContext } from "@dnd-kit/sortable";
 
 interface DroppableAreaProps {
   id: string;
   children: ReactNode;
+  items: string[];
 }
 
-const DroppableArea = ({ id, children }: DroppableAreaProps) => {
+const DroppableArea = ({ id, children, items }: DroppableAreaProps) => {
   const { isOver, setNodeRef } = useDroppable({
     id: id,
   });
@@ -25,7 +27,7 @@ const DroppableArea = ({ id, children }: DroppableAreaProps) => {
       style={style}
       className="flex flex-row flex-wrap gap-2 p-4 w-full min-h-32 rounded-xl border-2 border-dashed"
     >
-      {children}
+      <SortableContext items={items}> {children}</SortableContext>
     </div>
   );
 };
