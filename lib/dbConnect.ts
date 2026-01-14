@@ -1,3 +1,4 @@
+import Illustration from "@/models/Illustration";
 import mongoose from "mongoose";
 
 interface MongooseCache {
@@ -39,6 +40,12 @@ async function dbConnect(retries = 3, delay = 1000) {
       for (let attempt = 1; attempt <= retries; attempt++) {
         try {
           const connection = await mongoose.connect(MONGODB_URI, opts);
+
+          await Illustration.updateOne(
+            { name: "Unassigned" },
+            { $setOnInsert: { name: "Unassigned", artwork: [] } },
+            { upsert: true }
+          );
 
           // Setup connection event listeners
           connection.connection.on("error", (err) => {

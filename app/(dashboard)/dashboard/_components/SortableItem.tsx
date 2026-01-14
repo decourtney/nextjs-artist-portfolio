@@ -1,8 +1,6 @@
 "use client";
 
-import { PopulatedArtworkDocument } from "@/models/Artwork";
 import { useSortable } from "@dnd-kit/sortable";
-import Image from "next/image";
 import { ReactNode } from "react";
 
 interface SortableItemProps {

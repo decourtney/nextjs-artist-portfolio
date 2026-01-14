@@ -6,7 +6,7 @@ export interface IIllustration extends Document {
   artwork: ObjectId[];
 }
 
-const TagSchema = new Schema<IIllustration>(
+const IllustrationSchema = new Schema<IIllustration>(
   {
     name: {
       type: String,
@@ -23,5 +23,5 @@ const TagSchema = new Schema<IIllustration>(
   { timestamps: true }
 );
 
-export default mongoose.models.Tag ||
-  mongoose.model<IIllustration>("Illustration", TagSchema);
+export default mongoose.models.Illustration ||
+  mongoose.model<IIllustration>("Illustration", IllustrationSchema);

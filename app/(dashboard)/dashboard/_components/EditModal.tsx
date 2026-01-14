@@ -157,7 +157,17 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
               </div>
 
               <div className="space-x-2">
-                <input id="isIllustration" type="checkbox" value="True" />
+                <input
+                  id="isIllustration"
+                  type="checkbox"
+                  checked={editFormData.isIllustration}
+                  onChange={(e) =>
+                    setEditFormData({
+                      ...editFormData,
+                      isIllustration: e.target.checked,
+                    })
+                  }
+                />
                 <label className="text-md font-medium text-gray-700 mb-2">
                   Part of an Illustration
                 </label>

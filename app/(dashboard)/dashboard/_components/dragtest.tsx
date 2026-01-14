@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import {
   DndContext,
   DragEndEvent,
@@ -13,6 +13,7 @@ import { arrayMove } from "@dnd-kit/sortable";
 import { PopulatedArtworkDocument } from "@/models/Artwork";
 import SortableItem from "./SortableItem";
 import DroppableArea from "./DroppableArea";
+import Image from "next/image";
 
 const DragTest = ({ artwork }: { artwork: PopulatedArtworkDocument[] }) => {
   const [activeId, setActiveId] = useState<null | string>(null);
@@ -20,7 +21,7 @@ const DragTest = ({ artwork }: { artwork: PopulatedArtworkDocument[] }) => {
     unassigned: artwork.map((a) => a._id),
   });
   const [nextCollectionId, setNextCollectionId] = useState<number>(1);
-  console.log(containers);
+  const formRef = useRef<HTMLFormElement>(null);
 
   function findContainer(id: UniqueIdentifier) {
     // Check if id is a container itself
@@ -38,6 +39,13 @@ const DragTest = ({ artwork }: { artwork: PopulatedArtworkDocument[] }) => {
     setActiveId(event.active.id as string);
   }
 
+  // ** DRAGOVER NOT CURRENTLY IN-USE **
+  // DragOver works but current implementation has a minor drawback: The sortable item is inserted into a hovered droppable
+  // which removes the item from the original droppable. So if the user 'cancels' the move by dropping the
+  // item outside any droppable areas then the item remains in the last hovered droppable rather than resetting to its
+  // original droppable area.
+  // Leaving this in case the user perfers this action or I get around to fixing the bug.
+  // This could also be due to my lack of experience with dnd-kit.
   function handleDragOver(event: DragOverEvent) {
     const { active, over } = event;
 
@@ -82,7 +90,7 @@ const DragTest = ({ artwork }: { artwork: PopulatedArtworkDocument[] }) => {
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
-    console.log(over);
+
     if (!over) {
       setActiveId(null);
       return;
@@ -93,9 +101,6 @@ const DragTest = ({ artwork }: { artwork: PopulatedArtworkDocument[] }) => {
 
     const activeContainer = findContainer(activeId);
     const overContainer = findContainer(overId);
-
-    console.log("Active Container:", activeContainer);
-    console.log("Over Container:", overContainer);
 
     if (!activeContainer || !overContainer) {
       setActiveId(null);
@@ -119,7 +124,7 @@ const DragTest = ({ artwork }: { artwork: PopulatedArtworkDocument[] }) => {
       const activeItems = containers[activeContainer];
       const overItems = containers[overContainer];
 
-      const activeIndex = activeItems.indexOf(activeId);
+      // const activeIndex = activeItems.indexOf(activeId);
       const overIndex = overItems.indexOf(overId);
 
       setContainers({
@@ -156,7 +161,16 @@ const DragTest = ({ artwork }: { artwork: PopulatedArtworkDocument[] }) => {
     });
   }
 
-  function saveCollection(collectionId: string) {
+  // function saveCollection(collectionId: string) {
+  //   const items = containers[collectionId];
+  //   console.log(`Saving ${collectionId}:`, items);
+  //   alert(`Collection saved with ${items.length} items: ${items.join(", ")}`);
+  // }
+
+  function saveCollection(event: FormEvent) {
+    event.preventDefault();
+
+    console.log(event)
     const items = containers[collectionId];
     console.log(`Saving ${collectionId}:`, items);
     alert(`Collection saved with ${items.length} items: ${items.join(", ")}`);
@@ -171,10 +185,10 @@ const DragTest = ({ artwork }: { artwork: PopulatedArtworkDocument[] }) => {
   return (
     <DndContext
       onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
+      // onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div className="bg-gray-50 p-6 space-y-6 rounded-xl border border-gray-200 max-w-6xl mx-auto">
+      <section className="bg-gray-50 p-6 space-y-6 rounded-xl border border-gray-200 max-w-6xl mx-auto">
         {/* Unassigned Artwork */}
         <div>
           <label className="text-sm font-medium text-gray-700 mb-2 block">
@@ -183,7 +197,7 @@ const DragTest = ({ artwork }: { artwork: PopulatedArtworkDocument[] }) => {
           <DroppableArea id="unassigned" items={containers.unassigned}>
             {containers.unassigned.length === 0 ? (
               <p className="text-gray-400 text-sm w-full text-center">
-                All artwork assigned
+                No unassigned artwork
               </p>
             ) : (
               containers.unassigned.map((id) => {
@@ -191,9 +205,11 @@ const DragTest = ({ artwork }: { artwork: PopulatedArtworkDocument[] }) => {
                 return (
                   <SortableItem key={id} id={id}>
                     <div className="w-24 h-24 flex-shrink-0 relative rounded-md overflow-hidden bg-gray-100 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-shadow">
-                      <img
-                        src={file?.thumbSrc}
-                        alt={file?.name}
+                      <Image
+                        src={file.thumbSrc}
+                        alt={file.name}
+                        fill
+                        sizes="(max-width: 640px) 100vw, 160px"
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -225,29 +241,45 @@ const DragTest = ({ artwork }: { artwork: PopulatedArtworkDocument[] }) => {
           ) : (
             collections.map((collectionId) => (
               <div key={collectionId} className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <h4 className="text-md font-medium text-gray-700">
-                    {collectionId
-                      .replace("-", " ")
-                      .replace(/\b\w/g, (l) => l.toUpperCase())}{" "}
-                    ({containers[collectionId].length})
-                  </h4>
+                <form
+                  ref={formRef}
+                  onSubmit={saveCollection}
+                  className="flex justify-between items-center"
+                >
+                  <div className="space-x-2">
+                    <input
+                      id={collectionId}
+                      type="text"
+                      name="name"
+                      placeholder={collectionId
+                        .replace("-", " ")
+                        .replace(/\b\w/g, (l) => l.toUpperCase())}
+                      size={collectionId.length}
+                      // onChange={(event)=> setContainers(...containers, [collectionId]:event.target.value)}
+                    />
+                    <span className="text-md font-medium text-gray-700">
+                      ({containers[collectionId].length})
+                    </span>
+                  </div>
+
                   <div className="flex gap-2">
                     <button
-                      onClick={() => saveCollection(collectionId)}
+                      type="submit"
+                      // onClick={() => saveCollection(collectionId)}
                       disabled={containers[collectionId].length === 0}
                       className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors text-sm"
                     >
                       Save
                     </button>
                     <button
+                      type="button"
                       onClick={() => deleteCollection(collectionId)}
                       className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm"
                     >
                       Delete
                     </button>
                   </div>
-                </div>
+                </form>
                 <DroppableArea
                   id={collectionId}
                   items={containers[collectionId]}
@@ -262,9 +294,11 @@ const DragTest = ({ artwork }: { artwork: PopulatedArtworkDocument[] }) => {
                       return (
                         <SortableItem key={id} id={id}>
                           <div className="w-24 h-24 flex-shrink-0 relative rounded-md overflow-hidden bg-gray-100 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-shadow">
-                            <img
-                              src={file?.thumbSrc}
-                              alt={file?.name}
+                            <Image
+                              src={file.thumbSrc}
+                              alt={file.name}
+                              fill
+                              sizes="(max-width: 640px) 100vw, 160px"
                               className="w-full h-full object-cover"
                             />
                           </div>
@@ -277,7 +311,7 @@ const DragTest = ({ artwork }: { artwork: PopulatedArtworkDocument[] }) => {
             ))
           )}
         </div>
-      </div>
+      </section>
 
       <DragOverlay>
         {activeArtwork ? (

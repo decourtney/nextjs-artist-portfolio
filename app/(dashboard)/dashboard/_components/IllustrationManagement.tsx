@@ -10,6 +10,7 @@ import DroppableArea from "./DroppableArea";
 import DragTest from "./dragtest";
 
 const IllustrationManagement = async () => {
+  
   const queryResult = await Artwork.where("isIllustration").equals(true);
   const illustrationArtwork: PopulatedArtworkDocument[] = JSON.parse(
     JSON.stringify(queryResult)
@@ -43,44 +44,7 @@ const IllustrationManagement = async () => {
 
       {/* Illustration Content */}
       <DragTest artwork={illustrationArtwork} />
-      {/* <DraggableContext>
-        <div className="bg-gray-50 p-6 space-y-6 rounded-xl border border-gray-200">
-          Unassigned Artwork
-          <div>
-            <label className="text-sm font-medium text-gray-700 mb-2">
-              Unassigned Artwork
-            </label>
-              <div className="flex flex-row gap-2 p-4 bg-white rounded-xl border border-gray-200 overflow-x-auto">
-                {illustrationArtwork.map((file) => (
-                  <DraggableArtwork key={file._id} fileId={file._id}>
-                    <div
-                      key={file._id}
-                      className="w-24 h-24 flex-shrink-0 relative rounded-md overflow-hidden bg-gray-100"
-                    >
-                      <Image
-                        src={file.thumbSrc}
-                        alt={file.name}
-                        fill
-                        sizes="(max-width: 640px) 100vw, 160px"
-                        className="object-cover"
-                      />
-                    </div>
-                  </DraggableArtwork>
-                ))}
-              </div>
-          </div>
 
-          Illustrations
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              Illustrations
-            </h3>
-            <DroppableArea>
-              <div className="flex flex-row p-6 w-full h-32 bg-white rounded-xl border border-gray-200"></div>
-            </DroppableArea>
-          </div>
-        </div>
-      </DraggableContext> */}
     </section>
   );
 };

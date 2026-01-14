@@ -5,12 +5,13 @@ import {
   CopyObjectCommand,
 } from "@aws-sdk/client-s3";
 import dbConnect from "@/lib/dbConnect";
-import Artwork, { IArtwork } from "@/models/Artwork";
+import Artwork, { IArtwork, PopulatedArtworkDocument } from "@/models/Artwork";
 import { Tag } from "@/models";
 import { SanitizeAndShortenString } from "@/utils/sanitizeAndShortenString";
 import { getServerSession } from "next-auth";
 import { _nextAuthOptions } from "@/auth";
 import { EditFormData } from "@/types/editFormData";
+import Illustration from "@/models/Illustration";
 
 // Create S3 client
 const s3Client = new S3Client({
@@ -101,33 +102,6 @@ export async function DELETE(
   }
 }
 
-type S3dbUpdateData = {
-  newName: string;
-  s3FolderPath: string;
-  s3Bucket: string;
-  s3url: string;
-  currentName: string;
-  currentSrc: string;
-  currentThumbSrc: string;
-};
-
-type CurrentArtworkData = {
-  name: string;
-  description?: string;
-  substance?: string;
-  size?: string;
-  medium?: string;
-  category?: string;
-  price: number;
-  isAvailable: boolean;
-  isMainImage: boolean;
-  isFeatured: boolean;
-  isCategoryImage: boolean;
-  isIllustration: boolean;
-  src: string;
-  thumbSrc: string;
-};
-
 // Some resilience logic to handle S3 errors and rollback if necessary
 export async function PATCH(
   request: NextRequest,
@@ -159,7 +133,8 @@ export async function PATCH(
     // Retrieve the artwork document by ID
     const artwork = (await Artwork.findById(id)
       .maxTimeMS(10000)
-      .exec()) as IArtwork;
+      .populate(["substance", "size", "medium", "category"])
+      .exec()) as PopulatedArtworkDocument;
 
     if (!artwork) {
       return NextResponse.json(
@@ -168,29 +143,9 @@ export async function PATCH(
       );
     }
 
-    // S3 details
-    const bucket = process.env.NEXT_PUBLIC_AWS_S3_BUCKET!;
-    const region = process.env.NEXT_PUBLIC_AWS_REGION!;
-    const folderPath = process.env.NEXT_PUBLIC_AWS_IMAGES_FOLDER || "";
-    const urlPrefix = `https://${bucket}.s3.${region}.amazonaws.com/`;
-
     // Maintain current artwork document data for rollback if necessary
-    const currentArtworkData: CurrentArtworkData = {
-      name: artwork.name,
-      description: artwork.description,
-      substance: artwork.substance?._id.toString(),
-      size: artwork.size?._id.toString(),
-      medium: artwork.medium?._id.toString(),
-      category: artwork.category?._id.toString(),
-      price: artwork.price,
-      isAvailable: artwork.isAvailable,
-      isMainImage: artwork.isMainImage,
-      isFeatured: artwork.isFeatured,
-      isCategoryImage: artwork.isCategoryImage,
-      isIllustration: artwork.isIllustration,
-      src: artwork.src,
-      thumbSrc: artwork.thumbSrc,
-    };
+    // Current not being used
+    const oldArtworkData = artwork;
 
     // Deconstruct new data
     const { category, medium, size, substance, ...restData } = newArtworkData;
@@ -215,6 +170,9 @@ export async function PATCH(
         : null,
     ]);
 
+    if (artwork.isIllustration !== newArtworkData.isIllustration)
+      await updateIllustration(artwork._id, newArtworkData.isIllustration);
+
     // Assign new data to existing artwork document
     Object.assign(artwork, {
       ...restData,
@@ -224,18 +182,22 @@ export async function PATCH(
       ...(substanceTag && { substance: substanceTag._id }),
     });
 
-    // if (category && !categoryTag) throw new Error("Invalid category name");
+    // S3 details
+    const bucket = process.env.NEXT_PUBLIC_AWS_S3_BUCKET!;
+    const region = process.env.NEXT_PUBLIC_AWS_REGION!;
+    const folderPath = process.env.NEXT_PUBLIC_AWS_IMAGES_FOLDER || "";
+    const urlPrefix = `https://${bucket}.s3.${region}.amazonaws.com/`;
 
     // If the name has changed then we need to update the s3
-    if (newArtworkData.name !== currentArtworkData.name) {
+    if (newArtworkData.name !== artwork.name) {
       const s3UpdateResult = await updateS3({
         newName: newArtworkData.name,
         s3FolderPath: folderPath,
         s3Bucket: bucket,
         s3url: urlPrefix,
-        currentName: currentArtworkData.name,
-        currentSrc: currentArtworkData.src,
-        currentThumbSrc: currentArtworkData.thumbSrc,
+        currentName: artwork.name,
+        currentSrc: artwork.src,
+        currentThumbSrc: artwork.thumbSrc,
       });
 
       // Update artwork document with the S3 update results
@@ -245,10 +207,13 @@ export async function PATCH(
     }
 
     // Save and return updated artwork document
-    const savedDoc = await artwork.save();
-    const updatedArtwork = await savedDoc.populate(
-      "category medium size substance"
-    );
+    const updatedArtwork = await artwork.save();
+    // const updatedArtwork = await savedDoc.populate([
+    //   "substance",
+    //   "size",
+    //   "medium",
+    //   "category",
+    // ]);
 
     console.log(updatedArtwork);
     return NextResponse.json(updatedArtwork, {
@@ -261,57 +226,74 @@ export async function PATCH(
   }
 }
 
-async function updateS3(
-  s3Data: S3dbUpdateData
-): Promise<{ src: string; thumbSrc: string; name: string }> {
-  const sanitizedName = SanitizeAndShortenString(s3Data.newName); // Sanitize and shorten the name for S3 key
-  const newMainKey = `${s3Data.s3FolderPath}${sanitizedName}.webp`;
-  const newThumbKey = `${s3Data.s3FolderPath}thumbnails/${sanitizedName}-thumb.webp`;
-  const oldMainKey = s3Data.currentSrc.replace(s3Data.s3url, "");
-  const oldThumbKey = s3Data.currentThumbSrc.replace(s3Data.s3url, "");
+async function updateIllustration(id: string, boolValue: boolean) {
+  if (boolValue) {
+    await Illustration.updateOne(
+      { name: "Unassigned" },
+      { $addToSet: { artwork: id } }
+    );
+  } else {
+    await Illustration.updateMany({ artwork: id }, { $pull: { artwork: id } });
+  }
+}
+
+async function updateS3(updateData: {
+  newName: string;
+  s3FolderPath: string;
+  s3Bucket: string;
+  s3url: string;
+  currentName: string;
+  currentSrc: string;
+  currentThumbSrc: string;
+}): Promise<{ src: string; thumbSrc: string; name: string }> {
+  const sanitizedName = SanitizeAndShortenString(updateData.newName); // Sanitize and shorten the name for S3 key
+  const newMainKey = `${updateData.s3FolderPath}${sanitizedName}.webp`;
+  const newThumbKey = `${updateData.s3FolderPath}thumbnails/${sanitizedName}-thumb.webp`;
+  const oldMainKey = updateData.currentSrc.replace(updateData.s3url, "");
+  const oldThumbKey = updateData.currentThumbSrc.replace(updateData.s3url, "");
 
   try {
     // Create a copy of the image and thumbnail with the new key then delete the old images
     await s3Client.send(
       new CopyObjectCommand({
-        Bucket: s3Data.s3Bucket,
-        CopySource: `${s3Data.s3Bucket}/${oldMainKey}`,
+        Bucket: updateData.s3Bucket,
+        CopySource: `${updateData.s3Bucket}/${oldMainKey}`,
         Key: newMainKey,
       })
     );
     await s3Client.send(
       new DeleteObjectCommand({
-        Bucket: s3Data.s3Bucket,
+        Bucket: updateData.s3Bucket,
         Key: oldMainKey,
       })
     );
 
     await s3Client.send(
       new CopyObjectCommand({
-        Bucket: s3Data.s3Bucket,
-        CopySource: `${s3Data.s3Bucket}/${oldThumbKey}`,
+        Bucket: updateData.s3Bucket,
+        CopySource: `${updateData.s3Bucket}/${oldThumbKey}`,
         Key: newThumbKey,
       })
     );
     await s3Client.send(
       new DeleteObjectCommand({
-        Bucket: s3Data.s3Bucket,
+        Bucket: updateData.s3Bucket,
         Key: oldThumbKey,
       })
     );
 
     return {
-      src: `${s3Data.s3url}${newThumbKey}`,
-      thumbSrc: `${s3Data.s3url}${newMainKey}`,
-      name: s3Data.newName,
+      src: `${updateData.s3url}${newThumbKey}`,
+      thumbSrc: `${updateData.s3url}${newMainKey}`,
+      name: updateData.newName,
     };
   } catch (error) {
     console.log("Error during S3 copy/delete:", error);
     // return old name so doc and file stay sync
     return {
-      src: s3Data.currentSrc,
-      thumbSrc: s3Data.currentThumbSrc,
-      name: s3Data.currentName,
+      src: updateData.currentSrc,
+      thumbSrc: updateData.currentThumbSrc,
+      name: updateData.currentName,
     };
   }
 }
