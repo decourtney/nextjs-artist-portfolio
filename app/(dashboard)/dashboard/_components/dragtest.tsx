@@ -14,11 +14,20 @@ import { PopulatedArtworkDocument } from "@/models/Artwork";
 import SortableItem from "./SortableItem";
 import DroppableArea from "./DroppableArea";
 import Image from "next/image";
+import {
+  ArtworkPlain,
+  IllustrationPlain,
+} from "../../utils/getIllustrationsForClient";
 
-const DragTest = ({ artwork }: { artwork: PopulatedArtworkDocument[] }) => {
+interface DragTestProps {
+  illustrations: IllustrationPlain[];
+  artworks: ArtworkPlain[];
+}
+
+const DragTest = ({ illustrations, artworks }: DragTestProps) => {
   const [activeId, setActiveId] = useState<null | string>(null);
   const [containers, setContainers] = useState<Record<string, string[]>>({
-    unassigned: artwork.map((a) => a._id),
+    unassigned: illustrations.map((a) => a.id),
   });
   const [nextCollectionId, setNextCollectionId] = useState<number>(1);
   const formRef = useRef<HTMLFormElement>(null);
@@ -170,13 +179,14 @@ const DragTest = ({ artwork }: { artwork: PopulatedArtworkDocument[] }) => {
   function saveCollection(event: FormEvent) {
     event.preventDefault();
 
-    console.log(event)
+    console.log(event);
     const items = containers[collectionId];
     console.log(`Saving ${collectionId}:`, items);
     alert(`Collection saved with ${items.length} items: ${items.join(", ")}`);
   }
 
-  const getArtworkById = (id: string) => artwork.find((a) => a._id === id);
+  const getArtworkById = (id: string) =>
+    illustrations.find((a) => a._id === id);
   const activeArtwork = activeId ? getArtworkById(activeId) : null;
   const collections = Object.keys(containers).filter(
     (key) => key !== "unassigned"

@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, ObjectId, Types } from "mongoose";
+import { IArtwork } from "./Artwork";
 
 export interface IIllustration extends Document {
   _id: string;
@@ -14,11 +15,14 @@ const IllustrationSchema = new Schema<IIllustration>(
       unique: true,
       trim: true,
     },
-    artwork: {
-      type: [Types.ObjectId],
-      default: undefined,
-      required: false,
-    },
+    artwork: [
+      {
+        type: Types.ObjectId,
+        default: undefined,
+        required: false,
+        ref: "Artwork",
+      },
+    ],
   },
   { timestamps: true }
 );

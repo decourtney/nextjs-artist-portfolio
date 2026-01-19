@@ -1,20 +1,11 @@
 "use server";
 
-import { Artwork } from "@/models";
-import Image from "next/image";
-import { IoAddCircleOutline, IoBookOutline } from "react-icons/io5";
-import DraggableArtwork from "./DraggableArtwork";
-import { PopulatedArtworkDocument } from "@/models/Artwork";
-import DraggableContext from "./DraggableContext";
-import DroppableArea from "./DroppableArea";
+import { IoBookOutline } from "react-icons/io5";
+import { getIllustrationsForClient } from "../../utils/getIllustrationsForClient";
 import DragTest from "./dragtest";
 
 const IllustrationManagement = async () => {
-  
-  const queryResult = await Artwork.where("isIllustration").equals(true);
-  const illustrationArtwork: PopulatedArtworkDocument[] = JSON.parse(
-    JSON.stringify(queryResult)
-  );
+  const { illustrations, artworksById } = await getIllustrationsForClient();
 
   return (
     <section
@@ -36,15 +27,13 @@ const IllustrationManagement = async () => {
         </div>
 
         <div className="text-sm text-gray-600">
-          Total:{" "}
-          <span className="font-semibold">{illustrationArtwork.length}</span>{" "}
+          Total: <span className="font-semibold">{illustrations.length}</span>{" "}
           items
         </div>
       </div>
 
       {/* Illustration Content */}
-      <DragTest artwork={illustrationArtwork} />
-
+      <DragTest illustrations={illustrations} artworks={artworksById} />
     </section>
   );
 };
