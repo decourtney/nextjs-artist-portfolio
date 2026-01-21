@@ -5,7 +5,8 @@ import { getIllustrationsForClient } from "../../utils/getIllustrationsForClient
 import DragTest from "./dragtest";
 
 const IllustrationManagement = async () => {
-  const { illustrations, artworksById } = await getIllustrationsForClient();
+  const { illustrationRecords, artworkRecords } =
+    await getIllustrationsForClient();
 
   return (
     <section
@@ -27,13 +28,17 @@ const IllustrationManagement = async () => {
         </div>
 
         <div className="text-sm text-gray-600">
-          Total: <span className="font-semibold">{illustrations.length}</span>{" "}
+          Total:{" "}
+          <span className="font-semibold">{/* {illustrations.length} */}</span>
           items
         </div>
       </div>
 
       {/* Illustration Content */}
-      <DragTest illustrations={illustrations} artworks={artworksById} />
+      <DragTest
+        illustrationRecords={illustrationRecords}
+        artworkRecords={artworkRecords}
+      />
     </section>
   );
 };

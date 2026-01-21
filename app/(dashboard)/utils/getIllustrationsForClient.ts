@@ -1,34 +1,36 @@
 import Illustration from "@/models/Illustration";
 import Artwork from "@/models/Artwork";
-import { Types } from "mongoose";
 
-export interface ArtworkPlain {
-  id: Types.ObjectId | string;
+export interface ArtworkObj {
+  id: string;
   name: string;
   thumbSrc: string;
 }
 
-export interface IllustrationPlain {
-  id: Types.ObjectId | string;
+export interface IllustrationObj {
+  id: string;
   name: string;
   artworkIds: string[];
 }
 
-// Helper to safely convert ObjectId to string
+// Helper to safely convert value to string
 const oid = (v: any) => v?.toString?.() ?? v;
 
+// TODO: Need to rework the Illustration collection - currently we are creating an 'unassigned' illustration...
+// to hold all artwork flagged for an illustration but not yet assigned in the dashboard. with this current setup...
+// it makes more sense to leave them literally unassigned and query for all artwork tagged for illustrations.
+// then maybe create an array of the artworkIds as 'unassigned' in the dnd component and then...
+// Retrieve illustration and associated Artwork documents
+// Construct and return record objs of the documents
 export async function getIllustrationsForClient() {
   const illustrationsRaw = await Illustration.find().lean();
   const artworkIds = [...new Set(illustrationsRaw.flatMap((i) => i.artwork))];
-
   const artworksRaw = await Artwork.find(
     { _id: { $in: artworkIds } },
     { name: 1, thumbSrc: 1 }
   ).lean();
 
-  // serialize db objects for passing to client components - populate vs manual serialization
-  // serialize artworks into a map keyed by _id string
-  const artworksById: ArtworkPlain[] = Object.fromEntries(
+  const artworkRecords: Record<string, ArtworkObj> = Object.fromEntries(
     artworksRaw.map((a) => [
       oid(a._id),
       {
@@ -39,16 +41,16 @@ export async function getIllustrationsForClient() {
     ])
   );
 
-  // serialize illustrations and map ObjectIds to strings
-  const illustrations: IllustrationPlain[] = illustrationsRaw.map((i) => ({
-    id: oid(i._id),
-    name: i.name,
-    artworkIds: i.artwork?.map(oid) ?? [],
-  }));
+  const illustrationRecords: Record<string, IllustrationObj> =
+    Object.fromEntries(
+      illustrationsRaw.map((i) => [
+        oid(i._id),
+        { id: oid(i._id), name: i.name, artworkIds: i.artwork?.map(oid) ?? [] },
+      ])
+    );
 
-  // now we can return normalized flat objects with illustrations still maintaining references to artworks
   return {
-    illustrations,
-    artworksById,
+    illustrationRecords,
+    artworkRecords,
   };
 }
