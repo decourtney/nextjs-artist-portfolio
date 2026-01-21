@@ -4,15 +4,16 @@ import dbConnect from "@/lib/dbConnect";
 import Artwork, { IArtwork } from "@/models/Artwork";
 import { getServerSession } from "next-auth";
 import { _nextAuthOptions } from "@/auth";
+import { s3Client } from "@/lib/s3Client";
 
 // Create S3 client
-const s3Client = new S3Client({
-  region: process.env.NEXT_PUBLIC_AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-  },
-});
+// const s3Client = new S3Client({
+//   region: process.env.NEXT_PUBLIC_AWS_REGION,
+//   credentials: {
+//     accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+//     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+//   },
+// });
 
 export async function DELETE(request: NextRequest) {
   try {
