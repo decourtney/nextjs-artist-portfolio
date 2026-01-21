@@ -29,9 +29,19 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
   const [activeId, setActiveId] = useState<null | string>(null);
   const [recordsContainer, setRecordsContainer] = useState(illustrationRecords);
   const formRef = useRef<HTMLFormElement>(null);
-  const unassignedContainer = Object.keys(recordsContainer).find(
-    (key) => recordsContainer[key].name === "Unassigned"
-  );
+
+  // The unassigned records are rendered separate from the other records because theyre dirty and no one wants them
+  const { key: unassignedKey, record: unassignedRecord } =
+    getUnassignedRecord(recordsContainer);
+
+  // Helper to safely get the Unassigned record
+  function getUnassignedRecord(container: Record<string, IllustrationObj>) {
+    const key = Object.keys(container).find(
+      (k) => container[k].name === "Unassigned"
+    );
+    if (!key) throw new Error("Unassigned container not found");
+    return { key, record: container[key] };
+  }
 
   // Create non-presisted illustration record entry in recordsContainer state
   function addNewIllustrationRecord() {
@@ -48,6 +58,7 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
     }));
   }
 
+  // Uses the active, draggables Id to determine the droppable its currently over
   function findRecord(id: UniqueIdentifier) {
     // Check if id is a record itself
     if (id in recordsContainer) {
@@ -60,6 +71,7 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
     );
   }
 
+  // Once a draggable is grabbed set it as active
   function handleDragStart(event: DragStartEvent) {
     setActiveId(event.active.id as string);
   }
@@ -112,6 +124,7 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
   //   });
   // }
 
+  // I could be doing this all wrong but it works.
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
@@ -135,7 +148,6 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
 
     // Sorting within the same record
     if (activeRecord === overRecord) {
-      // const activeRecordArtworkIds = recordsContainer[activeRecord].artworkIds;
       const oldIndex = activeRecordArtworkIds.indexOf(activeArtworkId);
       const newIndex = activeRecordArtworkIds.indexOf(overArtworkId);
 
@@ -181,15 +193,6 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
     setActiveId(null);
   }
 
-  // function addNewCollection() {
-  //   const newId = `collection-${nextCollectionId}`;
-  //   setContainer({
-  //     ...recordsContainer,
-  //     [newId]: [],
-  //   });
-  //   setNextCollectionId(nextCollectionId + 1);
-  // }
-
   // function deleteCollection(collectionId: string) {
   //   const itemsToReturn = recordsContainer[collectionId];
   //   const newContainers = { ...recordsContainer };
@@ -216,14 +219,6 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
   //   alert(`Collection saved with ${items.length} items: ${items.join(", ")}`);
   // }
 
-  const getArtworkById = (id: string) => artworkRecords[id];
-
-  const activeArtwork = activeId ? artworkRecords[activeId] : null;
-  const collections = Object.keys(recordsContainer).filter(
-    (key) => key !== "Unassigned"
-  );
-
-
   return (
     <DndContext
       onDragStart={handleDragStart}
@@ -234,26 +229,23 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
         {/* Unassigned Artwork */}
         <div>
           <label className="text-sm font-medium text-gray-700 mb-2 block">
-            Unassigned Artwork (
-            {recordsContainer[unassignedContainer].artworkIds.length})
+            Unassigned Artwork ({unassignedRecord.artworkIds.length})
           </label>
-          <DroppableArea
-            id="unassigned"
-            items={recordsContainer[unassignedContainer].artworkIds}
-          >
-            {recordsContainer[unassignedContainer].artworkIds.length === 0 ? (
+
+          <DroppableArea id={unassignedKey} items={unassignedRecord.artworkIds}>
+            {unassignedRecord.artworkIds.length === 0 ? (
               <p className="text-gray-400 text-sm w-full text-center">
                 No unassigned artwork
               </p>
             ) : (
-              recordsContainer[unassignedContainer].artworkIds.map((id) => {
-                const file = getArtworkById(id);
+              unassignedRecord.artworkIds.map((id) => {
+                const artwork = artworkRecords[id];
                 return (
                   <SortableItem key={id} id={id}>
                     <div className="w-24 h-24 flex-shrink-0 relative rounded-md overflow-hidden bg-gray-100 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-shadow">
                       <Image
-                        src={file.thumbSrc}
-                        alt={file.name}
+                        src={artwork.thumbSrc}
+                        alt={artwork.name}
                         fill
                         sizes="(max-width: 640px) 100vw, 160px"
                         className="w-full h-full object-cover"

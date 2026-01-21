@@ -16,10 +16,6 @@ export interface IllustrationObj {
 // Helper to safely convert value to string
 const oid = (v: any) => v?.toString?.() ?? v;
 
-// TODO: Need to rework the Illustration collection - currently we are creating an 'unassigned' illustration...
-// to hold all artwork flagged for an illustration but not yet assigned in the dashboard. with this current setup...
-// it makes more sense to leave them literally unassigned and query for all artwork tagged for illustrations.
-// then maybe create an array of the artworkIds as 'unassigned' in the dnd component and then...
 // Retrieve illustration and associated Artwork documents
 // Construct and return record objs of the documents
 export async function getIllustrationsForClient() {
