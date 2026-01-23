@@ -28,11 +28,8 @@ interface DragTestProps {
 const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
   const [activeId, setActiveId] = useState<null | string>(null);
   const [recordsContainer, setRecordsContainer] = useState(illustrationRecords);
-  const formRef = useRef<HTMLFormElement>(null);
-
-  // The unassigned records are rendered separate from the other records because theyre dirty and no one wants them
   const { key: unassignedKey, record: unassignedRecord } =
-    getUnassignedRecord(recordsContainer);
+    getUnassignedRecord(recordsContainer); // unassigned record is rendered separate from others
 
   // Helper to safely get the Unassigned record
   function getUnassignedRecord(container: Record<string, IllustrationObj>) {
@@ -54,12 +51,73 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
         id: tempId,
         name,
         artworkIds: [],
+        isPersisted: false,
+        isDirty: true,
       },
     }));
   }
 
-  // Uses the active, draggables Id to determine the droppable its currently over
-  function findRecord(id: UniqueIdentifier) {
+  function updateIllustrationRecord(
+    id: string,
+    patch: Partial<IllustrationObj>
+  ) {
+    setRecordsContainer((prev) => ({
+      ...prev,
+      [id]: {
+        ...prev[id],
+        ...patch,
+      },
+    }));
+  }
+
+  async function saveIllustrationRecordToDB(record: IllustrationObj) {
+    if (!record.isPersisted && !record.isDirty) {
+      return null;
+    }
+
+    const payload = sanitizeIllustration(record);
+
+    try {
+      let res;
+
+      if (!record.isPersisted) {
+        res = await fetch(`/api/illustration`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      } else if (record.isDirty) {
+        res = await fetch(`/api/illustration/${record.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      }
+
+      if (!res) return null;
+      if (!res.ok) {
+        throw new Error(`Save failed with status ${res.status}`);
+      }
+
+      const data = await res.json();
+      return data;
+    } catch (err) {
+      console.error("Error saving illustration:", err);
+      throw err;
+    }
+  }
+
+  function applySavedRecord(record: IllustrationObj){
+    console.log("applying record to state")
+  }
+
+  function sanitizeIllustration(record: IllustrationObj) {
+    const { isPersisted, isDirty, ...clean } = record;
+    return clean;
+  }
+
+  // Uses the active, draggables Id to determine the dnd-kit droppable its currently over
+  function findDroppableRecord(id: UniqueIdentifier) {
     // Check if id is a record itself
     if (id in recordsContainer) {
       return id as string;
@@ -71,7 +129,7 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
     );
   }
 
-  // Once a draggable is grabbed set it as active
+  // Once a draggable is being dragged set it as active
   function handleDragStart(event: DragStartEvent) {
     setActiveId(event.active.id as string);
   }
@@ -136,8 +194,8 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
     const activeArtworkId = active.id as string;
     const overArtworkId = over.id as string;
 
-    const activeRecord = findRecord(activeArtworkId);
-    const overRecord = findRecord(overArtworkId);
+    const activeRecord = findDroppableRecord(activeArtworkId);
+    const overRecord = findDroppableRecord(overArtworkId);
 
     if (!activeRecord || !overRecord) {
       setActiveId(null);
@@ -289,19 +347,27 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
               .filter((value) => value.name !== "Unassigned")
               .map((recordsContainer) => (
                 <div key={recordsContainer.id} className="space-y-2">
-                  <form
-                    ref={formRef}
-                    // onSubmit={saveCollection}
-                    className="flex justify-between items-center"
-                  >
+                  <div className="flex justify-between items-center">
                     <div className="space-x-2">
                       <input
                         id={recordsContainer.id}
-                        type="text"
-                        name="name"
-                        placeholder={recordsContainer.name}
-                        size={recordsContainer.name.length}
-                        // onChange={(event)=> setContainer(...recordsContainer, [collectionId]:event.target.value)}
+                        value={recordsContainer.name}
+                        size={Math.max(recordsContainer.name.length, 20)}
+                        onChange={(event) =>
+                          updateIllustrationRecord(recordsContainer.id, {
+                            name: event.target.value,
+                          })
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.currentTarget.blur();
+                          }
+                        }}
+                        onBlur={(event) =>
+                          updateIllustrationRecord(recordsContainer.id, {
+                            name: event.target.value,
+                          })
+                        }
                       />
                       <span className="text-md font-medium text-gray-700">
                         ({recordsContainer.artworkIds.length})
@@ -310,9 +376,10 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
 
                     <div className="flex gap-2">
                       <button
-                        type="submit"
-                        // onClick={() => saveCollection(collectionId)}
-                        disabled={recordsContainer.artworkIds.length === 0}
+                        onClick={() =>
+                          saveIllustrationRecordToDB(recordsContainer)
+                        }
+                        disabled={!recordsContainer.isDirty}
                         className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors text-sm"
                       >
                         Save
@@ -325,7 +392,8 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
                         Delete
                       </button>
                     </div>
-                  </form>
+                  </div>
+
                   <DroppableArea
                     id={recordsContainer.id}
                     items={recordsContainer.artworkIds}

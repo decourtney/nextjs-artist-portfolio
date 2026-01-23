@@ -11,6 +11,8 @@ export interface IllustrationObj {
   id: string;
   name: string;
   artworkIds: string[];
+  isPersisted: boolean;
+  isDirty: boolean;
 }
 
 // Helper to safely convert value to string
@@ -41,7 +43,13 @@ export async function getIllustrationsForClient() {
     Object.fromEntries(
       illustrationsRaw.map((i) => [
         oid(i._id),
-        { id: oid(i._id), name: i.name, artworkIds: i.artwork?.map(oid) ?? [] },
+        {
+          id: oid(i._id),
+          name: i.name,
+          artworkIds: i.artwork?.map(oid) ?? [],
+          isPersisted: true,
+          isDirty: false,
+        },
       ])
     );
 
