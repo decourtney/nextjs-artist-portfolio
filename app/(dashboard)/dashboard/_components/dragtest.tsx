@@ -18,6 +18,7 @@ import {
   ArtworkObj,
   IllustrationObj,
 } from "../../utils/getIllustrationsForClient";
+import { Bounce, Slide, ToastContainer, Zoom, toast } from "react-toastify";
 
 interface DragTestProps {
   illustrationRecords: Record<string, IllustrationObj>;
@@ -96,19 +97,21 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
 
       if (!res) return null;
       if (!res.ok) {
-        throw new Error(`Save failed with status ${res.status}`);
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.message ?? "Failed to save Illustration");
       }
 
       const data = await res.json();
       return data;
     } catch (err) {
-      console.error("Error saving illustration:", err);
-      throw err;
+      if (err instanceof Error) {
+        toast.error(err.message);
+      }
     }
   }
 
-  function applySavedRecord(record: IllustrationObj){
-    console.log("applying record to state")
+  function applySavedRecord(record: IllustrationObj) {
+    console.log("applying record to state");
   }
 
   function sanitizeIllustration(record: IllustrationObj) {
@@ -221,6 +224,7 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
           [activeRecord]: {
             ...prev[activeRecord],
             artworkIds: newArtworkIdsOrder,
+            isDirty: true,
           },
         }));
       }
@@ -240,10 +244,12 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
           artworkIds: activeRecordArtworkIds.filter(
             (id) => id !== activeArtworkId
           ),
+          isDirty: true,
         },
         [overRecord]: {
           ...prev[overRecord],
           artworkIds: overRecordArtworkIds,
+          isDirty: true,
         },
       }));
     }
@@ -440,6 +446,19 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
           </div>
         ) : null}
       </DragOverlay>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Slide}
+      />
     </DndContext>
   );
 };
