@@ -5,7 +5,7 @@ import { getIllustrationsForClient } from "../../utils/getIllustrationsForClient
 import DragTest from "./dragtest";
 
 const IllustrationManagement = async () => {
-  const { illustrationRecords, artworkRecords } =
+  const { illustrationAndUnassignedRecords, artworkRecords } =
     await getIllustrationsForClient();
 
   return (
@@ -36,7 +36,7 @@ const IllustrationManagement = async () => {
 
       {/* Illustration Content */}
       <DragTest
-        illustrationRecords={illustrationRecords}
+        illustrationRecords={illustrationAndUnassignedRecords}
         artworkRecords={artworkRecords}
       />
     </section>

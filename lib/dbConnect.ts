@@ -41,12 +41,6 @@ async function dbConnect(retries = 3, delay = 1000) {
         try {
           const connection = await mongoose.connect(MONGODB_URI, opts);
 
-          await Illustration.updateOne(
-            { name: "Unassigned" },
-            { $setOnInsert: { name: "Unassigned", artwork: [] } },
-            { upsert: true }
-          );
-
           // Setup connection event listeners
           connection.connection.on("error", (err) => {
             console.error("Mongoose connection error:", err);

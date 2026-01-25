@@ -1,4 +1,4 @@
-import Illustration from "@/models/Illustration";
+import Illustration, { IIllustration } from "@/models/Illustration";
 import Artwork from "@/models/Artwork";
 
 export interface ArtworkObj {
@@ -21,15 +21,31 @@ const oid = (v: any) => v?.toString?.() ?? v;
 // Retrieve illustration and associated Artwork documents
 // Construct and return record objs of the documents
 export async function getIllustrationsForClient() {
-  const illustrationsRaw = await Illustration.find().lean();
-  const artworkIds = [...new Set(illustrationsRaw.flatMap((i) => i.artworkIds))];
-  const artworksRaw = await Artwork.find(
-    { _id: { $in: artworkIds } },
-    { name: 1, thumbSrc: 1 }
-  ).lean();
+  const illustrations = await Illustration.find().lean();
+  const artworks = await Artwork.find({ isIllustration: true }).lean();
 
+  // create set of artwork ids that are assigned to an illustration
+  const assignedIds = new Set(
+    illustrations.flatMap((i) => i.artworkIds.map((id: string) => oid(id)))
+  );
+
+  // create an array of remaining artwork ids not in the set
+  const unassignedArtworks = artworks
+    .filter((a) => !assignedIds.has(oid(a._id)))
+    .map((a) => oid(a._id));
+
+  // create a virtual record for unassigned artwork ids
+  const unassignedRecord: IllustrationObj = {
+    id: "unassigned",
+    name: "Unassigned",
+    artworkIds: unassignedArtworks,
+    isPersisted: false,
+    isDirty: false,
+  };
+
+  // create records for illustrations and assigned artwork
   const artworkRecords: Record<string, ArtworkObj> = Object.fromEntries(
-    artworksRaw.map((a) => [
+    artworks.map((a) => [
       oid(a._id),
       {
         id: oid(a._id),
@@ -41,7 +57,7 @@ export async function getIllustrationsForClient() {
 
   const illustrationRecords: Record<string, IllustrationObj> =
     Object.fromEntries(
-      illustrationsRaw.map((i) => [
+      illustrations.map((i) => [
         oid(i._id),
         {
           id: oid(i._id),
@@ -53,8 +69,18 @@ export async function getIllustrationsForClient() {
       ])
     );
 
+  if (illustrationRecords[unassignedRecord.id]) {
+    throw new Error("Unassigned record id collision");
+  }
+
+  // add the virtual record
+  const illustrationAndUnassignedRecords = {
+    ...illustrationRecords,
+    [unassignedRecord.id]: unassignedRecord,
+  };
+
   return {
-    illustrationRecords,
+    illustrationAndUnassignedRecords,
     artworkRecords,
   };
 }

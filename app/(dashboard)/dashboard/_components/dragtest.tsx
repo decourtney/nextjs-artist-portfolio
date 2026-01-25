@@ -29,17 +29,6 @@ interface DragTestProps {
 const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
   const [activeId, setActiveId] = useState<null | string>(null);
   const [recordsContainer, setRecordsContainer] = useState(illustrationRecords);
-  const { key: unassignedKey, record: unassignedRecord } =
-    getUnassignedRecord(recordsContainer); // unassigned record is rendered separate from others
-
-  // Helper to safely get the Unassigned record
-  function getUnassignedRecord(container: Record<string, IllustrationObj>) {
-    const key = Object.keys(container).find(
-      (k) => container[k].name === "Unassigned"
-    );
-    if (!key) throw new Error("Unassigned container not found");
-    return { key, record: container[key] };
-  }
 
   // Create non-presisted illustration record entry in recordsContainer state
   function createTempRecordInState() {
@@ -82,7 +71,7 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
 
   async function saveAllDirtyRecords() {
     for (const record of Object.values(recordsContainer)) {
-      if (record.isDirty) {
+      if (record.isDirty && record.id !== "unassigned") {
         await saveIllustrationRecord(record);
       }
     }
@@ -278,16 +267,20 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
         {/* Unassigned Artwork */}
         <div>
           <label className="text-sm font-medium text-gray-700 mb-2 block">
-            Unassigned Artwork ({unassignedRecord.artworkIds.length})
+            Unassigned Artwork (
+            {recordsContainer["unassigned"].artworkIds.length})
           </label>
 
-          <DroppableArea id={unassignedKey} items={unassignedRecord.artworkIds}>
-            {unassignedRecord.artworkIds.length === 0 ? (
+          <DroppableArea
+            id={recordsContainer["unassigned"].id}
+            items={recordsContainer["unassigned"].artworkIds}
+          >
+            {recordsContainer["unassigned"].artworkIds.length === 0 ? (
               <p className="text-gray-400 text-sm w-full text-center">
                 No unassigned artwork
               </p>
             ) : (
-              unassignedRecord.artworkIds.map((id) => {
+              recordsContainer["unassigned"].artworkIds.map((id) => {
                 const artwork = artworkRecords[id];
                 return (
                   <SortableItem key={id} id={id}>
