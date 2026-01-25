@@ -1,7 +1,16 @@
+"use client";
+
 import { useState } from "react";
 import { IllustrationObj } from "./getIllustrationsForClient";
+import {
+  createIllustration,
+  deleteIllustration,
+  updateIllustration,
+} from "@/lib/illustrationService";
 
-export function useIllustrationRecords(initial: Record<string, IllustrationObj>) {
+export function useIllustrationRecords(
+  initial: Record<string, IllustrationObj>
+) {
   const [records, setRecords] = useState(initial);
 
   // create non-persisted records
@@ -21,6 +30,7 @@ export function useIllustrationRecords(initial: Record<string, IllustrationObj>)
     }));
   }
 
+  // update record in state
   function update(id: string, patch: Partial<IllustrationObj>) {
     setRecords((prev) => ({
       ...prev,
@@ -32,6 +42,7 @@ export function useIllustrationRecords(initial: Record<string, IllustrationObj>)
     }));
   }
 
+  // remove record from state and release assigned artworkIds
   function removeFromState(id: string) {
     const releasedArtworkIds = records[id].artworkIds;
 
@@ -53,97 +64,52 @@ export function useIllustrationRecords(initial: Record<string, IllustrationObj>)
     });
   }
 
+  // remove fields unecessary for db
   function sanitizeRecord(record: IllustrationObj) {
     const { isPersisted, isDirty, ...clean } = record;
     return clean;
   }
 
+  // remove the record from db and state if persisted otherwise just from state
   async function remove(id: string) {
-    if (records[id]) {
-      // try {
-        const res = await fetch(`/api/illustration/${id}`, {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-        });
+    const record = records[id];
 
-        if (!res) return null;
-        if (!res.ok) {
-          const errorData = await res.json().catch(() => null);
-          throw new Error(
-            errorData?.message ?? "Failed to delete Illustration"
-          );
-        }
-
-        const data = await res.json();
-
-        removeFromState(data.id);
-      // } catch (err) {
-      //   if (err instanceof Error) {
-      //     toast.error(err.message);
-      //   }
-      // }
+    if (record?.isPersisted) {
+      const data = await deleteIllustration(id);
+      removeFromState(data.id);
     } else {
       removeFromState(id);
     }
   }
 
+  // create document if not already persisted otherwise update
   async function save(record: IllustrationObj) {
-    if (!record.isPersisted && !record.isDirty) {
-      return null;
-    }
-
     const payload = sanitizeRecord(record);
 
-    // try {
-      let res;
+    const data = record.isPersisted
+      ? await updateIllustration(payload)
+      : await createIllustration(payload);
 
-      if (!record.isPersisted) {
-        res = await fetch(`/api/illustration`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-      } else if (record.isDirty) {
-        res = await fetch(`/api/illustration/${record.id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+    setRecords((prev) => {
+      const next = { ...prev };
+
+      if (record.id !== data.id) {
+        delete next[record.id];
       }
 
-      if (!res) return null;
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => null);
-        throw new Error(errorData?.message ?? "Failed to save Illustration");
-      }
+      next[data.id] = {
+        id: data.id,
+        name: data.name,
+        artworkIds: data.artworkIds,
+        isPersisted: true,
+        isDirty: false,
+      };
 
-      const data = await res.json();
-
-      setRecords((prev) => {
-        const next = { ...prev };
-
-        if (record.id !== data.id) {
-          delete next[record.id];
-        }
-
-        next[data.id] = {
-          id: data.id,
-          name: data.name,
-          artworkIds: data.artworkIds,
-          isPersisted: true,
-          isDirty: false,
-        };
-
-        return next;
-      });
-    // } catch (err) {
-    //   if (err instanceof Error) {
-    //     toast.error(err.message);
-    //   }
-    // }
+      return next;
+    });
   }
 
-  // this is temp fix to ensure all modified records are persisted (ex. moving artwork) 
+  // this is temp fix to ensure all modified records are persisted (ex. moving artwork)
   async function saveAll() {
     for (const record of Object.values(records)) {
       if (record.isDirty && record.id !== "unassigned") {

@@ -126,7 +126,6 @@ const IllustrationDND = ({
   return (
     <DndContext
       onDragStart={handleDragStart}
-      // onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
       <section className="bg-gray-50 p-6 space-y-6 rounded-xl border border-gray-200 max-w-6xl mx-auto">
