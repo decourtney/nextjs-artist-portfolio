@@ -2,7 +2,7 @@
 
 import { IoBookOutline } from "react-icons/io5";
 import { getIllustrationsForClient } from "../../utils/getIllustrationsForClient";
-import DragTest from "./dragtest";
+import IllustrationDND from "./IllustrationDND";
 
 const IllustrationManagement = async () => {
   const { illustrationAndUnassignedRecords, artworkRecords } =
@@ -35,7 +35,7 @@ const IllustrationManagement = async () => {
       </div>
 
       {/* Illustration Content */}
-      <DragTest
+      <IllustrationDND
         illustrationRecords={illustrationAndUnassignedRecords}
         artworkRecords={artworkRecords}
       />

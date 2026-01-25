@@ -1,16 +1,14 @@
 "use client";
 
-import { FormEvent, useRef, useState } from "react";
+import { useState } from "react";
 import {
   DndContext,
   DragEndEvent,
-  DragOverEvent,
   DragOverlay,
   DragStartEvent,
   UniqueIdentifier,
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
-import { PopulatedArtworkDocument } from "@/models/Artwork";
 import SortableItem from "./SortableItem";
 import DroppableArea from "./DroppableArea";
 import Image from "next/image";
@@ -18,7 +16,7 @@ import {
   ArtworkObj,
   IllustrationObj,
 } from "../../utils/getIllustrationsForClient";
-import { Bounce, Slide, ToastContainer, Zoom, toast } from "react-toastify";
+import { Slide, ToastContainer, toast } from "react-toastify";
 
 interface DragTestProps {
   illustrationRecords: Record<string, IllustrationObj>;
@@ -26,7 +24,10 @@ interface DragTestProps {
 }
 5;
 
-const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
+const IllustrationDND = ({
+  illustrationRecords,
+  artworkRecords,
+}: DragTestProps) => {
   const [activeId, setActiveId] = useState<null | string>(null);
   const [recordsContainer, setRecordsContainer] = useState(illustrationRecords);
 
@@ -62,9 +63,22 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
   }
 
   function deleteIllustrationRecordInState(id: string) {
+    const releasedArtworkIds = recordsContainer[id].artworkIds;
+
     setRecordsContainer((prev) => {
       const next = { ...prev };
+
+      // remove record
       delete next[id];
+
+      // add released artworkIds to unassigned record
+      if (next["unassigned"]) {
+        next["unassigned"] = {
+          ...next["unassigned"],
+          artworkIds: [...next["unassigned"].artworkIds, ...releasedArtworkIds],
+        };
+      }
+
       return next;
     });
   }
@@ -440,4 +454,4 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
   );
 };
 
-export default DragTest;
+export default IllustrationDND;

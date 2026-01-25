@@ -1,4 +1,4 @@
-import Illustration, { IIllustration } from "@/models/Illustration";
+import Illustration from "@/models/Illustration";
 import Artwork from "@/models/Artwork";
 
 export interface ArtworkObj {
