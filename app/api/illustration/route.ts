@@ -31,14 +31,14 @@ export async function POST(request: NextRequest) {
   try {
     const illustration: IIllustration = await Illustration.create({
       name,
-      artwork: artworkIds ?? [],
+      artworkIds: artworkIds ?? [],
     });
 
     return NextResponse.json(
       {
         id: illustration._id.toString(),
         name: illustration.name,
-        artworkIds: illustration.artwork.map((id) => id.toString()),
+        artworkIds: illustration.artworkIds.map((id) => id.toString()),
       },
       { status: 201 }
     );

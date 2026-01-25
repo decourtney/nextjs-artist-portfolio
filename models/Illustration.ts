@@ -4,7 +4,7 @@ import { IArtwork } from "./Artwork";
 export interface IIllustration extends Document {
   _id: string;
   name: string;
-  artwork: ObjectId[];
+  artworkIds: ObjectId[];
 }
 
 const IllustrationSchema = new Schema<IIllustration>(
@@ -15,7 +15,7 @@ const IllustrationSchema = new Schema<IIllustration>(
       unique: true,
       trim: true,
     },
-    artwork: [
+    artworkIds: [
       {
         type: Types.ObjectId,
         default: undefined,

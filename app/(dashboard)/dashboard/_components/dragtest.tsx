@@ -42,7 +42,7 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
   }
 
   // Create non-presisted illustration record entry in recordsContainer state
-  function addNewIllustrationRecord() {
+  function createTempRecordInState() {
     const tempId = crypto.randomUUID();
     const name = "New Illustration";
 
@@ -58,7 +58,7 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
     }));
   }
 
-  function updateIllustrationRecord(
+  function updateIllustrationRecordInState(
     id: string,
     patch: Partial<IllustrationObj>
   ) {
@@ -67,11 +67,28 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
       [id]: {
         ...prev[id],
         ...patch,
+        isDirty: true,
       },
     }));
   }
 
-  async function saveIllustrationRecordToDB(record: IllustrationObj) {
+  function deleteIllustrationRecordInState(id: string) {
+    setRecordsContainer((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+  }
+
+  async function saveAllDirtyRecords() {
+    for (const record of Object.values(recordsContainer)) {
+      if (record.isDirty) {
+        await saveIllustrationRecord(record);
+      }
+    }
+  }
+
+  async function saveIllustrationRecord(record: IllustrationObj) {
     if (!record.isPersisted && !record.isDirty) {
       return null;
     }
@@ -102,7 +119,24 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
       }
 
       const data = await res.json();
-      return data;
+
+      setRecordsContainer((prev) => {
+        const next = { ...prev };
+
+        if (record.id !== data.id) {
+          delete next[record.id];
+        }
+
+        next[data.id] = {
+          id: data.id,
+          name: data.name,
+          artworkIds: data.artworkIds,
+          isPersisted: true,
+          isDirty: false,
+        };
+
+        return next;
+      });
     } catch (err) {
       if (err instanceof Error) {
         toast.error(err.message);
@@ -110,8 +144,33 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
     }
   }
 
-  function applySavedRecord(record: IllustrationObj) {
-    console.log("applying record to state");
+  async function deleteIllustrationRecord(record: IllustrationObj) {
+    if (record.isPersisted) {
+      try {
+        const res = await fetch(`/api/illustration/${record.id}`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!res) return null;
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => null);
+          throw new Error(
+            errorData?.message ?? "Failed to delete Illustration"
+          );
+        }
+
+        const data = await res.json();
+
+        deleteIllustrationRecordInState(data.id);
+      } catch (err) {
+        if (err instanceof Error) {
+          toast.error(err.message);
+        }
+      }
+    } else {
+      deleteIllustrationRecordInState(record.id);
+    }
   }
 
   function sanitizeIllustration(record: IllustrationObj) {
@@ -136,54 +195,6 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
   function handleDragStart(event: DragStartEvent) {
     setActiveId(event.active.id as string);
   }
-
-  // ** DRAGOVER NOT CURRENTLY IN-USE **
-  // DragOver works but current implementation has a minor drawback: The sortable item is inserted into a hovered droppable
-  // which removes the item from the original droppable. So if the user 'cancels' the move by dropping the
-  // item outside any droppable areas then the item remains in the last hovered droppable rather than resetting to its
-  // original droppable area.
-  // Leaving this in case the user perfers this action or I get around to fixing the bug.
-  // This could also be due to my lack of experience with dnd-kit.
-  // function handleDragOver(event: DragOverEvent) {
-  //   const { active, over } = event;
-
-  //   if (!over) return;
-
-  //   const activeId = active.id as string;
-  //   const overArtworkId = over.id as string;
-
-  //   const activeContainer = findContainer(activeId);
-  //   const overContainer = findContainer(overArtworkId);
-
-  //   if (
-  //     !activeContainer ||
-  //     !overContainer ||
-  //     activeContainer === overContainer
-  //   ) {
-  //     return;
-  //   }
-
-  //   setContainer((prev) => {
-  //     const activeItems = prev[activeContainer];
-  //     const overRecordArtworkIds = prev[overContainer];
-
-  //     const activeIndex = activeItems.indexOf(activeId);
-  //     const overIndex = overRecordArtworkIds.indexOf(overArtworkId);
-
-  //     return {
-  //       ...prev,
-  //       [activeContainer]: activeItems.filter((id) => id !== activeId),
-  //       [overContainer]: [
-  //         ...overRecordArtworkIds.slice(
-  //           0,
-  //           overIndex >= 0 ? overIndex + 1 : overRecordArtworkIds.length
-  //         ),
-  //         activeId,
-  //         ...overRecordArtworkIds.slice(overIndex >= 0 ? overIndex + 1 : overRecordArtworkIds.length),
-  //       ],
-  //     };
-  //   });
-  // }
 
   // I could be doing this all wrong but it works.
   function handleDragEnd(event: DragEndEvent) {
@@ -257,32 +268,6 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
     setActiveId(null);
   }
 
-  // function deleteCollection(collectionId: string) {
-  //   const itemsToReturn = recordsContainer[collectionId];
-  //   const newContainers = { ...recordsContainer };
-  //   delete newContainers[collectionId];
-
-  //   setContainer({
-  //     ...newContainers,
-  //     unassigned: [...newContainers.unassigned, ...itemsToReturn],
-  //   });
-  // }
-
-  // function saveCollection(collectionId: string) {
-  //   const items = recordsContainer[collectionId];
-  //   console.log(`Saving ${collectionId}:`, items);
-  //   alert(`Collection saved with ${items.length} items: ${items.join(", ")}`);
-  // }
-
-  // function saveCollection(event: FormEvent) {
-  //   event.preventDefault();
-
-  //   console.log(event);
-  //   const items = recordsContainer[collectionId];
-  //   console.log(`Saving ${collectionId}:`, items);
-  //   alert(`Collection saved with ${items.length} items: ${items.join(", ")}`);
-  // }
-
   return (
     <DndContext
       onDragStart={handleDragStart}
@@ -335,7 +320,7 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
               )
             </h3>
             <button
-              onClick={addNewIllustrationRecord}
+              onClick={createTempRecordInState}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
             >
               + New Illustration
@@ -360,7 +345,7 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
                         value={recordsContainer.name}
                         size={Math.max(recordsContainer.name.length, 20)}
                         onChange={(event) =>
-                          updateIllustrationRecord(recordsContainer.id, {
+                          updateIllustrationRecordInState(recordsContainer.id, {
                             name: event.target.value,
                           })
                         }
@@ -370,7 +355,7 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
                           }
                         }}
                         onBlur={(event) =>
-                          updateIllustrationRecord(recordsContainer.id, {
+                          updateIllustrationRecordInState(recordsContainer.id, {
                             name: event.target.value,
                           })
                         }
@@ -382,17 +367,16 @@ const DragTest = ({ illustrationRecords, artworkRecords }: DragTestProps) => {
 
                     <div className="flex gap-2">
                       <button
-                        onClick={() =>
-                          saveIllustrationRecordToDB(recordsContainer)
-                        }
+                        onClick={() => saveAllDirtyRecords()}
                         disabled={!recordsContainer.isDirty}
                         className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors text-sm"
                       >
                         Save
                       </button>
                       <button
-                        type="button"
-                        // onClick={() => deleteCollection(collectionId)}
+                        onClick={() =>
+                          deleteIllustrationRecord(recordsContainer)
+                        }
                         className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm"
                       >
                         Delete

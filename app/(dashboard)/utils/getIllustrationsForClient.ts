@@ -22,7 +22,7 @@ const oid = (v: any) => v?.toString?.() ?? v;
 // Construct and return record objs of the documents
 export async function getIllustrationsForClient() {
   const illustrationsRaw = await Illustration.find().lean();
-  const artworkIds = [...new Set(illustrationsRaw.flatMap((i) => i.artwork))];
+  const artworkIds = [...new Set(illustrationsRaw.flatMap((i) => i.artworkIds))];
   const artworksRaw = await Artwork.find(
     { _id: { $in: artworkIds } },
     { name: 1, thumbSrc: 1 }
@@ -46,7 +46,7 @@ export async function getIllustrationsForClient() {
         {
           id: oid(i._id),
           name: i.name,
-          artworkIds: i.artwork?.map(oid) ?? [],
+          artworkIds: i.artworkIds?.map(oid) ?? [],
           isPersisted: true,
           isDirty: false,
         },

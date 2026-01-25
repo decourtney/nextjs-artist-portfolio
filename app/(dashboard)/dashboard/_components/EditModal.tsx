@@ -1,3 +1,5 @@
+"use client";
+
 import { PopulatedArtworkDocument } from "@/models/Artwork";
 import { AllTags } from "@/types/allTags";
 import { EditFormData } from "@/types/editFormData";
@@ -38,7 +40,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
       isMainImage: fileToEdit.isMainImage,
       isFeatured: fileToEdit.isFeatured,
       isCategoryImage: fileToEdit.isCategoryImage,
-      isIllustration: fileToEdit.isIllustration
+      isIllustration: fileToEdit.isIllustration,
     };
   });
 

@@ -231,10 +231,10 @@ async function updateIllustration(id: string, boolValue: boolean) {
   if (boolValue) {
     await Illustration.updateOne(
       { name: "Unassigned" },
-      { $addToSet: { artwork: id } }
+      { $addToSet: { artworkIds: id } }
     );
   } else {
-    await Illustration.updateMany({ artwork: id }, { $pull: { artwork: id } });
+    await Illustration.updateMany({ artworkIds: id }, { $pull: { artworkIds: id } });
   }
 }
 
