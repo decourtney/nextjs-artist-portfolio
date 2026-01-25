@@ -17,6 +17,7 @@ import {
   IllustrationObj,
 } from "../../utils/getIllustrationsForClient";
 import { Slide, ToastContainer, toast } from "react-toastify";
+import { useIllustrationRecords } from "../../utils/useIllustrationRecords";
 
 interface DragTestProps {
   illustrationRecords: Record<string, IllustrationObj>;
@@ -29,168 +30,19 @@ const IllustrationDND = ({
   artworkRecords,
 }: DragTestProps) => {
   const [activeId, setActiveId] = useState<null | string>(null);
-  const [recordsContainer, setRecordsContainer] = useState(illustrationRecords);
-
-  // Create non-presisted illustration record entry in recordsContainer state
-  function createTempRecordInState() {
-    const tempId = crypto.randomUUID();
-    const name = "New Illustration";
-
-    setRecordsContainer((prev) => ({
-      ...prev,
-      [tempId]: {
-        id: tempId,
-        name,
-        artworkIds: [],
-        isPersisted: false,
-        isDirty: true,
-      },
-    }));
-  }
-
-  function updateIllustrationRecordInState(
-    id: string,
-    patch: Partial<IllustrationObj>
-  ) {
-    setRecordsContainer((prev) => ({
-      ...prev,
-      [id]: {
-        ...prev[id],
-        ...patch,
-        isDirty: true,
-      },
-    }));
-  }
-
-  function deleteIllustrationRecordInState(id: string) {
-    const releasedArtworkIds = recordsContainer[id].artworkIds;
-
-    setRecordsContainer((prev) => {
-      const next = { ...prev };
-
-      // remove record
-      delete next[id];
-
-      // add released artworkIds to unassigned record
-      if (next["unassigned"]) {
-        next["unassigned"] = {
-          ...next["unassigned"],
-          artworkIds: [...next["unassigned"].artworkIds, ...releasedArtworkIds],
-        };
-      }
-
-      return next;
-    });
-  }
-
-  async function saveAllDirtyRecords() {
-    for (const record of Object.values(recordsContainer)) {
-      if (record.isDirty && record.id !== "unassigned") {
-        await saveIllustrationRecord(record);
-      }
-    }
-  }
-
-  async function saveIllustrationRecord(record: IllustrationObj) {
-    if (!record.isPersisted && !record.isDirty) {
-      return null;
-    }
-
-    const payload = sanitizeIllustration(record);
-
-    try {
-      let res;
-
-      if (!record.isPersisted) {
-        res = await fetch(`/api/illustration`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-      } else if (record.isDirty) {
-        res = await fetch(`/api/illustration/${record.id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-      }
-
-      if (!res) return null;
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => null);
-        throw new Error(errorData?.message ?? "Failed to save Illustration");
-      }
-
-      const data = await res.json();
-
-      setRecordsContainer((prev) => {
-        const next = { ...prev };
-
-        if (record.id !== data.id) {
-          delete next[record.id];
-        }
-
-        next[data.id] = {
-          id: data.id,
-          name: data.name,
-          artworkIds: data.artworkIds,
-          isPersisted: true,
-          isDirty: false,
-        };
-
-        return next;
-      });
-    } catch (err) {
-      if (err instanceof Error) {
-        toast.error(err.message);
-      }
-    }
-  }
-
-  async function deleteIllustrationRecord(record: IllustrationObj) {
-    if (record.isPersisted) {
-      try {
-        const res = await fetch(`/api/illustration/${record.id}`, {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-        });
-
-        if (!res) return null;
-        if (!res.ok) {
-          const errorData = await res.json().catch(() => null);
-          throw new Error(
-            errorData?.message ?? "Failed to delete Illustration"
-          );
-        }
-
-        const data = await res.json();
-
-        deleteIllustrationRecordInState(data.id);
-      } catch (err) {
-        if (err instanceof Error) {
-          toast.error(err.message);
-        }
-      }
-    } else {
-      deleteIllustrationRecordInState(record.id);
-    }
-  }
-
-  function sanitizeIllustration(record: IllustrationObj) {
-    const { isPersisted, isDirty, ...clean } = record;
-    return clean;
-  }
+  const { records, setRecords, createTemp, update, remove, save, saveAll } =
+    useIllustrationRecords(illustrationRecords);
 
   // Uses the active, draggables Id to determine the dnd-kit droppable its currently over
   function findDroppableRecord(id: UniqueIdentifier) {
     // Check if id is a record itself
-    if (id in recordsContainer) {
+    if (id in records) {
       return id as string;
     }
 
     // Otherwise, find the record that contains this artwork ID
-    return Object.keys(recordsContainer).find((key) =>
-      recordsContainer[key].artworkIds.includes(id as string)
+    return Object.keys(records).find((key) =>
+      records[key].artworkIds.includes(id as string)
     );
   }
 
@@ -219,7 +71,7 @@ const IllustrationDND = ({
       return;
     }
 
-    const activeRecordArtworkIds = recordsContainer[activeRecord].artworkIds;
+    const activeRecordArtworkIds = records[activeRecord].artworkIds;
 
     // Sorting within the same record
     if (activeRecord === overRecord) {
@@ -233,7 +85,7 @@ const IllustrationDND = ({
       );
 
       if (oldIndex !== newIndex) {
-        setRecordsContainer((prev) => ({
+        setRecords((prev) => ({
           ...prev,
           [activeRecord]: {
             ...prev[activeRecord],
@@ -244,14 +96,14 @@ const IllustrationDND = ({
       }
     } else {
       // Moving between recordsContainer
-      const overRecordArtworkIds = recordsContainer[overRecord].artworkIds;
+      const overRecordArtworkIds = records[overRecord].artworkIds;
       const rawIndex = overRecordArtworkIds.indexOf(overArtworkId);
       const overIndex =
         rawIndex === -1 ? overRecordArtworkIds.length : rawIndex;
 
       overRecordArtworkIds.splice(overIndex, 0, activeArtworkId);
 
-      setRecordsContainer((prev) => ({
+      setRecords((prev) => ({
         ...prev,
         [activeRecord]: {
           ...prev[activeRecord],
@@ -282,19 +134,19 @@ const IllustrationDND = ({
         <div>
           <label className="text-sm font-medium text-gray-700 mb-2 block">
             Unassigned Artwork (
-            {recordsContainer["unassigned"].artworkIds.length})
+            {records["unassigned"].artworkIds.length})
           </label>
 
           <DroppableArea
-            id={recordsContainer["unassigned"].id}
-            items={recordsContainer["unassigned"].artworkIds}
+            id={records["unassigned"].id}
+            items={records["unassigned"].artworkIds}
           >
-            {recordsContainer["unassigned"].artworkIds.length === 0 ? (
+            {records["unassigned"].artworkIds.length === 0 ? (
               <p className="text-gray-400 text-sm w-full text-center">
                 No unassigned artwork
               </p>
             ) : (
-              recordsContainer["unassigned"].artworkIds.map((id) => {
+              records["unassigned"].artworkIds.map((id) => {
                 const artwork = artworkRecords[id];
                 return (
                   <SortableItem key={id} id={id}>
@@ -314,45 +166,45 @@ const IllustrationDND = ({
           </DroppableArea>
         </div>
 
-        {/* Collections */}
+        {/* Illustrations */}
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-semibold text-gray-800">
               Illustrations (
               {
-                Object.values(recordsContainer).filter(
+                Object.values(records).filter(
                   (value) => value.name !== "Unassigned"
                 ).length
               }
               )
             </h3>
             <button
-              onClick={createTempRecordInState}
+              onClick={createTemp}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
             >
               + New Illustration
             </button>
           </div>
 
-          {Object.values(recordsContainer).filter(
+          {Object.values(records).filter(
             (value) => value.name !== "Unassigned"
           ).length === 0 ? (
             <p className="text-gray-400 text-sm text-center py-8">
-              No collections yet. Click "New Collection" to create one.
+              No Illustrations yet. Click "New Illustration" to create one.
             </p>
           ) : (
-            Object.values(recordsContainer)
+            Object.values(records)
               .filter((value) => value.name !== "Unassigned")
-              .map((recordsContainer) => (
-                <div key={recordsContainer.id} className="space-y-2">
+              .map((records) => (
+                <div key={records.id} className="space-y-2">
                   <div className="flex justify-between items-center">
                     <div className="space-x-2">
                       <input
-                        id={recordsContainer.id}
-                        value={recordsContainer.name}
-                        size={Math.max(recordsContainer.name.length, 20)}
+                        id={records.id}
+                        value={records.name}
+                        size={Math.max(records.name.length, 20)}
                         onChange={(event) =>
-                          updateIllustrationRecordInState(recordsContainer.id, {
+                          update(records.id, {
                             name: event.target.value,
                           })
                         }
@@ -362,27 +214,27 @@ const IllustrationDND = ({
                           }
                         }}
                         onBlur={(event) =>
-                          updateIllustrationRecordInState(recordsContainer.id, {
+                          update(records.id, {
                             name: event.target.value,
                           })
                         }
                       />
                       <span className="text-md font-medium text-gray-700">
-                        ({recordsContainer.artworkIds.length})
+                        ({records.artworkIds.length})
                       </span>
                     </div>
 
                     <div className="flex gap-2">
                       <button
-                        onClick={() => saveAllDirtyRecords()}
-                        disabled={!recordsContainer.isDirty}
+                        onClick={saveAll}
+                        disabled={!records.isDirty}
                         className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors text-sm"
                       >
                         Save
                       </button>
                       <button
                         onClick={() =>
-                          deleteIllustrationRecord(recordsContainer)
+                          remove(records.id)
                         }
                         className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm"
                       >
@@ -392,15 +244,15 @@ const IllustrationDND = ({
                   </div>
 
                   <DroppableArea
-                    id={recordsContainer.id}
-                    items={recordsContainer.artworkIds}
+                    id={records.id}
+                    items={records.artworkIds}
                   >
-                    {recordsContainer.artworkIds.length === 0 ? (
+                    {records.artworkIds.length === 0 ? (
                       <p className="text-gray-400 text-sm w-full text-center">
-                        Drag artwork here to add to collection
+                        Drag artwork here to add to Illustration
                       </p>
                     ) : (
-                      recordsContainer.artworkIds.map((id) => {
+                      records.artworkIds.map((id) => {
                         const artwork = artworkRecords[id];
                         return (
                           <SortableItem key={id} id={id}>
