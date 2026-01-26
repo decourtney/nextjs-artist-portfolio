@@ -7,6 +7,7 @@ import {
   deleteIllustration,
   updateIllustration,
 } from "@/lib/illustrationService";
+import { toast } from "react-toastify";
 
 export function useIllustrationRecords(
   initial: Record<string, IllustrationObj>
@@ -74,11 +75,21 @@ export function useIllustrationRecords(
   async function remove(id: string) {
     const record = records[id];
 
-    if (record?.isPersisted) {
+    // non-persisted record
+    if (!record?.isPersisted) {
+      removeFromState(id);
+      return;
+    }
+
+    try {
       const data = await deleteIllustration(id);
       removeFromState(data.id);
-    } else {
-      removeFromState(id);
+    } catch (err) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error("Failed to delete illustration");
+      }
     }
   }
 
@@ -86,27 +97,35 @@ export function useIllustrationRecords(
   async function save(record: IllustrationObj) {
     const payload = sanitizeRecord(record);
 
-    const data = record.isPersisted
-      ? await updateIllustration(payload)
-      : await createIllustration(payload);
+    try {
+      const data = record.isPersisted
+        ? await updateIllustration(payload)
+        : await createIllustration(payload);
 
-    setRecords((prev) => {
-      const next = { ...prev };
+      setRecords((prev) => {
+        const next = { ...prev };
 
-      if (record.id !== data.id) {
-        delete next[record.id];
+        if (record.id !== data.id) {
+          delete next[record.id];
+        }
+
+        next[data.id] = {
+          id: data.id,
+          name: data.name,
+          artworkIds: data.artworkIds,
+          isPersisted: true,
+          isDirty: false,
+        };
+
+        return next;
+      });
+    } catch (err) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error("Failed to save illustration");
       }
-
-      next[data.id] = {
-        id: data.id,
-        name: data.name,
-        artworkIds: data.artworkIds,
-        isPersisted: true,
-        isDirty: false,
-      };
-
-      return next;
-    });
+    }
   }
 
   // this is temp fix to ensure all modified records are persisted (ex. moving artwork)
