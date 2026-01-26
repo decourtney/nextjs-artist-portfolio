@@ -66,8 +66,8 @@ export function useIllustrationRecords(
   }
 
   // remove fields unecessary for db
-  function sanitizeRecord(record: IllustrationObj) {
-    const { isPersisted, isDirty, ...clean } = record;
+  function sanitizeIllustrationObject(illustration: IllustrationObj) {
+    const { isPersisted, isDirty, ...clean } = illustration;
     return clean;
   }
 
@@ -94,19 +94,19 @@ export function useIllustrationRecords(
   }
 
   // create document if not already persisted otherwise update
-  async function save(record: IllustrationObj) {
-    const payload = sanitizeRecord(record);
+  async function save(illustration: IllustrationObj) {
+    const payload = sanitizeIllustrationObject(illustration);
 
     try {
-      const data = record.isPersisted
+      const data = illustration.isPersisted
         ? await updateIllustration(payload)
         : await createIllustration(payload);
 
       setRecords((prev) => {
         const next = { ...prev };
 
-        if (record.id !== data.id) {
-          delete next[record.id];
+        if (illustration.id !== data.id) {
+          delete next[illustration.id];
         }
 
         next[data.id] = {

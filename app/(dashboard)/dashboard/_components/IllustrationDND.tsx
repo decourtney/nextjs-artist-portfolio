@@ -73,6 +73,7 @@ const IllustrationDND = ({
           createTemp={createTemp}
           update={update}
           saveAll={saveAll}
+          save={save}
           remove={remove}
         />
       </section>

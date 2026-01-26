@@ -8,6 +8,8 @@ interface IllustrationItemProps {
 }
 
 const IllustrationItem = ({ item }: IllustrationItemProps) => {
+  if(!item) return null;
+  
   return (
     <SortableItem id={item.id}>
       <div className="w-24 h-24 flex-shrink-0 relative rounded-md overflow-hidden bg-gray-100 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-shadow">

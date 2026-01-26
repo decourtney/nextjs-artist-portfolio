@@ -12,6 +12,7 @@ interface IllustrationSectionProps {
   createTemp: () => void;
   update: (id: string, patch: Partial<IllustrationObj>) => void;
   saveAll: () => Promise<void>;
+  save: (illustration: IllustrationObj) => Promise<void>;
   remove: (id: string) => Promise<void>;
 }
 
@@ -21,6 +22,7 @@ const IllustrationSection = ({
   createTemp,
   update,
   saveAll,
+  save,
   remove,
 }: IllustrationSectionProps) => {
   return (
