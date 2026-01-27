@@ -31,7 +31,7 @@ const IllustrationBook = ({ artworks }: IllustrationBookProps) => {
       <div className="relative max-w-[1500px] w-full h-full">
         {/* Book container */}
         <div
-          className="relative w-full h-full bg-white rounded-2xl shadow-2xl overflow-hidden aspect-[16/9]"
+          className="relative w-full bg-white rounded-2xl shadow-2xl overflow-hidden aspect-[16/10]"
           // style={{ aspectRatio: "16/10" }}
         >
           <div className="w-full h-full grid grid-cols-1 md:grid-cols-2">
@@ -40,7 +40,7 @@ const IllustrationBook = ({ artworks }: IllustrationBookProps) => {
               <img
                 src={currentData.src}
                 alt={currentData.name}
-                className="w-full h-full object-contain rounded-sm"
+                className="h-full object-contain rounded-sm"
               />
             </div>
 
