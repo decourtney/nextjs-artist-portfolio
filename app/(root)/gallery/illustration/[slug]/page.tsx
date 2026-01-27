@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import React from "react";
 import { oid } from "@/utils/objectIdToString";
 import { getIllustrationWithOrderedArtworks } from "@/app/(root)/utils/getIllustrationWithOrderedArtworks";
-import IllustrationBook from "./IllustrationBook";
+import IllustrationBook from "../../../_components/IllustrationBook";
 
 const IllustrationDisplay = async ({
   params,

@@ -7,7 +7,7 @@ const RootLayoutLarge = ({ children }: { children: React.ReactNode }) => {
     <>
       <Header />
 
-      <main className="max-w-[1200px] min-h-[calc(100dvh-320px)] mx-auto">
+      <main className=" min-h-[calc(100dvh-320px)] mx-auto">
         <PageFadein>{children}</PageFadein>
       </main>
 

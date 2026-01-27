@@ -4,7 +4,6 @@ import { IllustrationArtworkObj } from "@/app/(root)/utils/getIllustrationWithOr
 import { useState, useEffect } from "react";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 
-
 interface IllustrationBookProps {
   artworks: IllustrationArtworkObj[];
 }
@@ -28,25 +27,25 @@ const IllustrationBook = ({ artworks }: IllustrationBookProps) => {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="max-w-7xl w-full relative">
+    <div className="flex items-center justify-center p-4">
+      <div className="relative max-w-[1500px] w-full h-full">
         {/* Book container */}
         <div
-          className="relative bg-white rounded-2xl shadow-2xl overflow-hidden"
-          style={{ aspectRatio: "16/10" }}
+          className="relative w-full h-full bg-white rounded-2xl shadow-2xl overflow-hidden aspect-[16/9]"
+          // style={{ aspectRatio: "16/10" }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 h-full">
+          <div className="w-full h-full grid grid-cols-1 md:grid-cols-2">
             {/* Left page */}
             <div className="flex items-center justify-center p-8 md:p-12 bg-gray-50">
               <img
                 src={currentData.src}
                 alt={currentData.name}
-                className="w-full h-full object-contain rounded-lg shadow-lg"
+                className="w-full h-full object-contain rounded-sm"
               />
             </div>
 
             {/* Right page */}
-            <div className="flex flex-col justify-center p-8 md:p-12 bg-white">
+            <div className="flex flex-col justify-center p-8 md:p-24 bg-white">
               <h2 className="text-3xl font-serif font-bold mb-4">
                 {currentData.name}
               </h2>
