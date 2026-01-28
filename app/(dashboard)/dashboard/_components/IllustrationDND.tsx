@@ -59,7 +59,7 @@ const IllustrationDND = ({
 
   return (
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <section className="bg-gray-50 p-6 space-y-6 rounded-xl border border-gray-200 max-w-6xl mx-auto">
+      <section className="bg-gray-50 p-4 space-y-6 rounded-xl border border-gray-200 max-w-6xl mx-auto">
         {unassigned && (
           <UnassignedArtworkSection
             unassigned={unassigned}
@@ -80,7 +80,7 @@ const IllustrationDND = ({
 
       <DragOverlay>
         {activeId ? (
-          <div className="w-24 h-24 flex-shrink-0 relative rounded-md overflow-hidden bg-gray-100 shadow-lg rotate-3">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 relative rounded-md overflow-hidden bg-gray-100 shadow-lg rotate-3">
             <Image
               src={artworkRecords[activeId].thumbSrc}
               alt={artworkRecords[activeId].name}

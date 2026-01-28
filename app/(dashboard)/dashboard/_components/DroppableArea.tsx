@@ -25,7 +25,7 @@ const DroppableArea = ({ id, children, items }: DroppableAreaProps) => {
     <div
       ref={setNodeRef}
       style={style}
-      className="flex flex-row flex-wrap gap-2 p-4 w-full min-h-32 rounded-xl border-2 border-dashed"
+      className="w-full p-2 min-h-32 rounded-xl border-2 border-dashed"
     >
       <SortableContext items={items}>{children}</SortableContext>
     </div>

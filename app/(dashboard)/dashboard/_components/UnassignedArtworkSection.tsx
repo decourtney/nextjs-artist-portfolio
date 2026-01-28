@@ -25,13 +25,17 @@ const UnassignedArtworkSection = ({
 
       <DroppableArea id={unassigned.id} items={unassigned.artworkIds}>
         {unassigned.artworkIds.length === 0 ? (
-          <p className="text-gray-400 text-sm w-full text-center">
+          <p className="text-gray-400 text-sm w-full text-center mt-4">
             No unassigned artwork
           </p>
         ) : (
-          unassigned.artworkIds.map((id) => (
-            <IllustrationItem key={id} item={artworks[id]} />
-          ))
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2">
+            {unassigned.artworkIds.map((id) => (
+              <div className="col-span-1">
+                <IllustrationItem key={id} item={artworks[id]} />
+              </div>
+            ))}
+          </div>
         )}
       </DroppableArea>
     </div>

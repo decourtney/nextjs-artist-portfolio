@@ -10,7 +10,7 @@ const IllustrationManagement = async () => {
 
   return (
     <section
-      id="file-management"
+      id="illustration-management"
       className="relative bg-white space-y-6 p-6 rounded-xl shadow-sm border border-gray-200"
     >
       {/* Header */}
@@ -25,12 +25,6 @@ const IllustrationManagement = async () => {
             </h2>
             <p className="text-sm text-gray-500">Manage your Illustrations</p>
           </div>
-        </div>
-
-        <div className="text-sm text-gray-600">
-          Total:{" "}
-          <span className="font-semibold">{/* {illustrations.length} */}</span>
-          items
         </div>
       </div>
 
