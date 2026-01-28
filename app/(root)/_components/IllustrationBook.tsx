@@ -30,20 +30,20 @@ const IllustrationBook = ({ artworks }: IllustrationBookProps) => {
     <div className="flex items-center justify-center p-4">
       <div className="relative max-w-[1500px] w-full h-full">
         {/* Book container */}
-        <div className="relative w-full rounded-2xl">
-          <div className="w-full grid grid-cols-1 md:grid-cols-2 max-h-screen aspect-[16/10]">
+        <div className="relative w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2">
             {/* Left page */}
-            <div className="flex justify-center p-8 md:pl-12 max-h-[800px]">
+            <div className="flex justify-center items-start px-12 h-full lg:h-[400px] xl:h-[800px]">
               <img
                 src={currentData.src}
                 alt={currentData.name}
-                className="object-contain rounded-sm"
+                className="object-contain h-full  rounded-sm aspect-auto"
               />
             </div>
 
             {/* Right page */}
-            <div className="flex flex-col justify-start p-8 md:pt-24 md:pr-24 md:pl-12">
-              <h2 className="text-3xl font-serif font-bold mb-4">
+            <div className="flex flex-col justify-start pt-8 pl-12 pr-12 lg:pt-8 lg:pr-12 lg:pl-4 xl:pt-24">
+              <h2 className=" text-3xl font-serif font-bold mb-4">
                 {currentData.name}
               </h2>
               <p className="text-gray-700 text-lg font-serif">
@@ -56,16 +56,16 @@ const IllustrationBook = ({ artworks }: IllustrationBookProps) => {
           <button
             onClick={prevPage}
             disabled={currentPage === 0}
-            className="absolute left-2 top-1/2 -translate-y-1/2"
+            className={`group absolute left-2 top-1/2 -translate-y-1/2 h-full ${currentPage === 0 ? "opacity-30" : "opacity-100"}`}
           >
-            <IoChevronBack size={32} />
+            <IoChevronBack size={32} className="group-hover:scale-125" />
           </button>
           <button
             onClick={nextPage}
             disabled={currentPage === artworks.length - 1}
-            className="absolute right-2 top-1/2 -translate-y-1/2"
+            className={`group absolute right-2 top-1/2 -translate-y-1/2 h-full ${currentPage === artworks.length - 1 ? "opacity-30" : "opacity-100"}`}
           >
-            <IoChevronForward size={32} />
+            <IoChevronForward size={32} className="group-hover:scale-125" />
           </button>
         </div>
 
