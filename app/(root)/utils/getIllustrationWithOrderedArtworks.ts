@@ -24,6 +24,9 @@ export interface IllustrationArtworkObj {
 }
 
 export async function getIllustrationWithOrderedArtworks(slug: string) {
+  // pipeline needs to flesh out artwork objects, drop null references, 
+  // and maintain the order of artwork objects relative to illustration.artworkIds
+  // and shape object for IllustrationAggResult
   const pipeline = [
     { $match: { slug: slug } },
     {
