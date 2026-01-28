@@ -1,8 +1,8 @@
-import { TagDocument } from "@/models/Tag";
+import { ITag } from "@/models/Tag";
 
 export type AllTags = {
-  substances: TagDocument[];
-  mediums: TagDocument[];
-  sizes: TagDocument[];
-  categories: TagDocument[];
+  substances: ITag[];
+  mediums: ITag[];
+  sizes: ITag[];
+  categories: ITag[];
 };

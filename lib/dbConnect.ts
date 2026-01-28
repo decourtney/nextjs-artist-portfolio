@@ -1,3 +1,4 @@
+import Illustration from "@/models/Illustration";
 import mongoose from "mongoose";
 
 interface MongooseCache {

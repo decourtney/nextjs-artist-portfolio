@@ -3,7 +3,7 @@ import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import Busboy from "busboy";
 import dbConnect from "@/lib/dbConnect";
-import Artwork, { ArtworkDocument } from "@/models/Artwork";
+import Artwork, { IArtwork } from "@/models/Artwork";
 import sharp from "sharp";
 import { Readable } from "stream";
 import {
@@ -13,6 +13,7 @@ import {
 import { getServerSession } from "next-auth";
 import { _nextAuthOptions } from "@/auth";
 import { Tag } from "@/models";
+import { s3Client } from "@/lib/s3Client";
 
 // Enhanced interface to also track a UUID for each file
 interface PendingImageData {
@@ -27,19 +28,19 @@ interface PendingImageData {
 }
 
 // Create S3 client
-const s3Client = new S3Client({
-  region: process.env.NEXT_PUBLIC_AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-  },
-  // Add additional configuration for CORS
-  requestHandler: {
-    httpOptions: {
-      timeout: 30000,
-    },
-  },
-});
+// const s3Client = new S3Client({
+//   region: process.env.NEXT_PUBLIC_AWS_REGION,
+//   credentials: {
+//     accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+//     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+//   },
+//   // Add additional configuration for CORS
+//   requestHandler: {
+//     httpOptions: {
+//       timeout: 30000,
+//     },
+//   },
+// });
 
 // Utility: Convert a Next.js ReadableStream to Node.js Readable
 function webStreamToNodeReadable(
@@ -257,7 +258,7 @@ export async function POST(request: NextRequest) {
             await thumbUpload.done();
 
             // Insert a document into MongoDB
-            const artworkDoc: ArtworkDocument = new Artwork({
+            const artworkDoc: IArtwork = new Artwork({
               name: baseName,
               src: mainUrl,
               alt: sanitizedFilename,

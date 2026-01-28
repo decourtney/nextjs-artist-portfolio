@@ -1,12 +1,12 @@
 "use client";
 
-import { ArtworkDocument } from "@/models/Artwork";
+import { IArtwork } from "@/models/Artwork";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
 interface ImageDisplayProps {
-  artworks: ArtworkDocument[];
+  artworks: IArtwork[];
 }
 
 const ImageDisplay = ({ artworks }: ImageDisplayProps) => {

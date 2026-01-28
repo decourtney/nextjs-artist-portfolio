@@ -6,11 +6,11 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import { ArtworkDocument } from "@/models/Artwork";
+import { IArtwork } from "@/models/Artwork";
 
 interface FilteredArtworkContextType {
-  filteredArtworks: ArtworkDocument[];
-  setFilteredArtworks: (artworks: ArtworkDocument[]) => void;
+  filteredArtworks: IArtwork[];
+  setFilteredArtworks: (artworks: IArtwork[]) => void;
   selectedCategory: string | null;
   setSelectedCategory: (category: string | null) => void;
   isLoading: boolean;
@@ -31,9 +31,7 @@ export function FilteredArtworkProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [filteredArtworks, setFilteredArtworks] = useState<ArtworkDocument[]>(
-    []
-  );
+  const [filteredArtworks, setFilteredArtworks] = useState<IArtwork[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);

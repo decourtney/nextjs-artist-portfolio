@@ -10,6 +10,7 @@ const nextConfig = {
       },
     ],
   },
+  transpilePackages: ["three"],
   experimental: {
     optimizePackageImports: ["@headlessui/react"],
   },

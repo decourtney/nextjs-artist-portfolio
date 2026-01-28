@@ -1,3 +1,5 @@
+"use client";
+
 import { PopulatedArtworkDocument } from "@/models/Artwork";
 import { AllTags } from "@/types/allTags";
 import { EditFormData } from "@/types/editFormData";
@@ -38,6 +40,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
       isMainImage: fileToEdit.isMainImage,
       isFeatured: fileToEdit.isFeatured,
       isCategoryImage: fileToEdit.isCategoryImage,
+      isIllustration: fileToEdit.isIllustration,
     };
   });
 
@@ -77,347 +80,378 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
   if (!editFormData) return;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
       <form
         ref={formRef}
-        className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4"
+        className="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl"
         onSubmit={handleOnSubmit}
       >
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Edit Artwork</h2>
+        {/* Header */}
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-2xl flex justify-between items-center">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800">Edit Artwork</h2>
+            <p className="text-sm text-gray-500">
+              Update artwork details and settings
+            </p>
+          </div>
           <button
-            type={"button"}
+            type="button"
             onClick={handleModalClose}
-            className="text-gray-500 hover:text-gray-700"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <IoIosClose size={24} />
+            <IoIosClose size={28} className="text-gray-600" />
           </button>
         </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
-            {error}
-          </div>
-        )}
-
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Name
-              <input
-                id="artwork-name"
-                type="text"
-                value={editFormData.name}
-                onChange={(e) =>
-                  setEditFormData({ ...editFormData, name: e.target.value })
-                }
-                className="w-full p-2 border rounded-md"
-              />
-            </label>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description
-              <textarea
-                id="artwork-description"
-                value={editFormData.description}
-                onChange={(e) =>
-                  setEditFormData({
-                    ...editFormData,
-                    description: e.target.value,
-                  })
-                }
-                rows={3}
-                className="w-full p-2 border rounded-md"
-              />
-            </label>
-          </div>
-
-          {/* Tags */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Substance
-                <select
-                  id="artwork-substance"
-                  value={editFormData.substance}
-                  onChange={(e) =>
-                    setEditFormData({
-                      ...editFormData,
-                      substance: e.target.value,
-                    })
-                  }
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="">Select Substance</option>
-                  {tags.substances.map((tag) => (
-                    <option key={tag._id} value={tag.label}>
-                      {tag.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
+        {/* Content */}
+        <div className="px-6 py-6">
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+              {error}
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Medium
-                <select
-                  id="artwork-medium"
-                  value={editFormData.medium}
-                  onChange={(e) =>
-                    setEditFormData({ ...editFormData, medium: e.target.value })
-                  }
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="">Select Medium</option>
-                  {tags.mediums.map((tag) => (
-                    <option key={tag._id} value={tag.label}>
-                      {tag.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
+          )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Size
-                <select
-                  id="artwork-size"
-                  value={editFormData.size}
-                  onChange={(e) =>
-                    setEditFormData({ ...editFormData, size: e.target.value })
-                  }
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="">Select Size</option>
-                  {tags.sizes.map((tag) => (
-                    <option key={tag._id} value={tag.label}>
-                      {tag.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
+          <div className="space-y-6">
+            {/* Basic Info Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">
+                Basic Information
+              </h3>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Category
-                <select
-                  id="artwork-category"
-                  value={editFormData.category}
-                  onChange={(e) =>
-                    setEditFormData({
-                      ...editFormData,
-                      category: e.target.value,
-                    })
-                  }
-                  className="w-full p-2 border rounded-md"
+              <div>
+                <label
+                  htmlFor="artwork-name"
+                  className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  <option value="">Select Category</option>
-                  {tags.categories.map((tag) => (
-                    <option key={tag._id} value={tag.label}>
-                      {tag.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-          </div>
-
-          {/* Price and Availability */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Price
+                  Artwork Name
+                </label>
                 <input
-                  id="artwork-price"
-                  type="number"
-                  placeholder={editFormData.price.toString()}
+                  id="artwork-name"
+                  type="text"
+                  value={editFormData.name}
+                  onChange={(e) =>
+                    setEditFormData({ ...editFormData, name: e.target.value })
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="artwork-description"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Description
+                </label>
+                <textarea
+                  id="artwork-description"
+                  value={editFormData.description}
                   onChange={(e) =>
                     setEditFormData({
                       ...editFormData,
-                      price: parseFloat(e.target.value) || 0,
+                      description: e.target.value,
                     })
                   }
-                  min="0"
-                  step="0.01"
-                  className="w-full p-2 border rounded-md"
+                  rows={4}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Add a description for this artwork..."
                 />
-              </label>
-              <div
-                className={`ml-2 cursor-pointer ${
-                  editFormData.isAvailable ? "text-blue-500" : "text-gray-300"
-                }`}
-                onClick={() =>
-                  setEditFormData({
-                    ...editFormData,
-                    isAvailable: !editFormData.isAvailable,
-                  })
-                }
-              >
-                {editFormData.isAvailable ? (
-                  <div className="flex flex-row items-center space-x-2">
-                    <IoIosCheckmarkCircle
-                      className="text-green-500"
-                      title="Available"
-                      size={20}
-                    />
-                    <span className="text-sm font-medium text-gray-700">
-                      Available
-                    </span>
-                  </div>
-                ) : (
-                  <div className="flex flex-row items-center space-x-2">
-                    <IoIosCloseCircle
-                      className="text-red-500"
-                      title="Unavailable"
-                      size={20}
-                    />
-                    <span className="text-sm font-medium text-gray-700">
-                      Unavailable
-                    </span>
-                  </div>
-                )}
+              </div>
+
+              <div className="space-x-2">
+                <input
+                  id="isIllustration"
+                  type="checkbox"
+                  checked={editFormData.isIllustration}
+                  onChange={(e) =>
+                    setEditFormData({
+                      ...editFormData,
+                      isIllustration: e.target.checked,
+                    })
+                  }
+                />
+                <label className="text-md font-medium text-gray-700 mb-2">
+                  Part of an Illustration
+                </label>
               </div>
             </div>
 
-            {/* Radio buttons for Home page, featured, and category images */}
-            <div className="flex flex-col justify-between">
-              <div
-                className={`cursor-pointer ${
-                  editFormData.isMainImage ? "text-blue-500" : "text-gray-300"
-                }`}
-                onClick={() =>
-                  setEditFormData({
-                    ...editFormData,
-                    isMainImage: !editFormData.isMainImage,
-                  })
-                }
-              >
-                {editFormData.isMainImage ? (
-                  <div className="flex flex-row items-center space-x-2">
-                    <IoIosHome
-                      className="text-blue-500"
-                      title="Home Page Image"
-                      size={20}
-                    />
-                    <span className="text-sm font-medium text-gray-700">
-                      Home Page Image
-                    </span>
-                  </div>
-                ) : (
-                  <div className="group flex flex-row items-center space-x-2">
-                    <IoIosHome
-                      className="text-gray-300 group-hover:text-blue-300"
-                      title="Home Page Image"
-                      size={20}
-                    />
-                    <span className="text-sm font-medium text-gray-300 group-hover:text-blue-300">
-                      Home Page Image
-                    </span>
-                  </div>
-                )}
-              </div>
+            {/* Tags Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">
+                Categories & Tags
+              </h3>
 
-              <div
-                className={`cursor-pointer ${
-                  editFormData.isFeatured ? "text-blue-500" : "text-gray-300"
-                }`}
-                onClick={() =>
-                  setEditFormData({
-                    ...editFormData,
-                    isFeatured: !editFormData.isFeatured,
-                  })
-                }
-              >
-                {editFormData.isFeatured ? (
-                  <div className="flex flex-row items-center space-x-2">
-                    <IoIosStar
-                      className="text-yellow-500 fill-current"
-                      title="Featured"
-                      size={20}
-                    />
-                    <span className="text-sm font-medium text-gray-700">
-                      Featured Image
-                    </span>
-                  </div>
-                ) : (
-                  <div className="group flex flex-row items-center space-x-2">
-                    <IoIosStar
-                      className="text-gray-300 group-hover:text-blue-300 fill-current"
-                      title="Featured"
-                      size={20}
-                    />
-                    <span className="text-sm font-medium text-gray-300 group-hover:text-blue-300">
-                      Featured Image
-                    </span>
-                  </div>
-                )}
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label
+                    htmlFor="artwork-category"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Category
+                  </label>
+                  <select
+                    id="artwork-category"
+                    value={editFormData.category}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        category: e.target.value,
+                      })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select Category</option>
+                    {tags.categories.map((tag) => (
+                      <option key={tag._id} value={tag.label}>
+                        {tag.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <div
-                className={`cursor-pointer ${
-                  editFormData.isCategoryImage
-                    ? "text-blue-500"
-                    : "text-gray-300"
-                }`}
-                onClick={() =>
-                  setEditFormData({
-                    ...editFormData,
-                    isCategoryImage: !editFormData.isCategoryImage,
-                  })
-                }
-              >
-                {editFormData.isCategoryImage ? (
-                  <div className="flex flex-row items-center space-x-2">
-                    <IoIosImages
-                      className="text-purple-500"
-                      title="Category Image"
-                      size={20}
-                    />
-                    <span className="text-sm font-medium text-gray-700">
-                      Category Image
-                    </span>
-                  </div>
-                ) : (
-                  <div className="group flex flex-row items-center space-x-2">
-                    <IoIosImages
-                      className="text-gray-300 group-hover:text-blue-300"
-                      title="Category Image"
-                      size={20}
-                    />
-                    <span className="text-sm font-medium text-gray-300 group-hover:text-blue-300">
-                      Category Image
-                    </span>
-                  </div>
-                )}
+                <div>
+                  <label
+                    htmlFor="artwork-size"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Size
+                  </label>
+                  <select
+                    id="artwork-size"
+                    value={editFormData.size}
+                    onChange={(e) =>
+                      setEditFormData({ ...editFormData, size: e.target.value })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select Size</option>
+                    {tags.sizes.map((tag) => (
+                      <option key={tag._id} value={tag.label}>
+                        {tag.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="artwork-substance"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Substance
+                  </label>
+                  <select
+                    id="artwork-substance"
+                    value={editFormData.substance}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        substance: e.target.value,
+                      })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select Substance</option>
+                    {tags.substances.map((tag) => (
+                      <option key={tag._id} value={tag.label}>
+                        {tag.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="artwork-medium"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Medium
+                  </label>
+                  <select
+                    id="artwork-medium"
+                    value={editFormData.medium}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        medium: e.target.value,
+                      })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select Medium</option>
+                    {tags.mediums.map((tag) => (
+                      <option key={tag._id} value={tag.label}>
+                        {tag.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Pricing Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">
+                Pricing & Availability
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label
+                    htmlFor="artwork-price"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Price ($)
+                  </label>
+                  <input
+                    id="artwork-price"
+                    type="number"
+                    value={editFormData.price}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        price: parseFloat(e.target.value) || 0,
+                      })
+                    }
+                    min="0"
+                    step="0.01"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Availability Status
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setEditFormData({
+                        ...editFormData,
+                        isAvailable: !editFormData.isAvailable,
+                      })
+                    }
+                    className={`
+                      w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors
+                      ${
+                        editFormData.isAvailable
+                          ? "bg-green-50 text-green-700 border-2 border-green-300 hover:bg-green-100"
+                          : "bg-red-50 text-red-700 border-2 border-red-300 hover:bg-red-100"
+                      }
+                    `}
+                  >
+                    {editFormData.isAvailable ? (
+                      <>
+                        <IoIosCheckmarkCircle size={20} />
+                        Available for Purchase
+                      </>
+                    ) : (
+                      <>
+                        <IoIosCloseCircle size={20} />
+                        Not Available
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Display Options Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">
+                Display Options
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setEditFormData({
+                      ...editFormData,
+                      isMainImage: !editFormData.isMainImage,
+                    })
+                  }
+                  className={`
+                    flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all border-2
+                    ${
+                      editFormData.isMainImage
+                        ? "bg-blue-50 text-blue-700 border-blue-300 hover:bg-blue-100"
+                        : "bg-gray-50 text-gray-600 border-gray-300 hover:bg-gray-100"
+                    }
+                  `}
+                >
+                  <IoIosHome size={20} />
+                  Home Page
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setEditFormData({
+                      ...editFormData,
+                      isFeatured: !editFormData.isFeatured,
+                    })
+                  }
+                  className={`
+                    flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all border-2
+                    ${
+                      editFormData.isFeatured
+                        ? "bg-yellow-50 text-yellow-700 border-yellow-300 hover:bg-yellow-100"
+                        : "bg-gray-50 text-gray-600 border-gray-300 hover:bg-gray-100"
+                    }
+                  `}
+                >
+                  <IoIosStar size={20} />
+                  Featured
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setEditFormData({
+                      ...editFormData,
+                      isCategoryImage: !editFormData.isCategoryImage,
+                    })
+                  }
+                  className={`
+                    flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all border-2
+                    ${
+                      editFormData.isCategoryImage
+                        ? "bg-purple-50 text-purple-700 border-purple-300 hover:bg-purple-100"
+                        : "bg-gray-50 text-gray-600 border-gray-300 hover:bg-gray-100"
+                    }
+                  `}
+                >
+                  <IoIosImages size={20} />
+                  Category
+                </button>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-6 flex justify-end space-x-3">
+        {/* Footer */}
+        <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 rounded-b-2xl flex justify-end gap-3">
           <button
-            type={"button"}
+            type="button"
             onClick={handleModalClose}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800"
+            className="px-6 py-2 text-gray-700 font-medium hover:bg-gray-200 rounded-lg transition-colors"
           >
             Cancel
           </button>
 
           <button
-            type={"submit"}
+            type="submit"
             disabled={isSubmitting}
             className={`
-                    px-4 py-2 bg-blue-500 text-white rounded-md
-                    ${
-                      isSubmitting
-                        ? "opacity-50 cursor-not-allowed"
-                        : "hover:bg-blue-600"
-                    }
-                  `}
+              px-6 py-2 font-medium rounded-lg transition-colors
+              ${
+                isSubmitting
+                  ? "bg-blue-300 text-white cursor-not-allowed"
+                  : "bg-blue-500 text-white hover:bg-blue-600"
+              }
+            `}
           >
             {isSubmitting ? "Saving..." : "Save Changes"}
           </button>

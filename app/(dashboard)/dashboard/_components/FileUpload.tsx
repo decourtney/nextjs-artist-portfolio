@@ -3,8 +3,12 @@
 import React, { useState, ChangeEvent, useRef, FormEvent } from "react";
 import { MdClose } from "react-icons/md";
 import { IoIosWarning } from "react-icons/io";
+import {
+  IoCloudUploadOutline,
+  IoCheckmarkCircleOutline,
+  IoCloseCircleOutline,
+} from "react-icons/io5";
 import { useRouter } from "next/navigation";
-import { overlay } from "@/ColorTheme";
 import LoadingSpinner from "./LoadingSpinner";
 
 interface FileItem {
@@ -25,8 +29,8 @@ const FileUpload = () => {
   const [selectedFiles, setSelectedFiles] = useState<FileItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [numberOfSuccesses, setNumberOfSuccesses] = useState<number | null>();
-  const [numberOfFailures, setNumberOfFailures] = useState<number | null>();
+  const [numberOfSuccesses, setNumberOfSuccesses] = useState<number | null>(null);
+  const [numberOfFailures, setNumberOfFailures] = useState<number | null>(null);
 
   const handleOpenFileDialog = () => {
     fileInputRef.current?.click();
@@ -62,6 +66,8 @@ const FileUpload = () => {
 
   const handleCancel = () => {
     setSelectedFiles([]);
+    setNumberOfSuccesses(null);
+    setNumberOfFailures(null);
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -125,6 +131,7 @@ const FileUpload = () => {
     } catch (error) {
       console.error(error);
       alert("Error uploading files");
+      setIsLoading(false);
     }
   };
 
@@ -132,34 +139,44 @@ const FileUpload = () => {
     <form
       id="file-upload"
       onSubmit={handleSubmit}
-      className="relative p-6 shadow-md rounded-lg bg-background-50 text-gray-900"
+      className="relative bg-white p-6 rounded-xl shadow-sm border border-gray-200"
     >
-      <div className="flex mb-4 pb-4 border-b">
-        <h1 className="mr-6 text-2xl font-bold text-foreground-500">
-          Upload Image
-        </h1>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 pb-4 border-b border-gray-200 gap-4">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-lg">
+            <IoCloudUploadOutline className="text-green-600" size={22} />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800">Upload Images</h2>
+            <p className="text-sm text-gray-500">
+              Add new artwork to your collection
+            </p>
+          </div>
+        </div>
 
-        <div className="flex flex-grow h-full">
-          {numberOfFailures && (
-            <div className="w-full p-1 text-center bg-red-100 text-red-700 rounded-md">
-              {numberOfFailures > 1 ? `${numberOfFailures} files failed to upload.` : "File failed to upload."}
+        {/* Status Messages */}
+        <div className="flex flex-col gap-2 w-full sm:w-auto">
+          {numberOfFailures !== null && numberOfFailures > 0 && (
+            <div className="px-4 py-2 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-center gap-2 text-sm">
+              <IoCloseCircleOutline size={18} />
+              {numberOfFailures > 1
+                ? `${numberOfFailures} files failed to upload`
+                : "1 file failed to upload"}
             </div>
           )}
 
-          {numberOfSuccesses && (
-            <div className="w-full p-1 text-center bg-green-100 text-green-700 rounded-md">
-              {numberOfSuccesses > 1 ? `${numberOfSuccesses} files` : "File"} uploaded successfully.
+          {numberOfSuccesses !== null && numberOfSuccesses > 0 && (
+            <div className="px-4 py-2 bg-green-50 border border-green-200 text-green-700 rounded-lg flex items-center gap-2 text-sm">
+              <IoCheckmarkCircleOutline size={18} />
+              {numberOfSuccesses > 1
+                ? `${numberOfSuccesses} files uploaded successfully`
+                : "1 file uploaded successfully"}
             </div>
           )}
         </div>
-
-        {selectedFiles.length > 0 ? (
-          <h3 className="px-4 py-2 text-center text-sm font-semibold text-gray-700">
-            <span>{selectedFiles.length} </span>File
-            {selectedFiles.length > 1 ? <span>s</span> : null} Selected
-          </h3>
-        ) : null}
       </div>
+
       <input
         id="file-input"
         ref={fileInputRef}
@@ -172,81 +189,135 @@ const FileUpload = () => {
 
       {isLoading && <LoadingSpinner />}
 
-      <div className="relative min-h-[200px] max-h-[500px] overflow-y-auto rounded-lg bg-white shadow-sm">
+      {/* File List */}
+      <div className="mb-6">
         {selectedFiles.length > 0 ? (
-          <>
-            <ul className="[&>*:nth-child(even)]:bg-gray-50 text-gray-900">
-              {selectedFiles.map((item, index) => (
-                <li
-                  key={item.id}
-                  className="flex justify-between items-center pr-1 pl-2 py-1"
-                >
-                  <p className="truncate">{item.name}</p>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-gray-700">
+                Selected Files ({selectedFiles.length})
+              </h3>
+            </div>
 
-                  <div className="flex items-center space-x-2">
-                    {item.status === "error" && item.errorMessage ? (
-                      <span className="px-2 py-1 rounded-full text-red-800 bg-red-100 text-xs whitespace-nowrap flex items-center">
-                        <IoIosWarning className="mr-1" />
+            <div className="max-h-[400px] overflow-y-auto space-y-2 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              {selectedFiles.map((item, index) => (
+                <div
+                  key={item.id}
+                  className={`
+                    flex items-center justify-between p-3 rounded-lg transition-colors
+                    ${
+                      item.status === "error"
+                        ? "bg-red-50 border border-red-200"
+                        : "bg-white border border-gray-200 hover:border-gray-300"
+                    }
+                  `}
+                >
+                  <div className="flex-1 min-w-0 mr-3">
+                    <p className="text-sm font-medium text-gray-800 truncate">
+                      {item.name}
+                    </p>
+                    {item.status === "error" && item.errorMessage && (
+                      <div className="mt-1 flex items-center gap-1 text-xs text-red-700">
+                        <IoIosWarning size={14} />
                         {item.errorMessage}
-                      </span>
-                    ) : null}
-                    <div className="border-l-2">
-                      <button
-                        type="button"
-                        className="p-1 rounded-full hover:bg-gray-100 text-gray-900"
-                        onClick={() => handleRemoveFile(index)}
-                      >
-                        <MdClose />
-                      </button>
-                    </div>
+                      </div>
+                    )}
                   </div>
-                </li>
+
+                  <button
+                    type="button"
+                    className="flex-shrink-0 p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
+                    onClick={() => handleRemoveFile(index)}
+                    title="Remove file"
+                  >
+                    <MdClose size={20} className="text-gray-600" />
+                  </button>
+                </div>
               ))}
-            </ul>
-          </>
+            </div>
+          </div>
         ) : (
-          <div className="h-[200px] content-center flex items-center justify-center text-gray-500">
-            <span className="text-sm">No files selected</span>
+          <div className="flex flex-col items-center justify-center py-16 px-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+            <IoCloudUploadOutline size={64} className="text-gray-300 mb-4" />
+            <h3 className="text-lg font-medium text-gray-700 mb-2">
+              No files selected
+            </h3>
+            <p className="text-sm text-gray-500 mb-4">
+              Click the button below to choose images
+            </p>
+            <button
+              type="button"
+              onClick={handleOpenFileDialog}
+              className="px-6 py-2 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              Choose Files
+            </button>
           </div>
         )}
       </div>
 
-      <div className="flex justify-between mt-4">
-        <button
-          type="button"
-          disabled={isLoading}
-          className="px-4 py-2 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors"
-          onClick={handleOpenFileDialog}
-        >
-          Choose Files
-        </button>
-
-        <div className="space-x-4">
+      {/* Action Buttons */}
+      {selectedFiles.length > 0 && (
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 pt-4 border-t border-gray-200">
           <button
             type="button"
-            disabled={selectedFiles.length === 0 || isLoading}
-            className="px-4 py-2 text-sm bg-secondary-700 hover:bg-secondary-900 text-white rounded-md transition-colors"
-            style={{
-              backgroundColor:
-                selectedFiles.length === 0 ? overlay[100] : undefined,
-            }}
-            onClick={handleCancel}
+            onClick={handleOpenFileDialog}
+            disabled={isLoading}
+            className={`
+              w-full sm:w-auto px-6 py-2 font-medium rounded-lg transition-colors
+              ${
+                isLoading
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-blue-500 text-white hover:bg-blue-600"
+              }
+            `}
           >
-            Cancel
+            Add More Files
           </button>
-          <button
-            type="submit"
-            disabled={selectedFiles.length === 0 || isLoading}
-            className="px-4 py-2 text-sm bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors"
-            style={{
-              backgroundColor:
-                selectedFiles.length === 0 ? overlay[100] : undefined,
-            }}
-          >
-            Upload
-          </button>
+
+          <div className="flex gap-3 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={handleCancel}
+              disabled={isLoading}
+              className={`
+                flex-1 sm:flex-none px-6 py-2 font-medium rounded-lg transition-colors
+                ${
+                  isLoading
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-gray-500 text-white hover:bg-gray-600"
+                }
+              `}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`
+                flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2 font-medium rounded-lg transition-colors
+                ${
+                  isLoading
+                    ? "bg-green-300 text-white cursor-not-allowed"
+                    : "bg-green-500 text-white hover:bg-green-600"
+                }
+              `}
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white"></div>
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <IoCloudUploadOutline size={18} />
+                  Upload Files
+                </>
+              )}
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </form>
   );
 };
