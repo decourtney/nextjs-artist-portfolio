@@ -30,10 +30,7 @@ const IllustrationBook = ({ artworks }: IllustrationBookProps) => {
     <div className="flex items-center justify-center p-4">
       <div className="relative max-w-[1500px] w-full h-full">
         {/* Book container */}
-        <div
-          className="relative w-full bg-white rounded-2xl shadow-2xl overflow-hidden aspect-[16/10]"
-          // style={{ aspectRatio: "16/10" }}
-        >
+        <div className="relative w-full bg-white rounded-2xl shadow-2xl overflow-hidden aspect-[16/10]">
           <div className="w-full h-full grid grid-cols-1 md:grid-cols-2">
             {/* Left page */}
             <div className="flex items-center justify-center p-8 md:p-12 bg-gray-50">

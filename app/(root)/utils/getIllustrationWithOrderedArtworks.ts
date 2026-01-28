@@ -8,6 +8,13 @@ interface IllustrationLean {
   artworkIds: string[];
 }
 
+export interface IllustrationAggResult {
+  id: string;
+  name: string;
+  artworkIds: string[];
+  artworks: IllustrationArtworkObj[];
+}
+
 export interface IllustrationArtworkObj {
   id: string;
   name: string;
@@ -17,47 +24,81 @@ export interface IllustrationArtworkObj {
 }
 
 export async function getIllustrationWithOrderedArtworks(slug: string) {
-  const illustration = await Illustration.findOne<IllustrationLean>(
-    { slug },
-    { name: 1, artworkIds: 1 },
-  ).lean();
-
-  if (!illustration) return null;
-
-  const artworks = await Artwork.find(
+  const pipeline = [
+    { $match: { slug: slug } },
     {
-      _id: { $in: illustration.artworkIds },
-    },
-    { name: 1, src: 1, thumbSrc: 1, description: 1 },
-  ).lean();
-
-  const artworkMap = new Map(
-    artworks.map((a) => [
-      oid(a._id),
-      {
-        id: oid(a._id),
-        name: a.name,
-        src: a.src,
-        thumbSrc: a.thumbSrc,
-        description: a.description,
+      $lookup: {
+        from: "artworks",
+        localField: "artworkIds",
+        foreignField: "_id",
+        as: "artworks",
       },
-    ]),
-  );
-
-  const orderedArtworks: IllustrationArtworkObj[] = illustration.artworkIds.map(
-    (id: string) => {
-      const stringId = oid(id); // id is still an ObjectId
-      const art = artworkMap.get(stringId);
-
-      // TODO: This will likely need to change to a default image
-      if (!art) throw new Error("Broken artwork reference");
-      return art;
     },
-  );
+    {
+      $addFields: {
+        artworks: {
+          $map: {
+            input: "$artworkIds",
+            as: "id",
+            in: {
+              $arrayElemAt: [
+                {
+                  $filter: {
+                    input: "$artworks",
+                    as: "art",
+                    cond: { $eq: ["$$art._id", "$$id"] },
+                  },
+                },
+                0,
+              ],
+            },
+          },
+        },
+      },
+    },
+    {
+      $addFields: {
+        artworks: {
+          $filter: {
+            input: "$artworks",
+            as: "art",
+            cond: { $ne: ["$$art", null] },
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        id: { $toString: "$_id" },
+        name: 1,
+        artworIds: {
+          $map: {
+            input: "$artworkIds",
+            as: "id",
+            in: { $toString: "$$id" },
+          },
+        },
+        artworks: {
+          $map: {
+            input: "$artworks",
+            as: "art",
+            in: {
+              id: { $toString: "$$art._id" },
+              name: "$$art.name",
+              src: "$$art.src",
+              thumbSrc: "$$art.thumbSrc",
+              description: "$$art.description",
+            },
+          },
+        },
+      },
+    },
+  ];
 
-  return {
-    id: oid(illustration._id),
-    name: illustration.name,
-    artworks: orderedArtworks,
-  };
+  const results = await Illustration.aggregate<IllustrationAggResult>(pipeline);
+
+  const illustration = results[0] ?? null;
+
+  return illustration;
 }
