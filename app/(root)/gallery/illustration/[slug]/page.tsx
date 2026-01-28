@@ -1,8 +1,5 @@
-import { Artwork } from "@/models";
-import Illustration from "@/models/Illustration";
-import { notFound } from "next/navigation";
 import React from "react";
-import { oid } from "@/utils/objectIdToString";
+import { notFound } from "next/navigation";
 import { getIllustrationWithOrderedArtworks } from "@/app/(root)/utils/getIllustrationWithOrderedArtworks";
 import IllustrationBook from "../../../_components/IllustrationBook";
 

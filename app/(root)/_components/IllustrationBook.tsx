@@ -30,19 +30,19 @@ const IllustrationBook = ({ artworks }: IllustrationBookProps) => {
     <div className="flex items-center justify-center p-4">
       <div className="relative max-w-[1500px] w-full h-full">
         {/* Book container */}
-        <div className="relative w-full bg-white rounded-2xl shadow-2xl overflow-hidden aspect-[16/10]">
-          <div className="w-full h-full grid grid-cols-1 md:grid-cols-2">
+        <div className="relative w-full rounded-2xl">
+          <div className="w-full grid grid-cols-1 md:grid-cols-2 max-h-screen aspect-[16/10]">
             {/* Left page */}
-            <div className="flex items-center justify-center p-8 md:p-12 bg-gray-50">
+            <div className="flex justify-center p-8 md:pl-12 max-h-[800px]">
               <img
                 src={currentData.src}
                 alt={currentData.name}
-                className="h-full object-contain rounded-sm"
+                className="object-contain rounded-sm"
               />
             </div>
 
             {/* Right page */}
-            <div className="flex flex-col justify-center p-8 md:p-24 bg-white">
+            <div className="flex flex-col justify-start p-8 md:pt-24 md:pr-24 md:pl-12">
               <h2 className="text-3xl font-serif font-bold mb-4">
                 {currentData.name}
               </h2>
@@ -56,16 +56,16 @@ const IllustrationBook = ({ artworks }: IllustrationBookProps) => {
           <button
             onClick={prevPage}
             disabled={currentPage === 0}
-            className="absolute left-4 top-1/2 -translate-y-1/2"
+            className="absolute left-2 top-1/2 -translate-y-1/2"
           >
-            <IoChevronBack size={24} />
+            <IoChevronBack size={32} />
           </button>
           <button
             onClick={nextPage}
             disabled={currentPage === artworks.length - 1}
-            className="absolute right-4 top-1/2 -translate-y-1/2"
+            className="absolute right-2 top-1/2 -translate-y-1/2"
           >
-            <IoChevronForward size={24} />
+            <IoChevronForward size={32} />
           </button>
         </div>
 

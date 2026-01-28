@@ -1,12 +1,4 @@
-import { Artwork } from "@/models";
 import Illustration from "@/models/Illustration";
-import { oid } from "@/utils/objectIdToString";
-
-interface IllustrationLean {
-  _id: string;
-  name: string;
-  artworkIds: string[];
-}
 
 export interface IllustrationAggResult {
   id: string;
