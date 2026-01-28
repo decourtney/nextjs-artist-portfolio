@@ -35,18 +35,18 @@ const IllustrationSection = ({
           onClick={createTemp}
           className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
         >
-          + New Illustration
+          + Create
         </button>
       </div>
 
       {illustrations.length === 0 ? (
         <p className="text-gray-400 text-sm text-center py-8">
-          No Illustrations yet. Click "New Illustration" to create one.
+          No Illustrations yet. Click "Create" to create one.
         </p>
       ) : (
         illustrations.map((illustration) => (
           <div key={illustration.id} className="space-y-2">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col">
               <div className="space-x-2">
                 <input
                   id={illustration.id}
@@ -68,37 +68,44 @@ const IllustrationSection = ({
                     })
                   }
                 />
-                <span className="text-md font-medium text-gray-700">
-                  ({illustration.artworkIds.length})
-                </span>
               </div>
 
-              <div className="flex gap-2">
-                <button
-                  onClick={saveAll}
-                  disabled={!illustration.isDirty}
-                  className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors text-sm"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={() => remove(illustration.id)}
-                  className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm"
-                >
-                  Delete
-                </button>
+              <div className="flex justify-between gap-2 w-full">
+                <div className="text-md font-medium text-gray-700">
+                  ({illustration.artworkIds.length})
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={saveAll}
+                    disabled={!illustration.isDirty}
+                    className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors text-sm"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => remove(illustration.id)}
+                    className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
 
             <DroppableArea id={illustration.id} items={illustration.artworkIds}>
               {illustration.artworkIds.length === 0 ? (
-                <p className="text-gray-400 text-sm w-full text-center">
+                <p className="text-gray-400 text-sm w-full text-center mt-4">
                   Drag artwork here to add to Illustration
                 </p>
               ) : (
-                illustration.artworkIds.map((id) => (
-                  <IllustrationItem key={id} item={artworks[id]} />
-                ))
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2">
+                  {illustration.artworkIds.map((id) => (
+                    <div className="col-span-1">
+                      <IllustrationItem key={id} item={artworks[id]} />
+                    </div>
+                  ))}
+                </div>
               )}
             </DroppableArea>
           </div>

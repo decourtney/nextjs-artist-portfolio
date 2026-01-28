@@ -4,7 +4,7 @@ import HashNavButton from "./HashNavButton";
 import SignoutButton from "./SignoutButton";
 
 const DashNav = () => {
-  const hashPaths = ["file-management", "tag-management", "file-upload"];
+  const hashPaths = ["file-management", "tag-management", "illustration-management", "file-upload"];
 
   return (
     <nav className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40">
@@ -15,7 +15,7 @@ const DashNav = () => {
             <h1 className="text-xl font-bold text-gray-800 mr-8">Dashboard</h1>
 
             {/* Navigation Links */}
-            <div className="hidden md:flex space-x-2">
+            <div className="hidden lg:flex space-x-2">
               {hashPaths.map((path) => (
                 <HashNavButton key={path} params={path} />
               ))}
@@ -36,7 +36,7 @@ const DashNav = () => {
         </div>
 
         {/* Mobile Navigation */}
-        <div className="md:hidden pb-3 flex space-x-2 overflow-x-auto">
+        <div className="lg:hidden pb-3 flex space-x-2 overflow-x-auto">
           {hashPaths.map((path) => (
             <HashNavButton key={path} params={path} />
           ))}

@@ -12,13 +12,13 @@ const IllustrationItem = ({ item }: IllustrationItemProps) => {
   
   return (
     <SortableItem id={item.id}>
-      <div className="w-24 h-24 flex-shrink-0 relative rounded-md overflow-hidden bg-gray-100 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-shadow">
+      <div className="relative w-20 h-20 sm:w-24 sm:h-24  rounded-md overflow-hidden bg-gray-100 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-shadow">
         <Image
           src={item.thumbSrc}
           alt={item.name}
           fill
           sizes="(max-width: 640px) 100vw, 160px"
-          className="w-full h-full object-cover"
+          className="object-cover"
         />
       </div>
     </SortableItem>

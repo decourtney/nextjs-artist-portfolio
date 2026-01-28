@@ -84,7 +84,7 @@ export default async function DashboardPage({
     const { metadata, data } = aggregateQueryResult[0];
     const totalPages = Math.ceil(metadata[0].totalCount / 10);
     const artworkDocuments: PopulatedArtworkDocument[] = JSON.parse(
-      JSON.stringify(data)
+      JSON.stringify(data),
     );
     const tags: ITag[] = JSON.parse(JSON.stringify(tagsResponse));
 
@@ -98,17 +98,19 @@ export default async function DashboardPage({
 
     return (
       <main className="w-full mx-auto">
-        <div className="space-y-8">
+        <div className="space-y-4 md:space-y-8">
           <ProfileManagement />
+          
           <FileManagement
             files={artworkDocuments}
             tags={allTags}
             currentPage={page}
             totalPages={totalPages}
           />
-          <IllustrationManagement />
 
           <TagManagement tags={allTags} />
+
+          <IllustrationManagement />
 
           <FileUpload />
         </div>
