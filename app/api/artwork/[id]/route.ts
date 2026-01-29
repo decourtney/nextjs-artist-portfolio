@@ -9,6 +9,7 @@ import { _nextAuthOptions } from "@/auth";
 import { EditFormData } from "@/types/editFormData";
 import Illustration from "@/models/Illustration";
 import { s3Client } from "@/lib/s3Client";
+import { oid } from "@/utils/objectIdToString";
 
 // Create S3 client
 // const s3Client = new S3Client({
@@ -168,7 +169,7 @@ export async function PATCH(
     ]);
 
     if (artwork.isIllustration !== newArtworkData.isIllustration)
-      await updateIllustration(artwork._id, newArtworkData.isIllustration);
+      await updateIllustration(oid(artwork._id), newArtworkData.isIllustration);
 
     // Assign new data to existing artwork document
     Object.assign(artwork, {
@@ -212,7 +213,7 @@ export async function PATCH(
     //   "category",
     // ]);
 
-    console.log(updatedArtwork);
+    // console.log(updatedArtwork);
     return NextResponse.json(updatedArtwork, {
       status: 200,
       headers: { "Content-Type": "application/json" },

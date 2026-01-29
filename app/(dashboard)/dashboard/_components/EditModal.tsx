@@ -13,6 +13,7 @@ import {
   IoIosImages,
   IoIosStar,
 } from "react-icons/io";
+import { oid } from "@/utils/objectIdToString";
 
 interface EditModalParams {
   fileToEdit: PopulatedArtworkDocument | null;
@@ -28,7 +29,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
   const [editFormData, setEditFormData] = useState<EditFormData | null>(() => {
     if (!fileToEdit) return null;
     return {
-      id: fileToEdit._id,
+      id: oid(fileToEdit._id),
       name: fileToEdit.name,
       description: fileToEdit.description ?? undefined,
       substance: fileToEdit.substance?.label,
@@ -203,7 +204,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
                   >
                     <option value="">Select Category</option>
                     {tags.categories.map((tag) => (
-                      <option key={tag._id} value={tag.label}>
+                      <option key={oid(tag._id)} value={tag.label}>
                         {tag.label}
                       </option>
                     ))}
@@ -227,7 +228,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
                   >
                     <option value="">Select Size</option>
                     {tags.sizes.map((tag) => (
-                      <option key={tag._id} value={tag.label}>
+                      <option key={oid(tag._id)} value={tag.label}>
                         {tag.label}
                       </option>
                     ))}
@@ -254,7 +255,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
                   >
                     <option value="">Select Substance</option>
                     {tags.substances.map((tag) => (
-                      <option key={tag._id} value={tag.label}>
+                      <option key={oid(tag._id)} value={tag.label}>
                         {tag.label}
                       </option>
                     ))}
@@ -281,7 +282,7 @@ const EditModal = ({ fileToEdit, tags, setIsModalOpen }: EditModalParams) => {
                   >
                     <option value="">Select Medium</option>
                     {tags.mediums.map((tag) => (
-                      <option key={tag._id} value={tag.label}>
+                      <option key={oid(tag._id)} value={tag.label}>
                         {tag.label}
                       </option>
                     ))}

@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 import { TagType } from "@/types/tagType";
 
 export interface ITag extends Document {
-  _id: string;
+  // _id: string;
   label: string;
   type: TagType;
   description: string;

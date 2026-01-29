@@ -10,6 +10,7 @@ import {
   IoIosWarning,
 } from "react-icons/io";
 import { IoPencilOutline } from "react-icons/io5";
+import { oid } from "@/utils/objectIdToString";
 
 interface FileItemParams {
   file: PopulatedArtworkDocument;
@@ -49,12 +50,12 @@ const FileItem = ({
       {/* Checkbox */}
       <div className="absolute top-4 left-4 z-10">
         <input
-          id={`checkbox-${file._id}`}
+          id={`checkbox-${oid(file._id)}`}
           type="checkbox"
           className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
           checked={isChecked}
           onChange={(e) => {
-            handleChange(file._id, e.target.checked);
+            handleChange(oid(file._id), e.target.checked);
           }}
         />
       </div>

@@ -4,6 +4,7 @@ import { Artwork, Tag } from "@/models";
 import { PopulatedArtworkDocument } from "@/models/Artwork";
 import { ITag } from "@/models/Tag";
 import { Metadata } from "next";
+import { oid } from "@/utils/objectIdToString";
 
 export const metadata: Metadata = {
   title: "Gallery | Gena Courtney",
@@ -25,9 +26,7 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
 
   if (!categoryDoc) {
     return (
-      <div className="text-center pt-24">
-        That category doesn&apos;t exist
-      </div>
+      <div className="text-center pt-24">That category doesn&apos;t exist</div>
     );
   }
 
@@ -79,7 +78,7 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
       </div>
 
       {artworks.map((artwork) => (
-        <ArtworkCard key={artwork._id} artwork={artwork} />
+        <ArtworkCard key={oid(artwork._id)} artwork={artwork} />
       ))}
     </div>
   );
