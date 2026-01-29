@@ -10,7 +10,7 @@ import {
 import { toast } from "react-toastify";
 
 export function useIllustrationRecords(
-  initial: Record<string, IllustrationObj>
+  initial: Record<string, IllustrationObj>,
 ) {
   const [records, setRecords] = useState(initial);
 
@@ -66,10 +66,12 @@ export function useIllustrationRecords(
   }
 
   // remove fields unecessary for db
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   function sanitizeIllustrationObject(illustration: IllustrationObj) {
     const { isPersisted, isDirty, ...clean } = illustration;
     return clean;
   }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   // remove the record from db and state if persisted otherwise just from state
   async function remove(id: string) {

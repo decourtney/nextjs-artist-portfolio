@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  S3Client,
-  DeleteObjectCommand,
-  CopyObjectCommand,
-} from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, CopyObjectCommand } from "@aws-sdk/client-s3";
 import dbConnect from "@/lib/dbConnect";
 import Artwork, { IArtwork, PopulatedArtworkDocument } from "@/models/Artwork";
 import { Tag } from "@/models";
@@ -25,7 +21,7 @@ import { s3Client } from "@/lib/s3Client";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     await dbConnect();
@@ -42,7 +38,7 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     // Check if user is admin
@@ -50,7 +46,7 @@ export async function DELETE(
     if (!session?.user || session.user.role !== "admin") {
       return NextResponse.json(
         { message: "Unauthorized: Admin access required" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -62,7 +58,7 @@ export async function DELETE(
     if (!artwork) {
       return NextResponse.json(
         { message: "Artwork not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -79,7 +75,7 @@ export async function DELETE(
       new DeleteObjectCommand({
         Bucket: bucket,
         Key: mainKey,
-      })
+      }),
     );
 
     // Delete the thumbnail from S3
@@ -87,7 +83,7 @@ export async function DELETE(
       new DeleteObjectCommand({
         Bucket: bucket,
         Key: thumbKey,
-      })
+      }),
     );
 
     // Remove the artwork document from the database
@@ -95,7 +91,7 @@ export async function DELETE(
 
     return NextResponse.json(
       { message: "Artwork deleted successfully" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error deleting artwork:", error);
@@ -106,7 +102,7 @@ export async function DELETE(
 // Some resilience logic to handle S3 errors and rollback if necessary
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     // Check if user is admin
@@ -114,7 +110,7 @@ export async function PATCH(
     if (!session?.user || session.user.role !== "admin") {
       return NextResponse.json(
         { message: "Unauthorized: Admin access required" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -127,7 +123,7 @@ export async function PATCH(
     if (!newArtworkData) {
       return NextResponse.json(
         { message: "No updated fields provided" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -140,13 +136,13 @@ export async function PATCH(
     if (!artwork) {
       return NextResponse.json(
         { message: "Artwork not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     // Maintain current artwork document data for rollback if necessary
     // Current not being used
-    const oldArtworkData = artwork;
+    // const oldArtworkData = artwork;
 
     // Deconstruct new data
     const { category, medium, size, substance, ...restData } = newArtworkData;
@@ -231,10 +227,13 @@ async function updateIllustration(id: string, boolValue: boolean) {
   if (boolValue) {
     await Illustration.updateOne(
       { name: "Unassigned" },
-      { $addToSet: { artworkIds: id } }
+      { $addToSet: { artworkIds: id } },
     );
   } else {
-    await Illustration.updateMany({ artworkIds: id }, { $pull: { artworkIds: id } });
+    await Illustration.updateMany(
+      { artworkIds: id },
+      { $pull: { artworkIds: id } },
+    );
   }
 }
 
@@ -260,13 +259,13 @@ async function updateS3(updateData: {
         Bucket: updateData.s3Bucket,
         CopySource: `${updateData.s3Bucket}/${oldMainKey}`,
         Key: newMainKey,
-      })
+      }),
     );
     await s3Client.send(
       new DeleteObjectCommand({
         Bucket: updateData.s3Bucket,
         Key: oldMainKey,
-      })
+      }),
     );
 
     await s3Client.send(
@@ -274,13 +273,13 @@ async function updateS3(updateData: {
         Bucket: updateData.s3Bucket,
         CopySource: `${updateData.s3Bucket}/${oldThumbKey}`,
         Key: newThumbKey,
-      })
+      }),
     );
     await s3Client.send(
       new DeleteObjectCommand({
         Bucket: updateData.s3Bucket,
         Key: oldThumbKey,
-      })
+      }),
     );
 
     return {

@@ -1,6 +1,7 @@
 "use client";
 
 import { IllustrationArtworkObj } from "@/app/(root)/utils/getIllustrationWithOrderedArtworks";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 
@@ -24,26 +25,35 @@ const IllustrationBook = ({ artworks }: IllustrationBookProps) => {
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, []);
+  });
 
   return (
     <div className="flex items-center justify-center p-4">
       <div className="relative max-w-[1500px] w-full h-full">
         {/* Book container */}
-        <div className="relative w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-2">
+        <div className="relative w-full grid grid-cols-[auto_1fr_auto] items-stretch">
+          <button
+            onClick={prevPage}
+            disabled={currentPage === 0}
+            className="flex items-center justify-center md:px-3 disabled:opacity-30"
+          >
+            <IoChevronBack size={32} />
+          </button>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 w-full">
             {/* Left page */}
-            <div className="flex justify-center items-start px-12 h-full lg:h-[400px] xl:h-[800px]">
-              <img
+            <div className="relative h-[250px] sm:h-[300px] lg:h-[400px] xl:h-[800px]">
+              <Image
                 src={currentData.src}
                 alt={currentData.name}
-                className="object-contain h-full  rounded-sm aspect-auto"
+                fill
+                className="object-contain"
               />
             </div>
 
             {/* Right page */}
-            <div className="flex flex-col justify-start pt-8 pl-12 pr-12 lg:pt-8 lg:pr-12 lg:pl-4 xl:pt-24">
-              <h2 className=" text-3xl font-serif font-bold mb-4">
+            <div className="flex flex-col justify-start pt-8 px-6 lg:pt-8 xl:pt-24">
+              <h2 className="text-3xl font-serif font-bold mb-4">
                 {currentData.name}
               </h2>
               <p className="text-gray-700 text-lg font-serif">
@@ -52,20 +62,12 @@ const IllustrationBook = ({ artworks }: IllustrationBookProps) => {
             </div>
           </div>
 
-          {/* Navigation buttons */}
-          <button
-            onClick={prevPage}
-            disabled={currentPage === 0}
-            className={`group absolute left-2 top-1/2 -translate-y-1/2 h-full ${currentPage === 0 ? "opacity-30" : "opacity-100"}`}
-          >
-            <IoChevronBack size={32} className="group-hover:scale-125" />
-          </button>
           <button
             onClick={nextPage}
             disabled={currentPage === artworks.length - 1}
-            className={`group absolute right-2 top-1/2 -translate-y-1/2 h-full ${currentPage === artworks.length - 1 ? "opacity-30" : "opacity-100"}`}
+            className="flex items-center justify-center md:px-3 disabled:opacity-30"
           >
-            <IoChevronForward size={32} className="group-hover:scale-125" />
+            <IoChevronForward size={32} />
           </button>
         </div>
 

@@ -12,7 +12,6 @@ interface IllustrationSectionProps {
   createTemp: () => void;
   update: (id: string, patch: Partial<IllustrationObj>) => void;
   saveAll: () => Promise<void>;
-  save: (illustration: IllustrationObj) => Promise<void>;
   remove: (id: string) => Promise<void>;
 }
 
@@ -22,7 +21,6 @@ const IllustrationSection = ({
   createTemp,
   update,
   saveAll,
-  save,
   remove,
 }: IllustrationSectionProps) => {
   return (
@@ -41,7 +39,7 @@ const IllustrationSection = ({
 
       {illustrations.length === 0 ? (
         <p className="text-gray-400 text-sm text-center py-8">
-          No Illustrations yet. Click "Create" to create one.
+          No Illustrations yet. Click &quot;Create&quot; to create one.
         </p>
       ) : (
         illustrations.map((illustration) => (
@@ -101,8 +99,8 @@ const IllustrationSection = ({
               ) : (
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2">
                   {illustration.artworkIds.map((id) => (
-                    <div className="col-span-1">
-                      <IllustrationItem key={id} item={artworks[id]} />
+                    <div key={id} className="col-span-1">
+                      <IllustrationItem item={artworks[id]} />
                     </div>
                   ))}
                 </div>

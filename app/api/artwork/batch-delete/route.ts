@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import dbConnect from "@/lib/dbConnect";
 import Artwork, { IArtwork } from "@/models/Artwork";
 import { getServerSession } from "next-auth";

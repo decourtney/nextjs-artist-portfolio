@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { _nextAuthOptions } from "@/auth";
 import dbConnect from "@/lib/dbConnect";
 import Illustration, { IIllustration } from "@/models/Illustration";
+import { hasErrorCode } from "@/utils/hasErrorCode";
 
 export async function GET() {}
 
@@ -12,7 +13,7 @@ export async function POST(request: NextRequest) {
   if (!session?.user || session.user.role !== "admin") {
     return NextResponse.json(
       { message: "Unauthorized: Admin access required" },
-      { status: 403 }
+      { status: 403 },
     );
   }
 
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest) {
   if (!name) {
     return NextResponse.json(
       { message: "Illustration name is required" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -40,24 +41,18 @@ export async function POST(request: NextRequest) {
         name: illustration.name,
         artworkIds: illustration.artworkIds.map((id) => id.toString()),
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (err) {
-    if (
-      typeof err === "object" &&
-      err !== null &&
-      "code" in err &&
-      (err as any).code === 11000
-    ) {
+    if (hasErrorCode(err) && err.code === 11000) {
       return NextResponse.json(
-        { message: "An Illustration with this name already exists." },
-        { status: 409 }
+        { message: "An Illustration with this name already exists." }, { status: 409 },
       );
     }
 
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
