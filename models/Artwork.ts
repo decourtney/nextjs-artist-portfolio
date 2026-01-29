@@ -2,7 +2,7 @@ import mongoose, { Schema, Document, Types, ObjectId } from "mongoose";
 import { ITag } from "./Tag";
 
 export interface IArtwork extends Document {
-  _id: string;
+  // _id: string;
   name: string;
   description: string;
   src: string;

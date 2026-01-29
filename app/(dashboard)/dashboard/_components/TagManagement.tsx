@@ -8,6 +8,8 @@ import {
   IoAddCircleOutline,
   IoCloseCircle,
 } from "react-icons/io5";
+import { toast } from "react-toastify";
+import { oid } from "@/utils/objectIdToString";
 
 interface TagManagementProps {
   tags: {
@@ -56,8 +58,12 @@ export default function TagManagement({ tags }: TagManagementProps) {
       setNewTag({ label: "", type: "category", description: "" });
       setIsLoading(false);
       router.refresh();
-    } catch (error) {
-      setError("An error occurred while adding the tag");
+    } catch (err) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error("Failed to add the tag");
+      }
       setIsLoading(false);
     }
   };
@@ -86,8 +92,12 @@ export default function TagManagement({ tags }: TagManagementProps) {
 
       setSuccess(`Tag "${label}" deleted successfully`);
       router.refresh();
-    } catch (error) {
-      setError("An error occurred while deleting the tag");
+    } catch (err) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error("Failed to delete the tag");
+      }
     }
   };
 
@@ -119,7 +129,7 @@ export default function TagManagement({ tags }: TagManagementProps) {
       <div className="flex flex-wrap gap-2">
         {tagList.map((tag) => (
           <div
-            key={tag._id}
+            key={oid(tag._id)}
             className={`
               flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors
               ${getTagColor(tag.type)}
@@ -127,7 +137,7 @@ export default function TagManagement({ tags }: TagManagementProps) {
           >
             <span className="font-medium">{tag.label}</span>
             <button
-              onClick={() => handleDeleteTag(tag._id, tag.label)}
+              onClick={() => handleDeleteTag(oid(tag._id), tag.label)}
               className="hover:scale-110 transition-transform"
               title={`Delete ${tag.label}`}
             >

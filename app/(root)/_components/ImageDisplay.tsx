@@ -4,6 +4,7 @@ import { IArtwork } from "@/models/Artwork";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { oid } from "@/utils/objectIdToString";
 
 interface ImageDisplayProps {
   artworks: IArtwork[];
@@ -14,7 +15,7 @@ const ImageDisplay = ({ artworks }: ImageDisplayProps) => {
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {artworks.map((artwork) => (
         <Link
-          key={artwork._id}
+          key={oid(artwork._id)}
           href={`/artwork/${artwork.name}`}
           className="group relative aspect-square overflow-hidden rounded-medium bg-background-200"
         >

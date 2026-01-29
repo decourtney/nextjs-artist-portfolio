@@ -3,7 +3,7 @@ import { IArtwork } from "./Artwork";
 import slugify from "slugify";
 
 export interface IIllustration extends Document {
-  _id: string;
+  // _id: string;
   name: string;
   artworkIds: ObjectId[];
   slug: string;

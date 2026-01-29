@@ -9,6 +9,7 @@ import EditModal from "./EditModal";
 import FileItem from "./FileItem";
 import { AllTags } from "@/types/allTags";
 import LoadingSpinner from "./LoadingSpinner";
+import {oid} from "@/utils/objectIdToString"
 
 export default function FileManagement({
   files,
@@ -54,7 +55,7 @@ export default function FileManagement({
 
   // Global Select All
   const handleSelectAll = (isSelected: boolean) => {
-    setSelectedIds(isSelected ? files.map((file) => file._id) : []);
+    setSelectedIds(isSelected ? files.map((file) => oid(file._id)) : []);
   };
 
   // Delete selected items
@@ -162,9 +163,9 @@ export default function FileManagement({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
           {files.map((file) => (
             <FileItem
-              key={file._id}
+              key={oid(file._id)}
               file={file}
-              isSelected={selectedIds.includes(file._id)}
+              isSelected={selectedIds.includes(oid(file._id))}
               handleSelectItem={handleSelectItem}
               handleEdit={handleEdit}
             />
