@@ -11,13 +11,13 @@ export const metadata: Metadata = {
 
 const GalleryPage = async () => {
   return (
-    <>
+    <div className="flex-1">
       <CategorySection />
 
       <IllustrationSection />
 
       <GetInTouchSection />
-    </>
+    </div>
   );
 };
 

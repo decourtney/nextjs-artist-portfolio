@@ -25,8 +25,8 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
 
   if (!categoryDoc) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center">
-        Category not found.
+      <div className="text-center pt-24">
+        That category doesn&apos;t exist
       </div>
     );
   }
