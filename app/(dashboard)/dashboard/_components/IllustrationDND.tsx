@@ -27,13 +27,13 @@ const IllustrationDND = ({
   artworkRecords,
 }: DragTestProps) => {
   const [activeId, setActiveId] = useState<null | string>(null);
-  const { records, setRecords, createTemp, update, remove, save, saveAll } =
+  const { records, setRecords, createTemp, update, remove, saveAll } =
     useIllustrationRecords(illustrationRecords);
 
   // separate unassigned and assigned records
   const unassigned = records["unassigned"];
   const illustrations = Object.values(records).filter(
-    (r) => r.id !== "unassigned"
+    (r) => r.id !== "unassigned",
   );
 
   // Once a draggable is being dragged set it as active
@@ -51,7 +51,7 @@ const IllustrationDND = ({
     }
 
     setRecords((prev) =>
-      applyDrag(prev, active.id as string, over.id as string)
+      applyDrag(prev, active.id as string, over.id as string),
     );
 
     setActiveId(null);
@@ -73,7 +73,6 @@ const IllustrationDND = ({
           createTemp={createTemp}
           update={update}
           saveAll={saveAll}
-          save={save}
           remove={remove}
         />
       </section>
@@ -100,11 +99,11 @@ export default IllustrationDND;
 function applyDrag(
   records: Record<string, IllustrationObj>,
   activeArtworkId: string,
-  overArtworkId: string
+  overArtworkId: string,
 ): Record<string, IllustrationObj> {
   const findRecord = (artworkId: string) =>
     Object.keys(records).find((key) =>
-      records[key].artworkIds.includes(artworkId)
+      records[key].artworkIds.includes(artworkId),
     );
 
   const activeRecordId = findRecord(activeArtworkId);
@@ -132,7 +131,7 @@ function applyDrag(
   }
 
   const nextActiveIds = activeRecord.artworkIds.filter(
-    (id) => id !== activeArtworkId
+    (id) => id !== activeArtworkId,
   );
 
   const overIds = [...overRecord.artworkIds];

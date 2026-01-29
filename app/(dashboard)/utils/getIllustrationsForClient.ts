@@ -16,7 +16,7 @@ export interface IllustrationObj {
 }
 
 // Helper to safely convert value to string
-const oid = (v: any) => v?.toString?.() ?? v;
+export const oid = (v: string | { toString(): string }): string => v.toString();
 
 // Retrieve illustration and associated Artwork documents
 // Construct and return record objs of the documents
@@ -26,13 +26,13 @@ export async function getIllustrationsForClient() {
 
   // create set of artwork ids that are assigned to an illustration
   const assignedIds = new Set(
-    illustrations.flatMap((i) => i.artworkIds.map((id: string) => oid(id)))
+    illustrations.flatMap((i) => i.artworkIds.map((id: string) => oid(id))),
   );
 
   // create an array of remaining artwork ids not in the set
   const unassignedArtworks = artworks
-    .filter((a) => !assignedIds.has(oid(a._id)))
-    .map((a) => oid(a._id));
+    .filter((a) => !assignedIds.has(oid(a._id as string)))
+    .map((a) => oid(a._id as string));
 
   // create a virtual record for unassigned artwork ids
   const unassignedRecord: IllustrationObj = {
@@ -46,27 +46,27 @@ export async function getIllustrationsForClient() {
   // create records for illustrations and assigned artwork
   const artworkRecords: Record<string, ArtworkObj> = Object.fromEntries(
     artworks.map((a) => [
-      oid(a._id),
+      oid(a._id as string),
       {
-        id: oid(a._id),
+        id: oid(a._id as string),
         name: a.name,
         thumbSrc: a.thumbSrc,
       },
-    ])
+    ]),
   );
 
   const illustrationRecords: Record<string, IllustrationObj> =
     Object.fromEntries(
       illustrations.map((i) => [
-        oid(i._id),
+        oid(i._id as string),
         {
-          id: oid(i._id),
+          id: oid(i._id as string),
           name: i.name,
           artworkIds: i.artworkIds?.map(oid) ?? [],
           isPersisted: true,
           isDirty: false,
         },
-      ])
+      ]),
     );
 
   if (illustrationRecords[unassignedRecord.id]) {
