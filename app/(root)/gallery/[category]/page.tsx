@@ -72,7 +72,7 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_600px_1fr] min-h-[calc(100dvh-196px)] mx-auto py-8 lg:gap-y-8">
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_600px_1fr] max-w-7xl mx-auto py-8 lg:gap-y-8">
       <div className="flex flex-col mb-8 px-4">
         <h1 className="text-3xl font-bold">{categoryDoc.label}</h1>
         <p className="text-sm text-gray-600 mt-2">{categoryDoc.description}</p>
