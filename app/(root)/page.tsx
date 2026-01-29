@@ -25,7 +25,7 @@ const Home = async () => {
     .exec()) as unknown as PopulatedArtworkDocument[];
 
   return (
-    <div className="min-h-screen">
+    <div className="flex-1">
       {/* Hero Section */}
       <section className="py-20 px-4 relative">
         <div className="max-w-4xl mx-auto">
