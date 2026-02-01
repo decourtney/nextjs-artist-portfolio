@@ -55,7 +55,7 @@ const Home = async () => {
                 ena Courtney is an award-winning painter and illustrator from
                 Macon, Georgia, working in pastels, oils, and acrylics. Inspired
                 by nature, travel, and atmosphere, she captures the spirit of
-                people and places through vibrant, expressive art and shares her
+                people and places through vibrant, expressive art, and shares her
                 passion through teaching and workshops.
               </p>
             </div>

@@ -55,7 +55,7 @@ export default function AboutPage() {
                     </span>
                     ena Courtney is an award-winning painter and illustrator
                     based in Macon, Georgia. Working with pastels, oil, and
-                    acrylic paints on a variety of surfaces including canvas,
+                    acrylic paints on a variety of surfaces, including canvas,
                     wood panel, copper, and paper, Gena explores the beauty and
                     unique features of different subjects. Her work reflects a
                     deep connection to nature, atmosphere, and memory.
@@ -68,7 +68,7 @@ export default function AboutPage() {
                     experiences I have encountered and transcribing them through
                     eye, hand, and medium creates a cognitive and emotional
                     connection to meaningful moments. Dreams and spiritual
-                    nuances also influence my creative process. Painting and
+                    sensitivities also influence my creative process. Painting and
                     writing are ways I express emotion.&quot;
                   </p>
                 </div>
@@ -94,7 +94,7 @@ export default function AboutPage() {
                 <div className="prose prose-lg text-[#475569] space-y-6">
                   <p>
                     Combining her love of art, nature, and travel, Gena often
-                    paints plein air alongside her husband Bobby and often with
+                    paints plein air alongside her husband, Bobby, and often with
                     family and friends. Capturing the spirit, mood, and
                     environmental nuances of a location while responding to
                     quickly changing light and weather is central to her plein
